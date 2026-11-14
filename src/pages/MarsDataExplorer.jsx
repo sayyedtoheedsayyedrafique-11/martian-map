@@ -336,6 +336,9 @@ export default function MarsDataExplorer() {
         <div className="mde-header__left">
           <div className="mde-tag-strip mono">
             <span className="mde-tag mde-tag--accent">NASA PDS // USGS ASTROGEOLOGY</span>
+            <span className="mde-tag" style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' }}>
+              ● REAL DATA: NASA JPL MARS TREK & USGS PDS
+            </span>
             <span className="mde-tag">LIVE ODE REST API [CORS *]</span>
             <span className="mde-tag">MOLA AREOID DATUM 610.5 Pa</span>
           </div>
@@ -571,6 +574,7 @@ export default function MarsDataExplorer() {
             <div className="mde-target-pill mono">
               <Crosshair size={12} color="var(--accent-yellow)" />
               <span>SELECTED AREOGRAPHIC COORDINATE</span>
+              <span style={{ color: '#10b981', marginLeft: 'auto', fontWeight: 'bold' }}>● REAL DATA</span>
             </div>
             <h2 className="mde-inspector-title">{selectedTarget.name}</h2>
             <div className="mde-coord-display mono">
