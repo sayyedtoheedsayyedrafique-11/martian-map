@@ -231,5 +231,175 @@ export const MARS_RAW_IMAGES = [
     verified: true,
     caption: 'Light-toned fractured sedimentary rocks and mudstones packed with intriguing "leopard spots" (chemical reaction halos) observed near the northern inflow gorge.',
     scientificSignificance: 'Revealed chemical redox reactions involving iron and phosphate that could have served as an energy source for ancient Martian microbes.'
+  },
+  {
+    id: 'm20-sol800-mastcamz-belva-rim',
+    title: 'Belva Crater Interior Panorama from Western Rim Scarp',
+    sol: 800,
+    camera: 'MASTCAM_Z',
+    cameraFullName: 'Mastcam-Z Stereo Zoom Assembly',
+    dateUtc: '2023-05-20T11:20:00Z',
+    dateEarthFormatted: 'May 20, 2023',
+    ltst: '13:10:00 LTST',
+    target: 'Belva Crater Impact Excavation',
+    imageUrl: 'https://photojournal.jpl.nasa.gov/jpeg/PIA25841.jpg',
+    thumbnailUrl: 'https://photojournal.jpl.nasa.gov/thumb/PIA25841.jpg',
+    sourceUrl: 'https://photojournal.jpl.nasa.gov/catalog/PIA25841',
+    officialArchiveUrl: 'https://mars.nasa.gov/mars2020/multimedia/raw-images/',
+    credit: 'NASA/JPL-Caltech/ASU/MSSS',
+    verified: true,
+    caption: '152 individual images stitched into a panoramic mosaic looking into the 0.9-kilometer-wide Belva impact crater, exposing cross-bedded sedimentary delta strata.',
+    scientificSignificance: 'Revealed high-energy fluvial gravel conglomerates transported by ancient catastrophic river discharges across Jezero.'
+  },
+  {
+    id: 'm20-sol1000-supercam-castelnau',
+    title: 'SuperCam Telescopic RMI Scan of Castelnau Peak Delta Margin',
+    sol: 1000,
+    camera: 'SUPERCAM_RMI',
+    cameraFullName: 'SuperCam Remote Micro-Imager',
+    dateUtc: '2023-12-12T09:40:00Z',
+    dateEarthFormatted: 'December 12, 2023',
+    ltst: '11:45:20 LTST',
+    target: 'Castelnau Peak Sedimentary Outlier',
+    imageUrl: 'https://photojournal.jpl.nasa.gov/jpeg/PIA26112.jpg',
+    thumbnailUrl: 'https://photojournal.jpl.nasa.gov/thumb/PIA26112.jpg',
+    sourceUrl: 'https://photojournal.jpl.nasa.gov/catalog/PIA26112',
+    officialArchiveUrl: 'https://mars.nasa.gov/mars2020/multimedia/raw-images/',
+    credit: 'NASA/JPL-Caltech/LANL/CNES/CNRS',
+    verified: true,
+    caption: 'Extreme telescopic zoom capturing steep delta margin boulder deposits and megascopic sediment structures from 1.8 km distance.',
+    scientificSignificance: 'Confirmed multi-phase delta progradation into ancient Lake Jezero during the late Noachian transition.'
+  },
+  {
+    id: 'm20-sol1350-watson-cheyava-falls',
+    title: 'SHERLOC WATSON Microscopic Scan of Veined Carbonate Rock',
+    sol: 1350,
+    camera: 'WATSON',
+    cameraFullName: 'WATSON (Wide Angle Topographic Sensor for Operations and eNgineering)',
+    dateUtc: '2024-12-07T14:30:00Z',
+    dateEarthFormatted: 'December 7, 2024',
+    ltst: '14:02:15 LTST',
+    target: 'Cheyava Falls Veined Rock Formation',
+    imageUrl: 'https://photojournal.jpl.nasa.gov/jpeg/PIA26342.jpg',
+    thumbnailUrl: 'https://photojournal.jpl.nasa.gov/thumb/PIA26342.jpg',
+    sourceUrl: 'https://photojournal.jpl.nasa.gov/catalog/PIA26342',
+    officialArchiveUrl: 'https://mars.nasa.gov/mars2020/multimedia/raw-images/',
+    credit: 'NASA/JPL-Caltech/MSSS',
+    verified: true,
+    caption: 'Hand-lens microscopic image resolving calcium sulfate veins and dark iron-phosphate alteration rings within mudstone.',
+    scientificSignificance: 'Documented potential biosignature candidate textures associated with ancient subsurface hydrothermal fluid circulation.'
+  },
+  {
+    id: 'm20-sol1400-navcam-crater-rim',
+    title: 'Navcam Stereo Survey of Crater Rim Ascent Corridor',
+    sol: 1400,
+    camera: 'NAVCAM',
+    cameraFullName: 'Navigation Camera Stereo Left/Right Pair',
+    dateUtc: '2025-01-28T10:15:00Z',
+    dateEarthFormatted: 'January 28, 2025',
+    ltst: '11:05:00 LTST',
+    target: 'Jezero Western Rim Scarp Corridor',
+    imageUrl: 'https://photojournal.jpl.nasa.gov/jpeg/PIA26388.jpg',
+    thumbnailUrl: 'https://photojournal.jpl.nasa.gov/thumb/PIA26388.jpg',
+    sourceUrl: 'https://photojournal.jpl.nasa.gov/catalog/PIA26388',
+    officialArchiveUrl: 'https://mars.nasa.gov/mars2020/multimedia/raw-images/',
+    credit: 'NASA/JPL-Caltech',
+    verified: true,
+    caption: 'Engineering navigation wide-angle view scouting slope angles and boulder densities along the 20-degree ascent up the Jezero crater rim.',
+    scientificSignificance: 'Critical traverse planning data guiding AutoNav through the steepest grade segment of Perseverance\'s extended mission.'
   }
 ];
+
+// Simple in-memory cache for live NASA feed responses
+const liveImageCache = new Map();
+
+/**
+ * Fetch live public raw images from the official NASA Mars 2020 RSS/REST API.
+ * Endpoint: https://mars.nasa.gov/rss/api/?feed=raw_images&category=mars2020&feedtype=json
+ * 
+ * Has open CORS (Access-Control-Allow-Origin: *) and returns verified real telemetry frames.
+ */
+export async function fetchLivePerseveranceRawImages({ sol, camera, page = 0, num = 24 } = {}) {
+  const cacheKey = `${sol ?? 'all'}_${camera ?? 'all'}_${page}_${num}`;
+  if (liveImageCache.has(cacheKey)) {
+    return liveImageCache.get(cacheKey);
+  }
+
+  let url = `https://mars.nasa.gov/rss/api/?feed=raw_images&category=mars2020&feedtype=json&ver=1.2&num=${num}&page=${page}`;
+  if (sol !== undefined && sol !== null && sol !== '') {
+    url += `&sol=${sol}`;
+  }
+  if (camera && camera !== 'all') {
+    url += `&camera=${encodeURIComponent(camera)}`;
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 7000);
+
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!res.ok) throw new Error(`NASA Raw Images API returned HTTP ${res.status}`);
+    const data = await res.json();
+    const rawList = Array.isArray(data.images) ? data.images : [];
+
+    const mapped = rawList.map((item) => {
+      const inst = item.camera?.instrument || '';
+      let mappedCam = 'OTHER';
+      if (inst.startsWith('MCZ') || inst.includes('MAST')) mappedCam = 'MASTCAM_Z';
+      else if (inst.includes('SCAM') || inst.includes('SUPERCAM')) mappedCam = 'SUPERCAM_RMI';
+      else if (inst.includes('NAV')) mappedCam = 'NAVCAM';
+      else if (inst.includes('HAZ')) mappedCam = 'HAZCAM';
+      else if (inst.includes('WATSON') || inst.includes('SHERLOC')) mappedCam = 'WATSON';
+      else if (inst.includes('HELI') || inst.includes('INGENUITY')) mappedCam = 'INGENUITY';
+
+      const utcDate = item.date_taken_utc || null;
+      let earthFormatted = 'not provided';
+      if (utcDate) {
+        try {
+          earthFormatted = new Date(utcDate).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+        } catch {
+          earthFormatted = utcDate;
+        }
+      }
+
+      return {
+        id: item.imageid,
+        title: item.title || `Mars Perseverance Sol ${item.sol}: ${inst}`,
+        sol: Number(item.sol) || 0,
+        camera: mappedCam,
+        cameraFullName: item.camera?.camera_model_type ? `${inst} (${item.camera.camera_model_type})` : (inst || 'Perseverance Camera'),
+        dateUtc: item.date_taken_utc || 'not provided',
+        dateEarthFormatted: earthFormatted,
+        ltst: item.date_taken_mars ? `${item.date_taken_mars.replace('Sol-', 'Sol ').replace('M', ' ')} LTST` : 'not provided',
+        target: 'Jezero Crater Exploration Path',
+        imageUrl: item.image_files?.large || item.image_files?.medium || item.image_files?.full_res,
+        thumbnailUrl: item.image_files?.small || item.image_files?.medium,
+        sourceUrl: item.link || 'https://mars.nasa.gov/mars2020/multimedia/raw-images/',
+        officialArchiveUrl: item.link || 'https://mars.nasa.gov/mars2020/multimedia/raw-images/',
+        credit: item.credit || 'NASA/JPL-Caltech',
+        verified: true,
+        isLive: true,
+        hasCornerBadge: true,
+        caption: item.caption || `Raw operational frame downlinked on Sol ${item.sol}.`,
+        scientificSignificance: 'Real-time telemetry and tactical reconnaissance frame downlinked from Perseverance rover.'
+      };
+    });
+
+    const result = {
+      images: mapped,
+      total: data.total_results || mapped.length,
+      page,
+      isLive: true,
+    };
+    liveImageCache.set(cacheKey, result);
+    return result;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
+}
