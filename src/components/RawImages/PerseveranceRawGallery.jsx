@@ -106,6 +106,9 @@ export default function PerseveranceRawGallery() {
                 }}
               >
                 <div className="raw-card__image-box">
+                  {img.hasCornerBadge && (
+                    <span className="raw-card__corner-badge" title="Authentic NASA Raw Frame Indicator" />
+                  )}
                   {hasError ? (
                     <div className="raw-card__image-fallback mono">
                       <Camera size={24} />
@@ -121,6 +124,9 @@ export default function PerseveranceRawGallery() {
                     />
                   )}
                   <span className="raw-card__sol-chip mono">SOL {img.sol}</span>
+                  {img.isFeatured && (
+                    <span className="raw-card__featured-chip mono">FEATURED MOSAIC</span>
+                  )}
                   <span className="raw-card__expand-icon">
                     <Maximize2 size={13} />
                   </span>

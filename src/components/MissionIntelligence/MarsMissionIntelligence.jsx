@@ -25,6 +25,7 @@ import {
   Cpu,
   ShieldCheck,
   Camera,
+  Navigation,
 } from 'lucide-react';
 import './MarsMissionIntelligence.css';
 
@@ -228,6 +229,15 @@ function MarsMissionIntelligence({ defaultMissionId = 'perseverance', initialMod
                     <Camera size={14} /> View Raw Images ({MARS_RAW_IMAGES.length})
                   </button>
                 )}
+                {selectedMission.id === 'curiosity' && (
+                  <Link
+                    to="/route-planner?start=bradbury-landing&dest=gediz-vallis"
+                    className="mmi-btn-primary"
+                    style={{ background: '#f59e0b', color: '#08090c' }}
+                  >
+                    <Navigation size={14} /> View Curiosity Route Map Visual
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -306,6 +316,27 @@ function MarsMissionIntelligence({ defaultMissionId = 'perseverance', initialMod
               >
                 <Layers size={13} /> Inspect in 3D Planetary Globe
               </Link>
+
+              {selectedMission.id === 'curiosity' && (
+                <>
+                  <a
+                    href="https://mars.nasa.gov/msl/mission/where-is-the-rover/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mmi-btn-secondary"
+                  >
+                    <ExternalLink size={13} /> Official NASA MSL Route Map
+                  </a>
+                  <a
+                    href="https://trek.nasa.gov/mars/#v=0.1&x=137.4417&y=-4.5895&z=7&p=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A104905"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mmi-btn-secondary"
+                  >
+                    <Compass size={13} /> Open in JPL Mars Trek
+                  </a>
+                </>
+              )}
             </div>
 
             {/* Special Dual Landing Sites for Spirit and Opportunity */}

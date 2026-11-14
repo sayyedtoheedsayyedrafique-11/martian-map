@@ -563,6 +563,19 @@ function MarsMap({
             />
           )}
 
+          {/* Full Historical Curiosity MSL Traverse Corridor (Gale Crater Mode) */}
+          {filteredLocations && filteredLocations.length > 0 && filteredLocations[0]?.sol !== undefined && (
+            <Polyline
+              positions={filteredLocations.map((l) => [l.lat, l.lng])}
+              pathOptions={{
+                color: '#f59e0b',
+                weight: 2.5,
+                dashArray: '4, 6',
+                opacity: 0.7,
+              }}
+            />
+          )}
+
           {/* Alternative Route B (Dashed Cyan) */}
           {alternativeRoutePoints && alternativeRoutePoints.length >= 2 && (
             <Polyline

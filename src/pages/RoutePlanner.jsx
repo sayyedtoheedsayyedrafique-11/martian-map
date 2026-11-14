@@ -752,6 +752,16 @@ export default function RoutePlanner() {
                 </span>
               </div>
             )}
+            {scopeMode === 'gale' && (
+              <div className="route-legend-routes">
+                <span className="route-path-chip route-path-chip--a" style={{ color: '#F5C542' }}>
+                  ── Active Selected Traverse
+                </span>
+                <span className="route-path-chip" style={{ color: '#f59e0b', border: '1px dashed rgba(245, 158, 11, 0.6)', padding: '2px 6px' }}>
+                  ┄┄ Official NASA MSL Route Corridor (Sol 0 – 4100+)
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

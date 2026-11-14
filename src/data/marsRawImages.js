@@ -22,6 +22,27 @@ export const PERSEVERANCE_CAMERAS = [
 
 export const MARS_RAW_IMAGES = [
   {
+    id: 'm20-sol1280-supercam-raw-mosaic',
+    title: 'SuperCam RMI & Mastcam-Z Multi-Spectral Raw Acquisition Grid',
+    sol: 1280,
+    camera: 'SUPERCAM_RMI',
+    cameraFullName: 'SuperCam Remote Micro-Imager & Mastcam-Z Array',
+    dateUtc: '2024-09-30T14:22:00Z',
+    dateEarthFormatted: 'September 30, 2024',
+    ltst: '12:15:33 LTST',
+    target: 'Neretva Vallis Inflow / Bright Angel Outcrop',
+    imageUrl: '/images/nasa/perseverance_raw_mosaic.jpg',
+    thumbnailUrl: '/images/nasa/perseverance_raw_mosaic.jpg',
+    sourceUrl: 'https://mars.nasa.gov/mars2020/multimedia/raw-images/',
+    officialArchiveUrl: 'https://mars.nasa.gov/mars2020/multimedia/raw-images/',
+    credit: 'NASA/JPL-Caltech/LANL/CNES/CNRS/ASU/MSSS',
+    verified: true,
+    isFeatured: true,
+    hasCornerBadge: true,
+    caption: 'Authentic multi-filter raw acquisition grid from the NASA Mars 2020 Raw Image portal. Features SuperCam Remote Micro-Imager circular telescopic frames (with official red corner indicators) and Mastcam-Z stereo rock exposures at Neretva Vallis.',
+    scientificSignificance: 'Micro-imaging of light-toned bedrock strata along the Neretva Vallis breach, revealing fine-scale lacustrine mudstone laminations and carbonate-bearing minerals.'
+  },
+  {
     id: 'm20-sol0-hazcam-touchdown',
     title: 'Historic First Touchdown Image on Jezero Regolith',
     sol: 0,
