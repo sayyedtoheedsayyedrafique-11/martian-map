@@ -314,10 +314,24 @@ export const MARS_RAW_IMAGES = [
 const liveImageCache = new Map();
 
 /**
+ * Official NASA Mars 2020 Raw Image API Search Codes for camera instruments.
+ * In the official NASA API, filtering by instrument is executed via the "search" parameter.
+ */
+export const CAMERA_SEARCH_CODES = {
+  MASTCAM_Z: 'MCZ_LEFT|MCZ_RIGHT',
+  SUPERCAM_RMI: 'SUPERCAM_RMI',
+  NAVCAM: 'NAVCAM_LEFT|NAVCAM_RIGHT',
+  HAZCAM: 'FRONT_HAZCAM_LEFT_A|FRONT_HAZCAM_RIGHT_A|REAR_HAZCAM_LEFT|REAR_HAZCAM_RIGHT',
+  WATSON: 'SHERLOC_WATSON',
+  INGENUITY: 'HELI_NAV|HELI_RTE',
+};
+
+/**
  * Fetch live public raw images from the official NASA Mars 2020 RSS/REST API.
  * Endpoint: https://mars.nasa.gov/rss/api/?feed=raw_images&category=mars2020&feedtype=json
  * 
  * Has open CORS (Access-Control-Allow-Origin: *) and returns verified real telemetry frames.
+ * Uses official search parameter (e.g. search=MCZ_LEFT|MCZ_RIGHT) for camera filtering.
  */
 export async function fetchLivePerseveranceRawImages({ sol, camera, page = 0, num = 24 } = {}) {
   const cacheKey = `${sol ?? 'all'}_${camera ?? 'all'}_${page}_${num}`;
@@ -330,7 +344,8 @@ export async function fetchLivePerseveranceRawImages({ sol, camera, page = 0, nu
     url += `&sol=${sol}`;
   }
   if (camera && camera !== 'all') {
-    url += `&camera=${encodeURIComponent(camera)}`;
+    const searchCode = CAMERA_SEARCH_CODES[camera] || camera;
+    url += `&search=${encodeURIComponent(searchCode)}`;
   }
 
   const controller = new AbortController();

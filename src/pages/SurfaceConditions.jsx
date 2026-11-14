@@ -1,7 +1,16 @@
 import { useState } from 'react';
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
+import ClassificationBadge from '../components/ui/ClassificationBadge';
 import marsEnvironment from '../data/marsEnvironment';
+import {
+  INSIGHT_MISSION_METADATA,
+  MARS_INTERIOR_STRUCTURE,
+  INSIGHT_MARSQUAKE_EVENTS,
+} from '../data/marsQuakeCatalog';
+import {
+  DIURNAL_PRESSURE_TEMP_PROFILE,
+} from '../data/marsWeatherTelemetry';
 import {
   Thermometer,
   Gauge,
@@ -13,6 +22,7 @@ import {
   Globe2,
   Wind,
   Eye,
+  Waves,
 } from 'lucide-react';
 import './SurfaceConditions.css';
 
@@ -23,10 +33,10 @@ function SurfaceConditions() {
     comparisonWithEarth,
     curiosityRemsArchive,
     perseveranceMedaArchive,
-    insightSeismicCatalog,
   } = marsEnvironment;
 
   const [activeWeatherTab, setActiveWeatherTab] = useState('curiosity');
+  const [quakeFilter, setQuakeFilter] = useState('all');
 
   return (
     <div className="surface-conditions fade-in">
@@ -269,65 +279,225 @@ function SurfaceConditions() {
           </Card>
         )}
 
-        {/* InSight SEIS Content */}
+        {/* InSight SEIS Content & Planetary Interior Structure */}
         {activeWeatherTab === 'insight' && (
-          <Card
-            title={`${insightSeismicCatalog.platform} — ${insightSeismicCatalog.instrument}`}
-            icon={Activity}
-            accent
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px', paddingBottom: '12px', borderBottom: '1px solid var(--border-color)' }}>
-              <div>
-                <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                  Location: <strong>{insightSeismicCatalog.location}</strong> | Archive: <code style={{ color: 'var(--mars-coral)' }}>{insightSeismicCatalog.archivePdsId}</code>
-                </span>
-              </div>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <Badge variant="colored" color="#9b59b6">{insightSeismicCatalog.lastArchiveRelease}</Badge>
-                <a
-                  href={insightSeismicCatalog.repositoryUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="link"
-                  style={{ fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                >
-                  PDS Repository <ExternalLink size={12} />
-                </a>
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
-              {insightSeismicCatalog.notableEvents.map((ev) => (
-                <div
-                  key={ev.eventId}
-                  style={{
-                    background: 'var(--bg-input)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '8px',
-                    padding: '12px 14px',
-                    borderLeft: `4px solid ${ev.magnitude.includes('4.7') ? '#e74c3c' : '#3498db'}`,
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <strong style={{ color: 'var(--text-primary)', fontSize: '0.9rem' }}>Event {ev.eventId}</strong>
-                    <Badge variant="colored" color={ev.magnitude.includes('4.7') ? '#e74c3c' : '#3498db'}>
-                      {ev.magnitude}
-                    </Badge>
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                    Sol {ev.sol} ({ev.earthDate}) • {ev.type}
-                  </div>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: '0 0 6px 0', lineHeight: 1.4 }}>
-                    {ev.scientificImpact}
-                  </p>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                    Origin: {ev.sourceLocation} ({ev.duration})
-                  </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <Card
+              title={`${INSIGHT_MISSION_METADATA.platform} — ${INSIGHT_MISSION_METADATA.instrument}`}
+              icon={Activity}
+              accent
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px', paddingBottom: '12px', borderBottom: '1px solid var(--border-color)' }}>
+                <div>
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                    Station: <strong>{INSIGHT_MISSION_METADATA.location}</strong> | PDS: <code style={{ color: 'var(--accent-amber)' }}>{INSIGHT_MISSION_METADATA.pdsArchiveId}</code>
+                  </span>
                 </div>
-              ))}
-            </div>
-          </Card>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <ClassificationBadge type="actual" customLabel="ACTUAL SEISMIC TELEMETRY" size="sm" />
+                  <a
+                    href={INSIGHT_MISSION_METADATA.irisUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link mono"
+                    style={{ fontSize: '0.76rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    IRIS InSight Catalog <ExternalLink size={12} />
+                  </a>
+                  <a
+                    href={INSIGHT_MISSION_METADATA.pdsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link mono"
+                    style={{ fontSize: '0.76rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    PDS SEIS Archive <ExternalLink size={12} />
+                  </a>
+                </div>
+              </div>
+
+              {/* Marsquake Catalog Filters */}
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className={`conditions-tab-btn ${quakeFilter === 'all' ? 'conditions-tab-btn--active' : ''}`}
+                  onClick={() => setQuakeFilter('all')}
+                  style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+                >
+                  All Significant Marsquakes ({INSIGHT_MARSQUAKE_EVENTS.length})
+                </button>
+                <button
+                  type="button"
+                  className={`conditions-tab-btn ${quakeFilter === 'major' ? 'conditions-tab-btn--active' : ''}`}
+                  onClick={() => setQuakeFilter('major')}
+                  style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+                >
+                  Major Quakes (≥ 4.0 Mw)
+                </button>
+                <button
+                  type="button"
+                  className={`conditions-tab-btn ${quakeFilter === 'tectonic' ? 'conditions-tab-btn--active' : ''}`}
+                  onClick={() => setQuakeFilter('tectonic')}
+                  style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+                >
+                  Tectonic Fault Slips
+                </button>
+                <button
+                  type="button"
+                  className={`conditions-tab-btn ${quakeFilter === 'impact' ? 'conditions-tab-btn--active' : ''}`}
+                  onClick={() => setQuakeFilter('impact')}
+                  style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+                >
+                  Meteoroid Cratering
+                </button>
+              </div>
+
+              {/* Marsquake Event Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '14px' }}>
+                {INSIGHT_MARSQUAKE_EVENTS.filter((ev) => {
+                  if (quakeFilter === 'major') return ev.magnitudeMw >= 4.0;
+                  if (quakeFilter === 'tectonic') return ev.type.includes('Tectonic');
+                  if (quakeFilter === 'impact') return ev.type.includes('Impact');
+                  return true;
+                }).map((ev) => (
+                  <div
+                    key={ev.id}
+                    style={{
+                      background: 'var(--bg-input)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '8px',
+                      padding: '12px 14px',
+                      borderLeft: `4px solid ${ev.magnitudeMw >= 4.5 ? 'var(--status-critical, #ef4444)' : ev.magnitudeMw >= 4.0 ? 'var(--accent-amber, #d97706)' : 'var(--status-processed, #38bdf8)'}`,
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                      <strong style={{ color: 'var(--text-primary)', fontSize: '0.9rem' }}>Event {ev.id}</strong>
+                      <Badge variant="colored" color={ev.magnitudeMw >= 4.5 ? '#ef4444' : ev.magnitudeMw >= 4.0 ? '#d97706' : '#38bdf8'}>
+                        {ev.magnitudeFormatted}
+                      </Badge>
+                    </div>
+                    <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginBottom: '6px' }} className="mono">
+                      Sol {ev.sol} ({ev.earthDate}) • {ev.type}
+                    </div>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: '0 0 8px 0', lineHeight: 1.4 }}>
+                      {ev.scientificImpact}
+                    </p>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.5 }} className="mono">
+                      <div>Epicenter: {ev.sourceRegion} (~{ev.epicentralDistanceKm.toLocaleString()} km / {ev.epicentralDistanceDeg}°)</div>
+                      <div>Duration: {ev.durationFormatted} | Depth: {ev.depthEstimateKm}</div>
+                      <div>Sensor: {ev.instrument}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Martian Interior Structure Cross-Section */}
+            <Card
+              title="Martian Interior Structure Model (Constrained by InSight SEIS Data)"
+              icon={Layers}
+              accent
+            >
+              <div style={{ marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                  Seismological Inversion: <strong>Science 2021 (Knapmeyer-Endrun et al.; Stähler et al.)</strong>
+                </span>
+                <ClassificationBadge type="processed" customLabel="CALIBRATED SEISMIC INVERSION" size="sm" />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+                <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '12px' }}>
+                  <h4 style={{ color: 'var(--accent-amber)', margin: '0 0 6px 0', fontSize: '0.86rem' }}>
+                    1. {MARS_INTERIOR_STRUCTURE.crust.name}
+                  </h4>
+                  <div className="mono" style={{ fontSize: '0.76rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
+                    Thickness: {MARS_INTERIOR_STRUCTURE.crust.thicknessRange}
+                  </div>
+                  <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', margin: '0 0 6px 0' }}>
+                    Divided into 3 distinct layers: upper impact-fractured basalt, middle volcanic flows, and deep metamorphism. Density {MARS_INTERIOR_STRUCTURE.crust.density}.
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '12px' }}>
+                  <h4 style={{ color: '#38bdf8', margin: '0 0 6px 0', fontSize: '0.86rem' }}>
+                    2. {MARS_INTERIOR_STRUCTURE.mantle.name}
+                  </h4>
+                  <div className="mono" style={{ fontSize: '0.76rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
+                    Extent: {MARS_INTERIOR_STRUCTURE.mantle.thicknessRange}
+                  </div>
+                  <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', margin: '0 0 6px 0' }}>
+                    {MARS_INTERIOR_STRUCTURE.mantle.composition}. Thick rigid thermal lithosphere retards convection, explaining the lack of active plate tectonics.
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '12px' }}>
+                  <h4 style={{ color: 'var(--mars-coral)', margin: '0 0 6px 0', fontSize: '0.86rem' }}>
+                    3. {MARS_INTERIOR_STRUCTURE.core.name}
+                  </h4>
+                  <div className="mono" style={{ fontSize: '0.76rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
+                    Radius: {MARS_INTERIOR_STRUCTURE.core.radiusKm}
+                  </div>
+                  <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', margin: '0 0 6px 0' }}>
+                    {MARS_INTERIOR_STRUCTURE.core.state}. Core convection stopped ~4.0 Ga; remnant magnetic crustal stripes remain in southern highlands.
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
         )}
+      </div>
+
+      {/* Diurnal Atmospheric Pressure & Temperature Cycle (Thermal Tide) */}
+      <div className="conditions-section" style={{ marginTop: '30px' }}>
+        <h2 className="conditions-section-title">
+          <Waves size={20} />
+          Martian Diurnal Atmospheric Cycle (24-Hour Sol Thermal Tide Telemetry)
+        </h2>
+        <Card>
+          <div className="conditions-source-meta" style={{ marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+              Source: <strong>NASA Mars 2020 MEDA & Curiosity REMS Science Teams</strong> (CAB / INTA-CSIC / JPL)
+            </span>
+            <ClassificationBadge type="actual" customLabel="VERIFIED EMPIRICAL CYCLE" size="sm" />
+          </div>
+
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '14px' }}>
+            In Mars&apos; thin CO₂ atmosphere (~6–8 mbar), strong solar radiative heating triggers a global semi-diurnal thermal tide.
+            Atmospheric surface pressure reaches a maximum around 08:00 LTST (~782 Pa), drops to an afternoon minimum at 16:00 LTST (~694 Pa),
+            while ground surface temperature swings by nearly 100°C between dawn (-89°C) and early afternoon (+11°C).
+          </p>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table className="conditions-table">
+              <thead>
+                <tr>
+                  <th>Local True Solar Time (LTST)</th>
+                  <th>Atmospheric Pressure</th>
+                  <th>Air Temp (1.5m Mast)</th>
+                  <th>Ground Surface Temp (TIRS IR)</th>
+                  <th>Mean Wind Velocity</th>
+                  <th>Dust Tau (RDS)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {DIURNAL_PRESSURE_TEMP_PROFILE.map((item) => (
+                  <tr key={item.hourLtst}>
+                    <td className="mono" style={{ fontWeight: 600 }}>{item.label}</td>
+                    <td className="mono" style={{ color: item.pressurePa === 782 ? '#22c55e' : item.pressurePa === 694 ? '#ef4444' : 'inherit' }}>
+                      {item.pressurePa} Pa ({(item.pressurePa / 100).toFixed(2)} mbar)
+                    </td>
+                    <td className="mono">{item.airTempC}°C</td>
+                    <td className="mono" style={{ color: item.groundTempC > 0 ? '#f59e0b' : 'inherit' }}>
+                      {item.groundTempC}°C
+                    </td>
+                    <td className="mono">{item.windSpeedMs} m/s</td>
+                    <td className="mono">&tau; {item.tau}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       </div>
 
       {/* Atmospheric Molecular Composition */}

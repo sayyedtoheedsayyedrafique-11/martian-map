@@ -135,6 +135,89 @@ export const USGS_GEOLOGIC_UNITS = [
   },
 ];
 
+// Verified USGS SIM 3464 Geologic Map of Jezero Crater & Nili Planum (Sun & Stack 2020, DOI: 10.3133/sim3464)
+export const USGS_JEZERO_SIM3464_UNITS = [
+  {
+    code: 'NHjf1',
+    name: 'Jezero Delta Lower Member',
+    period: 'Noachian-Hesperian',
+    colorHex: '#c49a45',
+    type: 'Fine-Grained Lacustrine Mudstone',
+    occurrence: 'Western delta front bottomset beds, Enchanted Lake, Hawksbill Gap',
+    description: 'Fine-grained, clay-bearing and carbonate-bearing sedimentary rocks deposited in quiet lake waters. Prime astrobiology target for organic biosignature preservation.',
+    hazardGrade: 'Moderate (Layered mudstone terraces)',
+    sourceUrl: 'https://pubs.usgs.gov/sim/3464/',
+  },
+  {
+    code: 'NHjf2',
+    name: 'Jezero Delta Upper Member',
+    period: 'Noachian-Hesperian',
+    colorHex: '#b2883b',
+    type: 'Coarse Sandstone & Conglomerate',
+    occurrence: 'Delta topset and foreset beds, Tenby, Otis Peak',
+    description: 'Cross-bedded sandstone and boulder conglomerates deposited during high-energy episodic river flooding from Neretva Vallis.',
+    hazardGrade: 'Moderate to High (Cobble lags & rubbly scarps)',
+    sourceUrl: 'https://pubs.usgs.gov/sim/3464/',
+  },
+  {
+    code: 'NHjfb',
+    name: 'Delta Scarp & Remnant Outliers',
+    period: 'Noachian-Hesperian',
+    colorHex: '#9c7731',
+    type: 'Gilbert-Type Delta Erosional Outliers',
+    occurrence: 'Kodiak Butte, Castelnau Butte',
+    description: 'Isolated erosional remnants exhibiting classic Gilbert-type delta architecture with inclined foresets bounded by flat topsets.',
+    hazardGrade: 'High (Steep cliff faces, rockfall hazard)',
+    sourceUrl: 'https://pubs.usgs.gov/sim/3464/',
+  },
+  {
+    code: 'cf-fr',
+    name: 'Crater Floor Fractured Rough (Séítah Formation)',
+    period: 'Early Hesperian / Noachian',
+    colorHex: '#52796f',
+    type: 'Olivine-Rich Ultramafic Cumulate Bedrock',
+    occurrence: 'South Séítah, Bastide, Brac outcrops',
+    description: 'Coarse-grained igneous cumulate rock rich in olivine and pyroxene crystals, heavily altered by ancient carbonate-bearing fluids.',
+    hazardGrade: 'High (Active basaltic sand ripples, rover wheel sinkage)',
+    sourceUrl: 'https://pubs.usgs.gov/sim/3464/',
+  },
+  {
+    code: 'cf-f',
+    name: 'Crater Floor Fractured (Máaz Formation)',
+    period: 'Early Hesperian',
+    colorHex: '#354f52',
+    type: 'Capping Basaltic Lava Flows',
+    occurrence: 'Octavia E. Butler Landing floor, Artuby ridge',
+    description: 'Segmented polygonal fractured igneous plains composed of basaltic lava or impact melt sheet.',
+    hazardGrade: 'Low to Moderate (Competent bedrock pavement)',
+    sourceUrl: 'https://pubs.usgs.gov/sim/3464/',
+  },
+  {
+    code: 'cr',
+    name: 'Crater Rim Basement Breccia',
+    period: 'Noachian',
+    colorHex: '#847577',
+    type: 'Impact Megabreccia Bedrock',
+    occurrence: 'Jezero Crater northern and western rim scarps',
+    description: 'Ancient crustal basement blocks excavated from deep crust by the Isidis giant impact basin forming Jezero target bedrock.',
+    hazardGrade: 'Critical (Steep rim slopes >25°, boulder scree)',
+    sourceUrl: 'https://pubs.usgs.gov/sim/3464/',
+  },
+  {
+    code: 'Aeb',
+    name: 'Active Aeolian Bedforms',
+    period: 'Amazonian',
+    colorHex: '#cf995f',
+    type: 'Basaltic Sand Dunes & Transverse Aeolian Ridges (TARs)',
+    occurrence: 'Séítah dune fields, delta embayments',
+    description: 'Modern wind-blown dark basaltic sand dunes with active slip faces under modern Martian winds.',
+    hazardGrade: 'Critical (High risk of rover wheel immobilization)',
+    sourceUrl: 'https://pubs.usgs.gov/sim/3464/',
+  },
+];
+
+export const USGS_PGM_OFFICIAL_URL = 'https://www.usgs.gov/special-topics/planetary-geologic-mapping';
+
 // Existing base terrain types preserved for backwards compatibility
 const terrainTypes = [
   {

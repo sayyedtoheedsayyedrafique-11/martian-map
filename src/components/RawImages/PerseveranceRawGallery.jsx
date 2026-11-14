@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import ClassificationBadge from '../ui/ClassificationBadge';
 import {
   PERSEVERANCE_CAMERAS,
   MARS_RAW_IMAGES,
@@ -339,7 +340,7 @@ export default function PerseveranceRawGallery() {
                 <div className="raw-card__body">
                   <div className="raw-card__meta-top mono">
                     <span className="raw-card__camera-badge">{img.camera}</span>
-                    <span style={{ color: '#10b981', fontSize: '8px', fontWeight: 700 }}>REAL DATA - NASA Raw Images</span>
+                    <ClassificationBadge type="actual" size="sm" />
                     <span className="raw-card__date">{img.dateEarthFormatted || 'not provided'}</span>
                   </div>
                   <h3 className="raw-card__heading">{img.title}</h3>
@@ -392,10 +393,8 @@ export default function PerseveranceRawGallery() {
                   <span className="raw-modal__badge mono">
                     {activeModalImage.cameraFullName} • SOL {activeModalImage.sol}
                   </span>
-                  <span style={{ color: '#10b981', fontSize: '9px', fontWeight: 700 }} className="mono">
-                    REAL DATA - NASA Raw Images
-                  </span>
-                  <span className="mono" style={{ fontSize: '9px', color: '#94a3b8' }}>
+                  <ClassificationBadge type="actual" size="sm" />
+                  <span className="mono" style={{ fontSize: '9px', color: 'var(--text-muted)' }}>
                     ({activeModalIndex + 1} of {filteredImages.length})
                   </span>
                 </div>
@@ -449,8 +448,8 @@ export default function PerseveranceRawGallery() {
               </div>
               <div className="raw-modal__detail-item">
                 <span className="raw-modal__label">DATA PROVENANCE:</span>
-                <span className="raw-modal__val" style={{ color: '#10b981', fontWeight: 700 }}>
-                  ● REAL DATA - NASA Raw Images
+                <span className="raw-modal__val">
+                  <ClassificationBadge type="actual" customLabel="AUTHENTIC NASA DOWNLINK" size="sm" />
                 </span>
               </div>
             </div>
@@ -469,7 +468,7 @@ export default function PerseveranceRawGallery() {
 
             <div className="raw-modal__footer">
               <div className="raw-modal__verified mono">
-                <CheckCircle2 size={13} color="#10b981" />
+                <CheckCircle2 size={13} color="var(--status-nominal)" />
                 <span>OFFICIAL NASA MARS 2020 / JPL ARCHIVE</span>
               </div>
               <a

@@ -1,0 +1,79 @@
+/* ClassificationBadge.css — Standardized 3-Tier Scientific Classification Badge */
+
+.classification-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-sm, 2px);
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1.2;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.classification-badge__dot {
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.classification-badge__label {
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+}
+
+/* Sizing variants */
+.classification-badge--sm {
+  font-size: 0.62rem;
+  padding: 1px 5px;
+  gap: 4px;
+}
+.classification-badge--sm .classification-badge__dot {
+  width: 4px;
+  height: 4px;
+}
+
+.classification-badge--md {
+  font-size: 0.68rem;
+  padding: 2px 7px;
+  gap: 5px;
+}
+.classification-badge--md .classification-badge__dot {
+  width: 5px;
+  height: 5px;
+}
+
+.classification-badge--lg {
+  font-size: 0.75rem;
+  padding: 3px 9px;
+  gap: 6px;
+}
+.classification-badge--lg .classification-badge__dot {
+  width: 6px;
+  height: 6px;
+}
+
+/* 1. ACTUAL DATA: Forest green dot, emerald border & subtle fill */
+.classification-badge--actual {
+  border: 1px solid rgba(34, 197, 94, 0.45);
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.08);
+}
+
+/* 2. PROCESSED DATA: Cyan dot, azure border & subtle fill */
+.classification-badge--processed {
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+}
+
+/* 3. ILLUSTRATIVE EXAMPLE: Amber dot, gold border & subtle fill */
+.classification-badge--illustrative {
+  border: 1px solid rgba(217, 119, 6, 0.45);
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.08);
+}

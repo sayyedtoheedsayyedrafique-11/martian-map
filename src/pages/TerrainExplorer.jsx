@@ -8,6 +8,8 @@ import {
   MARS_SURFACE_HAZARDS,
 } from '../data/marsTerrainFeatures';
 import terrainTypes, { USGS_CHRONOSTRATIGRAPHY, USGS_GEOLOGIC_UNITS } from '../data/terrainTypes';
+import ClassificationBadge from '../components/ui/ClassificationBadge';
+import { ESA_MISSIONS_METADATA, ESA_ORBITAL_OBSERVATIONS } from '../data/esaOrbitalData';
 import { formatCoordinates } from '../utils/helpers';
 import {
   Mountain,
@@ -548,6 +550,107 @@ function TerrainExplorer() {
                     <span className="terrain-ex-label mono">NOTABLE REGIONS:</span>
                     <span className="terrain-ex-vals">{t.examples.join(' • ')}</span>
                   </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ESA Mars Express HRSC & ExoMars CaSSIS Orbital Imagery & Stereo DTMs */}
+          <h3 className="terrain-chrono-sec-title mono" style={{ fontSize: '11px', color: '#f0f6fc', margin: '24px 0 8px 0' }}>
+            ESA MARS EXPRESS (HRSC) & EXOMARS (CASSIS) STEREO IMAGERY & DTMS
+          </h3>
+          <div className="terrain-chrono-banner" style={{ marginBottom: '14px' }}>
+            <div className="terrain-chrono-banner-icon">
+              <Layers size={18} color="#38bdf8" />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span className="terrain-chrono-banner-title mono">
+                  EUROPEAN SPACE AGENCY (ESA) STEREO PHOTOGRAMMETRY & DTM RECONSTRUCTION
+                </span>
+                <ClassificationBadge type="actual" customLabel="ACTUAL ESA OBSERVATION" size="sm" />
+              </div>
+              <p>
+                Multi-angle stereo observations from High Resolution Stereo Camera (HRSC) on ESA Mars Express (DLR / FU Berlin)
+                and Colour and Stereo Surface Imaging System (CaSSIS) on ExoMars TGO (Uni Bern). Yields color stereo imagery at up to 4.5 m/pixel
+                and digital terrain models (DTMs) with vertical precision of ±10 meters.
+              </p>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '6px' }}>
+                <a
+                  href={ESA_MISSIONS_METADATA.marsExpress.psaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="terrain-usgs-link mono"
+                >
+                  ESA Planetary Science Archive (PSA) <ExternalLink size={10} />
+                </a>
+                <a
+                  href={ESA_MISSIONS_METADATA.exoMarsTGO.cassisBernUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="terrain-usgs-link mono"
+                >
+                  UniBE CaSSIS Science Operations <ExternalLink size={10} />
+                </a>
+                <a
+                  href={ESA_MISSIONS_METADATA.marsExpress.esaPortalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="terrain-usgs-link mono"
+                >
+                  ESA Mars Express Mission Overview <ExternalLink size={10} />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+            {ESA_ORBITAL_OBSERVATIONS.map((obs) => (
+              <div
+                key={obs.id}
+                style={{
+                  background: 'var(--bg-panel)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '6px',
+                  padding: '14px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  borderTop: '3px solid #38bdf8',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                  <div>
+                    <h4 style={{ color: '#f5f5f0', fontSize: '0.88rem', margin: '0 0 3px 0' }}>{obs.targetFeature}</h4>
+                    <span className="mono" style={{ fontSize: '0.72rem', color: '#38bdf8' }}>
+                      {obs.id} • {obs.instrument}
+                    </span>
+                  </div>
+                  <span className="mono" style={{ fontSize: '0.72rem', background: 'var(--bg-input)', padding: '2px 6px', borderRadius: '3px', border: '1px solid var(--border-color)' }}>
+                    {obs.resolutionFormatted}
+                  </span>
+                </div>
+
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                  {obs.geologicalDescription}
+                </p>
+
+                <div className="mono" style={{ fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.5, background: 'var(--bg-input)', padding: '8px', borderRadius: '4px' }}>
+                  <div>Center: {obs.centerLat.toFixed(2)}°N, {obs.centerLng.toFixed(2)}°E | Orbit: {obs.orbit}</div>
+                  <div>Stereo DTM: {obs.stereoDtmAvailable ? `Vertical Precision ±${obs.dtmVerticalPrecisionMeters}m` : 'None'} | Ls: {obs.solarLongitudeLs}</div>
+                  <div>Attribution: {obs.sourceOrganization}</div>
+                </div>
+
+                <div style={{ marginTop: 'auto', paddingTop: '4px' }}>
+                  <a
+                    href={obs.officialArchiveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link mono"
+                    style={{ fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    ESA PSA Product Page <ExternalLink size={10} />
+                  </a>
                 </div>
               </div>
             ))}

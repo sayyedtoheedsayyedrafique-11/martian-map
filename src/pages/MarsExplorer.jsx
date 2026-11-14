@@ -1,9 +1,11 @@
-import { useState, useRef } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useState, useMemo } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import MarsGlobe from '../components/MarsGlobe/MarsGlobe';
 import MarsMap from '../components/MarsMap/MarsMap';
 import JezeroTerrainViewer from '../components/Jezero3D/JezeroTerrainViewer';
 import SearchBar from '../components/ui/SearchBar';
+import ClassificationBadge from '../components/ui/ClassificationBadge';
+import MetadataInspector from '../components/ui/MetadataInspector';
 import marsLocations, { locationTypes } from '../data/marsLocations';
 import { searchLocations, formatCoordinates } from '../utils/helpers';
 import {
@@ -17,29 +19,31 @@ import {
   Award,
   Globe,
   Layers,
-  ArrowDown,
   Activity,
-  Rocket,
   Box,
   Camera,
+  SlidersHorizontal,
 } from 'lucide-react';
 import './MarsExplorer.css';
 
 function MarsExplorer() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const siteParam = searchParams.get('site');
-  const mapSectionRef = useRef(null);
-  const terrainSectionRef = useRef(null);
+  const viewParam = searchParams.get('view');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [copiedCoords, setCopiedCoords] = useState(false);
-  const [viewMode, setViewMode] = useState('unified'); // 'unified' | 'globe' | 'terrain' | 'map'
+  // Default viewMode is 'map' — Map-Centric Primary Focus
+  const [viewMode, setViewMode] = useState(() => (viewParam === 'globe' ? 'globe' : viewParam === 'terrain' ? 'terrain' : 'map'));
   const [terrainFeatureId, setTerrainFeatureId] = useState('jezero-crater');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [activeBasemap, setActiveBasemap] = useState('ctx');
 
   const [selectedLocation, setSelectedLocation] = useState(() => {
     if (siteParam) {
-      return marsLocations.find((l) => l.id === siteParam) || null;
+      return marsLocations.find((l) => l.id === siteParam) || marsLocations[0];
     }
     return marsLocations.find((l) => l.id === 'perseverance') || marsLocations[0];
   });
@@ -51,15 +55,19 @@ function MarsExplorer() {
       const match = marsLocations.find((l) => l.id === siteParam);
       if (match) {
         setSelectedLocation(match);
+        setIsDrawerOpen(true);
       }
     }
   }
 
   // Filter locations by search query and type
-  let filteredLocations = searchLocations(marsLocations, searchQuery);
-  if (selectedType !== 'all') {
-    filteredLocations = filteredLocations.filter((loc) => loc.type === selectedType);
-  }
+  const filteredLocations = useMemo(() => {
+    let results = searchLocations(marsLocations, searchQuery);
+    if (selectedType !== 'all') {
+      results = results.filter((loc) => loc.type === selectedType);
+    }
+    return results;
+  }, [searchQuery, selectedType]);
 
   const handleCopyCoords = (lat, lng) => {
     const text = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
@@ -68,395 +76,393 @@ function MarsExplorer() {
     setTimeout(() => setCopiedCoords(false), 2000);
   };
 
-  const scrollToMap = (targetLoc) => {
-    if (targetLoc) {
-      setSelectedLocation(targetLoc);
-    }
-    mapSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const handleSelectLocation = (loc) => {
+    setSelectedLocation(loc);
+    setIsDrawerOpen(true);
   };
 
-  const handleExploreTerrain = (targetLoc) => {
-    if (targetLoc) {
-      setSelectedLocation(targetLoc);
-    }
-    setViewMode('terrain');
-    terrainSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // Basemap definitions for floating header switcher
+  const basemapOptions = [
+    { id: 'ctx', label: 'USGS CTX 5m' },
+    { id: 'mola', label: 'USGS Shaded Relief' },
+    { id: 'viking', label: 'NASA Viking Color' },
+    { id: 'mola-color', label: 'MOLA Altimetry' },
+    { id: 'themis', label: 'THEMIS Night IR' },
+  ];
 
   return (
-    <div className="mars-page fade-in">
-      {/* Top Header & Mission Control Bar */}
-      <div className="mars-page__header">
-        <div className="mars-page__title-area">
+    <div className="mars-page mars-page--workstation fade-in">
+      {/* Workstation Top Control Bar */}
+      <header className="mars-workstation__header" aria-label="Mars GIS Mission Header">
+        <div className="mars-workstation__title-box">
           <div className="mars-tag-row">
             <span className="mars-sys-tag mono">NASA PDS // IAU AREOGRAPHIC FRAME</span>
-            <span className="mars-sys-tag mars-sys-tag--accent mono">3D GLOBE + 2D FIELD GIS</span>
-            <Link to="/data-explorer" className="mars-sys-tag mono" style={{ textDecoration: 'none', color: 'var(--accent-yellow)', borderColor: 'var(--accent-yellow)' }}>
-              &rarr; LAUNCH PDS / CTX DATA EXPLORER
-            </Link>
+            <ClassificationBadge type="actual" customLabel="ACTUAL PLANETARY GIS" size="sm" />
+            <span className="mars-sys-tag mono">DATUM: MOLA AREOID (610.5 Pa)</span>
           </div>
-          <h1 className="mars-page__title">Mars Surface Exploration & GIS</h1>
-          <p className="mars-page__desc">
-            Explore authentic Martian landing sites using an interactive 3D planetary globe mapped with verified NASA Viking MDIM 2.1 cartography and USGS Astrogeology basemaps.
-          </p>
+          <h1 className="mars-workstation__title">Mars Planetary GIS & Science Workstation</h1>
         </div>
 
-        {/* View Mode Switcher */}
-        <div className="mars-view-switcher">
-          <button
-            type="button"
-            className={`mars-view-btn ${viewMode === 'unified' ? 'mars-view-btn--active' : ''}`}
-            onClick={() => setViewMode('unified')}
-          >
-            <Activity size={13} />
-            <span>Overview</span>
-          </button>
-          <button
-            type="button"
-            className={`mars-view-btn ${viewMode === 'globe' ? 'mars-view-btn--active' : ''}`}
-            onClick={() => setViewMode('globe')}
-          >
-            <Globe size={13} />
-            <span>3D Globe</span>
-          </button>
-          <button
-            type="button"
-            className={`mars-view-btn ${viewMode === 'terrain' ? 'mars-view-btn--active' : ''}`}
-            onClick={() => setViewMode('terrain')}
-          >
-            <Box size={13} />
-            <span>3D Terrain (Jezero DEM)</span>
-          </button>
-          <button
-            type="button"
-            className={`mars-view-btn ${viewMode === 'map' ? 'mars-view-btn--active' : ''}`}
-            onClick={() => setViewMode('map')}
-          >
-            <Layers size={13} />
-            <span>2D GIS Map</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 3D Jezero Crater Terrain Mode */}
-      {viewMode === 'terrain' && (
-        <section ref={terrainSectionRef} className="mars-terrain-section" aria-label="3D Jezero Crater Terrain Explorer">
-          <div className="mars-section-header">
-            <div className="mars-section-title-wrap">
-              <span className="mars-subtag mono">REGIONAL 3D TOPOGRAPHY // CTX DEM 20M/PX</span>
-              <h2 className="mars-section-heading">Jezero Crater 3D Elevation Mesh</h2>
-            </div>
-            <div className="mars-section-hint mono">
-              <span>DRAG TO ORBIT • RIGHT-DRAG TO PAN • SCROLL TO ZOOM • HOVER FOR MOLA ELEVATION</span>
-            </div>
-          </div>
-
-          <JezeroTerrainViewer
-            height="74vh"
-            selectedFeatureId={terrainFeatureId}
-            onFeatureSelect={(f) => setTerrainFeatureId(f.id)}
-          />
-        </section>
-      )}
-      {/* 3D Mars Globe Section */}
-      {(viewMode === 'unified' || viewMode === 'globe') && (
-        <section className="mars-globe-section" aria-label="Interactive 3D Mars Globe">
-          <div className="mars-section-header">
-            <div className="mars-section-title-wrap">
-              <span className="mars-subtag mono">ORBITAL VIEW</span>
-              <h2 className="mars-section-heading">Planetary 3D Sphere</h2>
-            </div>
-            <div className="mars-section-hint mono">
-              <span>DRAG TO ROTATE • SCROLL TO ZOOM • CLICK MARKERS TO INSPECT</span>
-            </div>
-          </div>
-
-          <MarsGlobe
-            locations={marsLocations}
-            selectedLocation={selectedLocation}
-            onLocationSelect={setSelectedLocation}
-            onScrollToMap={() => scrollToMap()}
-            onExploreTerrain={() => handleExploreTerrain(selectedLocation)}
-            height={viewMode === 'globe' ? '82vh' : '72vh'}
-          />
-        </section>
-      )}
-
-      {/* Selected Location Scientific Editorial Dossier */}
-      {selectedLocation && (
-        <section className="mars-dossier-section" aria-label="Selected Location Scientific Dossier">
-          <div className="mars-location-detail-card">
-            <div className="mars-detail-top">
-              <div>
-                <div className="mars-detail-tags">
-                  <span className="mars-detail-tag">
-                    {locationTypes[selectedLocation.type]?.label || selectedLocation.type}
-                  </span>
-                  <span className="mars-detail-status">{selectedLocation.status}</span>
-                  {selectedLocation.catalogId && (
-                    <span className="mars-detail-catalog mono">{selectedLocation.catalogId}</span>
-                  )}
-                </div>
-                <h2 className="mars-detail-title">{selectedLocation.name}</h2>
-                <span className="mars-detail-mission mono">
-                  {selectedLocation.mission} • {selectedLocation.agency || 'NASA / USGS'}
-                </span>
+        {/* View Mode Switcher & Basemap Controls */}
+        <div className="mars-workstation__controls">
+          {viewMode === 'map' && (
+            <div className="mars-workstation__basemap-group mono" aria-label="Basemap Switcher">
+              <span className="mars-control-label">BASEMAP:</span>
+              <div className="mars-button-group">
+                {basemapOptions.map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    className={`mars-control-btn ${activeBasemap === opt.id ? 'mars-control-btn--active' : ''}`}
+                    onClick={() => setActiveBasemap(opt.id)}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
               </div>
-              <button
-                type="button"
-                className="mars-detail-close"
-                onClick={() => setSelectedLocation(null)}
-                aria-label="Close location dossier"
-              >
-                <X size={18} />
-              </button>
             </div>
+          )}
 
-            <div className="mars-detail-body">
-              <p className="mars-detail-text">{selectedLocation.description}</p>
+          <div className="mars-view-switcher" role="tablist" aria-label="Workstation View Modes">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={viewMode === 'map'}
+              className={`mars-view-btn ${viewMode === 'map' ? 'mars-view-btn--active' : ''}`}
+              onClick={() => setViewMode('map')}
+              title="2D Cartographic Basemap (USGS / NASA Mars Trek)"
+            >
+              <Layers size={13} />
+              <span>2D Cartographic Map</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={viewMode === 'globe'}
+              className={`mars-view-btn ${viewMode === 'globe' ? 'mars-view-btn--active' : ''}`}
+              onClick={() => setViewMode('globe')}
+              title="Interactive 3D Planetary Sphere"
+            >
+              <Globe size={13} />
+              <span>3D Planetary Globe</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={viewMode === 'terrain'}
+              className={`mars-view-btn ${viewMode === 'terrain' ? 'mars-view-btn--active' : ''}`}
+              onClick={() => setViewMode('terrain')}
+              title="3D Jezero Crater DEM Elevation Mesh (20m/px)"
+            >
+              <Box size={13} />
+              <span>3D Jezero DEM</span>
+            </button>
+          </div>
 
-              {selectedLocation.notableDiscovery && (
-                <div className="mars-discovery-note">
-                  <strong style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <Award size={14} color="var(--accent-yellow)" /> Verified Scientific Finding:
-                  </strong>
-                  <span>{selectedLocation.notableDiscovery}</span>
+          {/* Toggle Right Mission Data Drawer */}
+          <button
+            type="button"
+            className={`mars-drawer-toggle-btn ${isDrawerOpen ? 'mars-drawer-toggle-btn--active' : ''}`}
+            onClick={() => setIsDrawerOpen((prev) => !prev)}
+            title="Toggle Mission Data Drawer"
+            aria-expanded={isDrawerOpen}
+          >
+            <SlidersHorizontal size={13} />
+            <span>Mission Drawer</span>
+            {selectedLocation && <span className="mars-drawer-indicator" />}
+          </button>
+        </div>
+      </header>
+
+      {/* Main Expansive Viewport Workstation Canvas & Sliding Drawer Container */}
+      <main className="mars-workstation-viewport" aria-label="Mars Surface Exploration Canvas">
+        <div className="mars-workstation-canvas-container">
+          {/* Active Workstation View Mode */}
+          {viewMode === 'map' && (
+            <div className="mars-viewport-map-wrapper">
+              <MarsMap
+                selectedLocation={selectedLocation}
+                onLocationSelect={handleSelectLocation}
+                filteredLocations={filteredLocations}
+                height="100%"
+                canvasClassName="mars-map-canvas--full-viewport"
+                activeLayer={activeBasemap}
+                onLayerChange={setActiveBasemap}
+              />
+            </div>
+          )}
+
+          {viewMode === 'globe' && (
+            <div className="mars-viewport-3d-wrapper">
+              <div className="mars-3d-hud-hint mono">
+                <span>ORBITAL VIEW // DRAG TO ROTATE • SCROLL TO ZOOM • CLICK TARGET TO INSPECT</span>
+              </div>
+              <MarsGlobe
+                locations={filteredLocations}
+                selectedLocation={selectedLocation}
+                onLocationSelect={handleSelectLocation}
+                onExploreTerrain={() => setViewMode('terrain')}
+                height="100%"
+              />
+            </div>
+          )}
+
+          {viewMode === 'terrain' && (
+            <div className="mars-viewport-3d-wrapper">
+              <div className="mars-3d-hud-hint mono">
+                <span>REGIONAL 3D CTX DEM (20M/PX) // DRAG TO ORBIT • RIGHT-DRAG TO PAN • SCROLL TO ZOOM</span>
+              </div>
+              <JezeroTerrainViewer
+                height="100%"
+                selectedFeatureId={terrainFeatureId}
+                onFeatureSelect={(f) => setTerrainFeatureId(f.id)}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Collapsible Sliding Right-Hand Mission Data Drawer */}
+        <aside
+          className={`mars-mission-drawer ${isDrawerOpen ? 'mars-mission-drawer--open' : ''}`}
+          aria-label="Selected Target Mission Dossier"
+          aria-hidden={!isDrawerOpen}
+        >
+          {selectedLocation ? (
+            <div className="mars-drawer-content">
+              {/* Drawer Header */}
+              <div className="mars-drawer-header">
+                <div className="mars-drawer-badge-row">
+                  <ClassificationBadge
+                    type="actual"
+                    customLabel={selectedLocation.type === 'landmark' ? 'IAU VERIFIED LANDMARK' : 'VERIFIED IN-SITU ROVER'}
+                    size="sm"
+                  />
+                  <span className="mars-drawer-status mono">{selectedLocation.status}</span>
                 </div>
-              )}
+                <div className="mars-drawer-title-row">
+                  <div>
+                    <h2 className="mars-drawer-title">{selectedLocation.name}</h2>
+                    <span className="mars-drawer-mission mono">
+                      {selectedLocation.mission} • {selectedLocation.agency || 'NASA / USGS'}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    className="mars-drawer-close-btn"
+                    onClick={() => setIsDrawerOpen(false)}
+                    aria-label="Collapse Mission Drawer"
+                    title="Collapse Drawer"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
 
-              {/* Scientific Metadata Grid */}
-              <div className="mars-metadata-grid">
-                <div className="mars-meta-item">
-                  <span className="mars-meta-label">Areographic Coordinates:</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className="mars-meta-value mono">{formatCoordinates(selectedLocation.lat, selectedLocation.lng)}</span>
+              {/* Drawer Body */}
+              <div className="mars-drawer-body">
+                <p className="mars-drawer-desc">{selectedLocation.description}</p>
+
+                {selectedLocation.notableDiscovery && (
+                  <div className="mars-drawer-discovery">
+                    <strong className="mono">
+                      <Award size={13} className="mars-discovery-icon" />
+                      NOTABLE SCIENTIFIC DISCOVERY
+                    </strong>
+                    <p>{selectedLocation.notableDiscovery}</p>
+                  </div>
+                )}
+
+                {/* Standardized Scientific Metadata Inspector */}
+                <MetadataInspector
+                  title="TARGET SCIENTIFIC PROVENANCE"
+                  classification="actual"
+                  customClassificationLabel="NASA PDS / USGS DATUM"
+                  platform={selectedLocation.mission}
+                  instrument={selectedLocation.terrainLabel}
+                  sol={selectedLocation.status?.includes('Sol') ? selectedLocation.status.match(/Sol\s+(\d+\+?)/)?.[0] : undefined}
+                  coordinates={{
+                    lat: selectedLocation.lat,
+                    lng: selectedLocation.lng,
+                    datum: 'MOLA Areoid (610.5 Pa)',
+                  }}
+                  elevation={selectedLocation.elevation}
+                  geologicUnit={selectedLocation.geologicalEra || 'USGS SIM 3292'}
+                  sourceName={selectedLocation.source || 'NASA Planetary Data System (PDS)'}
+                  sourceUrl={selectedLocation.sourceUrl}
+                  doiOrCatalogId={selectedLocation.catalogId}
+                  processingStatus="Verified Planetary Telemetry"
+                />
+
+                {/* Deep-Link Actions */}
+                <div className="mars-drawer-actions">
+                  <span className="mars-drawer-actions-label mono">TACTICAL NAVIGATION & CITATIONS:</span>
+                  <div className="mars-drawer-btn-grid">
                     <button
                       type="button"
-                      className="mars-copy-btn"
-                      onClick={() => handleCopyCoords(selectedLocation.lat, selectedLocation.lng)}
-                      title="Copy decimal coordinates"
+                      className="mars-drawer-btn mars-drawer-btn--primary"
+                      onClick={() => navigate(`/route-planner?start=${selectedLocation.id}`)}
+                      title="Set target as route origin Point A"
                     >
-                      {copiedCoords ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
-                      {copiedCoords ? 'Copied' : 'Copy'}
+                      <Route size={12} />
+                      <span>Route From Here (A)</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="mars-drawer-btn"
+                      onClick={() => navigate(`/route-planner?dest=${selectedLocation.id}`)}
+                      title="Set target as route destination Point B"
+                    >
+                      <Compass size={12} />
+                      <span>Route To Here (B)</span>
+                    </button>
+                    <a
+                      href={`https://trek.nasa.gov/mars/#v=0.1&x=${selectedLocation.lng.toFixed(4)}&y=${selectedLocation.lat.toFixed(4)}&z=6&p=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A104905`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mars-drawer-btn mars-drawer-btn--ext"
+                    >
+                      <span>Open in NASA Mars Trek</span>
+                      <ExternalLink size={11} />
+                    </a>
+                    {selectedLocation.id === 'perseverance' && (
+                      <Link to="/raw-images" className="mars-drawer-btn mars-drawer-btn--accent">
+                        <Camera size={12} />
+                        <span>In-Situ Raw Images</span>
+                      </Link>
+                    )}
+                    {selectedLocation.id === 'curiosity' && (
+                      <Link to="/route-planner" className="mars-drawer-btn mars-drawer-btn--accent">
+                        <Activity size={12} />
+                        <span>Curiosity Gale Dossier</span>
+                      </Link>
+                    )}
+                    {(selectedLocation.id === 'perseverance' || selectedLocation.id === 'jezero') && (
+                      <button
+                        type="button"
+                        className="mars-drawer-btn"
+                        onClick={() => setViewMode('terrain')}
+                      >
+                        <Box size={12} />
+                        <span>View 3D CTX DEM</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="mars-drawer-btn"
+                      onClick={() => handleCopyCoords(selectedLocation.lat, selectedLocation.lng)}
+                    >
+                      {copiedCoords ? <Check size={12} color="var(--status-nominal)" /> : <Copy size={12} />}
+                      <span>{copiedCoords ? 'Copied IAU Coords!' : 'Copy IAU Coords'}</span>
                     </button>
                   </div>
                 </div>
-
-                <div className="mars-meta-item">
-                  <span className="mars-meta-label">Elevation Datum (MOLA Areoid):</span>
-                  <span className="mars-meta-value">{selectedLocation.elevation || 'Not determined'}</span>
-                </div>
-
-                <div className="mars-meta-item">
-                  <span className="mars-meta-label">Terrain Classification:</span>
-                  <span className="mars-meta-value">{selectedLocation.terrainLabel || selectedLocation.terrainType}</span>
-                </div>
-
-                <div className="mars-meta-item">
-                  <span className="mars-meta-label">Touchdown / Geological Era:</span>
-                  <span className="mars-meta-value">{selectedLocation.landingDate || selectedLocation.geologicalEra || 'Documented'}</span>
-                </div>
-              </div>
-
-              {/* Actions for Route Exploration and Citations */}
-              <div className="mars-detail-actions">
-                {['perseverance', 'curiosity', 'insight', 'spirit', 'opportunity'].includes(selectedLocation.id) && (
-                  <Link
-                    to={`/missions?mission=${['spirit', 'opportunity'].includes(selectedLocation.id) ? 'spirit-opportunity' : selectedLocation.id}`}
-                    className="mars-btn-primary"
-                  >
-                    <Rocket size={14} /> Mission Intelligence
-                  </Link>
-                )}
-
-                <Link
-                  to={`/route-planner?start=${selectedLocation.id}`}
-                  className={['perseverance', 'curiosity', 'insight', 'spirit', 'opportunity'].includes(selectedLocation.id) ? "mars-btn-secondary" : "mars-btn-primary"}
-                >
-                  <Route size={14} /> Plan Route as Origin (Point A)
-                </Link>
-
-                <Link
-                  to={`/route-planner?dest=${selectedLocation.id}`}
-                  className="mars-btn-secondary"
-                >
-                  <Compass size={14} /> Plan Route as Destination (Point B)
-                </Link>
-
-                <a
-                  href={selectedLocation.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mars-btn-secondary"
-                >
-                  {selectedLocation.source} <ExternalLink size={12} />
-                </a>
-
-                <a
-                  href={`https://trek.nasa.gov/mars/#v=0.1&x=${selectedLocation.lng.toFixed(4)}&y=${selectedLocation.lat.toFixed(4)}&z=7&p=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A104905`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mars-btn-secondary"
-                  title="Synchronize and open this landing site in NASA JPL Mars Trek"
-                >
-                  <Compass size={14} /> Open in NASA JPL Mars Trek <ExternalLink size={12} />
-                </a>
-
-                {selectedLocation.id === 'perseverance' && (
-                  <Link
-                    to="/raw-images"
-                    className="mars-btn-primary"
-                  >
-                    <Camera size={14} /> In-Situ Raw Images
-                  </Link>
-                )}
-
-                {selectedLocation.id === 'perseverance' && (
-                  <button
-                    type="button"
-                    className="mars-btn-primary"
-                    onClick={() => handleExploreTerrain(selectedLocation)}
-                  >
-                    <Box size={14} /> 3D Jezero Crater DEM Mesh
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  className="mars-btn-secondary"
-                  onClick={() => scrollToMap(selectedLocation)}
-                >
-                  <ArrowDown size={14} /> Center on 2D GIS Map
-                </button>
               </div>
             </div>
-          </div>
-        </section>
-      )}
-
-      {/* 2D High-Resolution Surface GIS Map Section */}
-      {(viewMode === 'unified' || viewMode === 'map') && (
-        <section ref={mapSectionRef} id="mars-surface-map" className="mars-surface-map-section">
-          <div className="mars-section-header">
-            <div className="mars-section-title-wrap">
-              <span className="mars-subtag mono">SURFACE GIS RECONNAISSANCE</span>
-              <h2 className="mars-section-heading">High-Resolution Cartographic Basemap</h2>
+          ) : (
+            <div className="mars-drawer-empty mono">
+              <span>SELECT A MARS ROVER, CRATER, OR LANDMARK PIN TO INSPECT SCIENTIFIC DOSSIER.</span>
             </div>
-            <div className="mars-search-compact">
-              <SearchBar
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder="Search rovers, craters, or landmarks..."
-              />
-            </div>
+          )}
+        </aside>
+      </main>
+
+      {/* Directory & Search Explorer Footer Drawer Section */}
+      <section className="mars-locations-browser" aria-label="Mars Surface Sites Directory">
+        <div className="mars-locations-browser__header">
+          <div className="mars-locations-browser__title-wrap">
+            <h3 className="mars-locations-browser__title mono">
+              <MapPin size={14} className="mars-locations-browser__icon" />
+              PLANETARY CATALOG DIRECTORY ({filteredLocations.length} SITES)
+            </h3>
+            <span className="mars-locations-browser__subtitle">
+              Browse all 12 verified NASA & USGS surface targets across Mars. Click any card to center map and open dossier.
+            </span>
           </div>
 
-          {/* Category Filter Buttons */}
-          <div className="mars-category-bar">
-            <button
-              type="button"
-              className={`mars-cat-btn ${selectedType === 'all' ? 'mars-cat-btn--active' : ''}`}
-              onClick={() => setSelectedType('all')}
-            >
-              All Sites ({marsLocations.length})
-            </button>
-            {Object.entries(locationTypes).map(([key, { label }]) => {
-              const count = marsLocations.filter((l) => l.type === key).length;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  className={`mars-cat-btn ${selectedType === key ? 'mars-cat-btn--active' : ''}`}
-                  onClick={() => setSelectedType(selectedType === key ? 'all' : key)}
-                >
-                  {label} ({count})
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Main Focus: The Mars Map */}
-          <div className="mars-map-section">
-            <MarsMap
-              selectedLocation={selectedLocation}
-              onLocationSelect={setSelectedLocation}
-              filteredLocations={filteredLocations}
-              canvasClassName="mars-map-canvas--explorer"
+          {/* Search input */}
+          <div className="mars-search-wrap">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search landing sites, craters, volcanoes..."
             />
           </div>
-        </section>
-      )}
+        </div>
 
-      {/* Verified Locations Directory Grid */}
-      <div className="mars-quick-list-section">
-        <h3 className="mars-section-subtitle">
-          <MapPin size={16} /> Verified Planetary Locations ({filteredLocations.length})
-        </h3>
-        
-        {filteredLocations.length === 0 ? (
-          <div className="mars-empty-search">
-            <p>No verified planetary locations match &ldquo;{searchQuery}&rdquo;.</p>
-            <button
-              type="button"
-              className="mars-reset-search-btn"
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedType('all');
-              }}
-            >
-              Reset Search & Filters
-            </button>
-          </div>
-        ) : (
-          <div className="mars-quick-grid">
-            {filteredLocations.map((loc) => {
-              const isSelected = selectedLocation?.id === loc.id;
-              return (
-                <div
-                  key={loc.id}
-                  className={`mars-site-card ${isSelected ? 'mars-site-card--selected' : ''}`}
-                  onClick={() => {
-                    setSelectedLocation(loc);
-                  }}
-                >
-                  <div className="mars-site-header">
-                    <h4 className="mars-site-name">{loc.name}</h4>
-                    <span className="mars-site-type">{locationTypes[loc.type]?.label}</span>
-                  </div>
-                  <div className="mars-site-coords mono">
-                    {formatCoordinates(loc.lat, loc.lng)} • {loc.elevation}
-                  </div>
-                  <p className="mars-site-desc">
-                    {loc.description.slice(0, 110)}...
-                  </p>
-                  <div className="mars-site-footer">
-                    <span className="mars-site-status">{loc.status}</span>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      <button
-                        type="button"
-                        className="mars-site-select-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedLocation(loc);
-                        }}
-                      >
-                        Inspect
-                      </button>
-                      <Link
-                        to={`/route-planner?start=${loc.id}`}
-                        className="mars-site-select-btn"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        Route
-                      </Link>
-                    </div>
+        {/* Filter Pills */}
+        <div className="mars-category-bar">
+          <button
+            type="button"
+            className={`mars-cat-btn ${selectedType === 'all' ? 'mars-cat-btn--active' : ''}`}
+            onClick={() => setSelectedType('all')}
+          >
+            All Sites ({marsLocations.length})
+          </button>
+          {Object.entries(locationTypes).map(([key, { label }]) => {
+            const count = marsLocations.filter((l) => l.type === key).length;
+            return (
+              <button
+                key={key}
+                type="button"
+                className={`mars-cat-btn ${selectedType === key ? 'mars-cat-btn--active' : ''}`}
+                onClick={() => setSelectedType(selectedType === key ? 'all' : key)}
+              >
+                {label} ({count})
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Location Cards Grid */}
+        <div className="mars-quick-grid">
+          {filteredLocations.map((loc) => {
+            const isSelected = selectedLocation?.id === loc.id;
+            return (
+              <div
+                key={loc.id}
+                className={`mars-site-card ${isSelected ? 'mars-site-card--selected' : ''}`}
+                onClick={() => handleSelectLocation(loc)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && handleSelectLocation(loc)}
+              >
+                <div className="mars-site-header">
+                  <h4 className="mars-site-name">{loc.name}</h4>
+                  <span className="mars-site-type">{locationTypes[loc.type]?.label}</span>
+                </div>
+                <div className="mars-site-coords mono">
+                  {formatCoordinates(loc.lat, loc.lng)} • {loc.elevation}
+                </div>
+                <p className="mars-site-desc">
+                  {loc.description.slice(0, 110)}...
+                </p>
+                <div className="mars-site-footer">
+                  <ClassificationBadge type="actual" size="sm" />
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button
+                      type="button"
+                      className="mars-site-select-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectLocation(loc);
+                      }}
+                    >
+                      Inspect
+                    </button>
+                    <Link
+                      to={`/route-planner?start=${loc.id}`}
+                      className="mars-site-select-btn"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Route
+                    </Link>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }

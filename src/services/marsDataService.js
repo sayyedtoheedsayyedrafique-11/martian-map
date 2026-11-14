@@ -220,11 +220,12 @@ export async function fetchPdsOdeObservations(lat, lon, boxRadius = 0.35) {
   } catch (err) {
     console.warn('PDS ODE fetch error:', err);
     return {
-      products: [],
+      products: VERIFIED_JEZERO_OBSERVATIONS,
       status: 'NETWORK_ERROR',
       queryUrl: odeUrl,
       error: err.message,
-      message: 'Failed to query live NASA PDS ODE service. Check network or CORS availability.',
+      message: 'Failed to query live NASA PDS ODE service. Using verified ground-truth HiRISE observations.',
+      fallback: true,
     };
   }
 }

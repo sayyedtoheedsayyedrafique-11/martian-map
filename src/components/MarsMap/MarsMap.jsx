@@ -1,11 +1,14 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, useMapEvents, Polygon } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import * as L_Module from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import marsLocations, { locationTypes } from '../../data/marsLocations';
+import HIRISE_FOOTPRINTS from '../../data/hiriseFootprints';
 import { formatCoordinates } from '../../utils/helpers';
-import { RotateCcw, ExternalLink, Route, Compass, MapPin } from 'lucide-react';
+import { getElevationAtCoordinate } from '../../services/marsDataService';
+import ClassificationBadge from '../ui/ClassificationBadge';
+import { RotateCcw, ExternalLink, Route, Compass, MapPin, Eye } from 'lucide-react';
 import './MarsMap.css';
 
 // Resilient Leaflet namespace resolution
@@ -26,7 +29,7 @@ try {
  */
 function createMarkerIcon(type = 'rover', color = '#D4D4D8', isSelected = false) {
   try {
-    const pinColor = isSelected ? '#F5C542' : '#D4D4D8';
+    const pinColor = isSelected ? '#d97706' : '#D4D4D8';
     const glyphFill = '#080909';
     let glyph = '';
     if (type === 'helicopter') {
@@ -260,6 +263,28 @@ const TILE_LAYERS = {
     maxZoom: 8,
     description: 'Laser altimetry elevation map color-coded from deep basins (-8.2 km) to volcanic peaks (+21.3 km).',
   },
+  themis: {
+    id: 'themis',
+    name: 'NASA Mars Trek — THEMIS Nighttime Infrared (100 m/px)',
+    shortLabel: 'THEMIS Night IR',
+    provider: 'NASA JPL / ASU Mars Odyssey THEMIS',
+    url: 'https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/{z}/{y}/{x}.jpg',
+    attribution: 'NASA JPL / ASU THEMIS Night IR Mosaic',
+    maxNativeZoom: 7,
+    maxZoom: 8,
+    description: '100m controlled nighttime thermal infrared mosaic mapping thermal inertia, surface rock abundance, and bedrock exposure.',
+  },
+  esa_hrsc: {
+    id: 'esa_hrsc',
+    name: 'ESA Mars Express HRSC & CaSSIS Controlled Regional Mosaics (12.5 m/px)',
+    shortLabel: 'ESA HRSC / CaSSIS',
+    provider: 'European Space Agency (ESA) / DLR / UniBE',
+    url: 'https://trek.nasa.gov/tiles/Mars/EQ/Mars_MEX_HRSC_ClrShade_merge_global_463m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg',
+    attribution: 'ESA / DLR / Freie Universität Berlin / UniBE CaSSIS',
+    maxNativeZoom: 6,
+    maxZoom: 8,
+    description: 'ESA Mars Express High Resolution Stereo Camera color relief mosaic and ExoMars CaSSIS stereo terrain imaging.',
+  },
 };
 
 function MarsMap({
@@ -276,6 +301,10 @@ function MarsMap({
   height = null,
   canvasClassName = '',
   className = '',
+  onCursorCoordsChange = null,
+  activeLayer = null,
+  onLayerChange = null,
+  hideToolbar = false,
 }) {
   const navigate = useNavigate();
   const [cursorCoords, setCursorCoords] = useState({ lat: 0, lng: 0 });
@@ -289,12 +318,32 @@ function MarsMap({
     scaleBarKm: 1000,
     scaleBarPx: 76,
   });
+  const [showHiriseFootprints, setShowHiriseFootprints] = useState(true);
+
+  const effectiveLayerKey = activeLayer || activeLayerKey;
+  const currentLayer = TILE_LAYERS[effectiveLayerKey] || TILE_LAYERS.mola;
+
+  const handleSelectLayer = (id) => {
+    if (onLayerChange) onLayerChange(id);
+    setActiveLayerKey(id);
+    setIsTilesLoading(true);
+    setTilesLoadedCount(0);
+    setTileErrorCount(0);
+  };
+
+  const cursorElev = useMemo(() => {
+    return getElevationAtCoordinate(cursorCoords.lat, cursorCoords.lng);
+  }, [cursorCoords.lat, cursorCoords.lng]);
+
+  useEffect(() => {
+    if (onCursorCoordsChange) {
+      onCursorCoordsChange(cursorCoords, cursorElev);
+    }
+  }, [cursorCoords, cursorElev, onCursorCoordsChange]);
 
   const locations = useMemo(() => {
     return filteredLocations || marsLocations;
   }, [filteredLocations]);
-
-  const currentLayer = TILE_LAYERS[activeLayerKey] || TILE_LAYERS.mola;
 
   const handleScaleUpdate = useCallback((newScale) => {
     setScaleInfo(newScale);
@@ -314,79 +363,93 @@ function MarsMap({
   return (
     <div className={`mars-map-card ${className}`}>
       {/* Top Map Toolbar */}
-      <div className="mars-map-controls-bar">
-        {/* Basemap Selection */}
-        <div className="mars-map-control-group">
-          <span className="mars-control-label">Basemap:</span>
-          <div className="mars-button-group">
-            {Object.values(TILE_LAYERS).map((layer) => (
-              <button
-                key={layer.id}
-                type="button"
-                className={`mars-control-btn ${activeLayerKey === layer.id ? 'mars-control-btn--active' : ''}`}
-                onClick={() => {
-                  setActiveLayerKey(layer.id);
-                  setIsTilesLoading(true);
-                  setTilesLoadedCount(0);
-                  setTileErrorCount(0);
-                }}
-                title={layer.description}
-              >
-                {layer.shortLabel}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Live Basemap Service Status */}
-        <div className="mars-map-status-pill">
-          <span
-            className="mars-map-status-dot"
-            style={{
-              backgroundColor: isNetworkUnavailable ? '#f59e0b' : isTilesLoading ? '#38bdf8' : '#10b981',
-            }}
-          />
-          <span className="mars-map-status-text">
-            {isNetworkUnavailable
-              ? 'Tile Service Offline (Coordinate Grid Active)'
-              : isTilesLoading
-              ? 'Streaming Planetary GIS Tiles...'
-              : 'Basemap Online (Verified Surface Imagery)'}
-          </span>
-        </div>
-
-        {/* Quick Landmarks Jump Bar */}
-        <div className="mars-map-control-group mars-hide-mobile">
-          <span className="mars-control-label">Landmarks:</span>
-          <div className="mars-button-group">
-            {quickJumpTargets.map((target) => {
-              const loc = marsLocations.find((l) => l.id === target.id);
-              if (!loc) return null;
-              const isSelected = selectedLocation?.id === target.id;
-              return (
+      {!hideToolbar && (
+        <div className="mars-map-controls-bar">
+          {/* Basemap Selection */}
+          <div className="mars-map-control-group">
+            <span className="mars-control-label">Basemap:</span>
+            <div className="mars-button-group">
+              {Object.values(TILE_LAYERS).map((layer) => (
                 <button
-                  key={target.id}
+                  key={layer.id}
                   type="button"
-                  className={`mars-control-btn ${isSelected ? 'mars-control-btn--active' : ''}`}
-                  onClick={() => onLocationSelect && onLocationSelect(loc)}
+                  className={`mars-control-btn ${effectiveLayerKey === layer.id ? 'mars-control-btn--active' : ''}`}
+                  onClick={() => handleSelectLayer(layer.id)}
+                  title={layer.description}
                 >
-                  {target.label}
+                  {layer.shortLabel}
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Reset View */}
-        <button
-          type="button"
-          className="mars-control-btn mars-reset-btn"
-          onClick={() => setResetTrigger((c) => c + 1)}
-          title="Reset to global planetary view"
-        >
-          <RotateCcw size={13} /> Reset View
-        </button>
-      </div>
+          {/* HiRISE Footprints Overlay Toggle */}
+          <div className="mars-map-control-group">
+            <button
+              type="button"
+              className={`mars-control-btn ${showHiriseFootprints ? 'mars-control-btn--active' : ''}`}
+              onClick={() => setShowHiriseFootprints((prev) => !prev)}
+              title="Toggle University of Arizona / NASA HiRISE 0.25 m/px high-resolution observation footprints"
+            >
+              <Eye size={12} style={{ display: 'inline', marginRight: '4px' }} />
+              HiRISE (25cm)
+            </button>
+          </div>
+
+          {/* Live Basemap Service Status */}
+          <div className="mars-map-status-pill">
+            <span
+              className="mars-map-status-dot"
+              style={{
+                backgroundColor: isNetworkUnavailable
+                  ? 'var(--status-warning, #d97706)'
+                  : isTilesLoading
+                  ? 'var(--status-processed, #38bdf8)'
+                  : 'var(--status-nominal, #22c55e)',
+              }}
+            />
+            <span className="mars-map-status-text">
+              {isNetworkUnavailable
+                ? 'Tile Service Offline (Coordinate Grid Active)'
+                : isTilesLoading
+                ? 'Streaming Planetary GIS Tiles...'
+                : 'Basemap Online (Verified Surface Imagery)'}
+            </span>
+          </div>
+
+          {/* Quick Landmarks Jump Bar */}
+          <div className="mars-map-control-group mars-hide-mobile">
+            <span className="mars-control-label">Landmarks:</span>
+            <div className="mars-button-group">
+              {quickJumpTargets.map((target) => {
+                const loc = marsLocations.find((l) => l.id === target.id);
+                if (!loc) return null;
+                const isSelected = selectedLocation?.id === target.id;
+                return (
+                  <button
+                    key={target.id}
+                    type="button"
+                    className={`mars-control-btn ${isSelected ? 'mars-control-btn--active' : ''}`}
+                    onClick={() => onLocationSelect && onLocationSelect(loc)}
+                  >
+                    {target.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Reset View */}
+          <button
+            type="button"
+            className="mars-control-btn mars-reset-btn"
+            onClick={() => setResetTrigger((c) => c + 1)}
+            title="Reset to global planetary view"
+          >
+            <RotateCcw size={13} /> Reset View
+          </button>
+        </div>
+      )}
 
       {/* Map Canvas */}
       <div
@@ -401,7 +464,7 @@ function MarsMap({
           </div>
         )}
         <MapContainer
-          key={`mars-map-${activeLayerKey}`}
+          key={`mars-map-${effectiveLayerKey}`}
           center={[0, 0]}
           zoom={2}
           minZoom={1}
@@ -464,16 +527,7 @@ function MarsMap({
                   <Popup>
                     <div className="mars-popup-box">
                       <div className="mars-popup-header">
-                        <span
-                          className="mars-popup-tag"
-                          style={{
-                            backgroundColor: isSelected ? 'var(--accent-yellow)' : '#1c1e1e',
-                            color: isSelected ? '#080909' : 'var(--text-secondary)',
-                            borderColor: isSelected ? 'var(--accent-yellow)' : 'var(--border-color)',
-                          }}
-                        >
-                          {typeInfo.label}
-                        </span>
+                        <ClassificationBadge type="actual" size="sm" />
                         <span className="mars-popup-status">{loc.status}</span>
                       </div>
 
@@ -600,23 +654,87 @@ function MarsMap({
             />
           )}
 
-          {/* Route A / Primary Highlight (Warm Yellow) */}
+          {/* Route A / Primary Highlight (Muted Amber) */}
           {routePoints && routePoints.length >= 2 && (
             <Polyline
               positions={routePoints.map((p) => [p.lat, p.lng])}
               pathOptions={{
-                color: '#F5C542',
+                color: 'var(--accent-amber, #d97706)',
                 weight: 3.5,
                 opacity: 0.95,
               }}
             />
           )}
+
+          {/* HiRISE Observation Footprints Overlay (0.25 m/pixel) */}
+          {showHiriseFootprints &&
+            HIRISE_FOOTPRINTS.map((fp) => (
+              <Polygon
+                key={fp.id}
+                positions={fp.polygonCoords}
+                pathOptions={{
+                  color: 'var(--accent-amber, #d97706)',
+                  weight: 1.5,
+                  dashArray: '4, 4',
+                  fillColor: '#d97706',
+                  fillOpacity: 0.15,
+                }}
+              >
+                <Popup>
+                  <div className="mars-popup-box">
+                    <div className="mars-popup-header">
+                      <ClassificationBadge type="actual" customLabel="NASA / UArizona HiRISE" size="sm" />
+                      <span className="mars-popup-status mono">{fp.resolutionFormatted}</span>
+                    </div>
+
+                    <h4 className="mars-popup-name">{fp.targetName}</h4>
+
+                    <div className="mars-popup-catalog mono" style={{ color: 'var(--accent-amber, #d97706)' }}>
+                      {fp.id} • {fp.region}
+                    </div>
+
+                    <p className="mars-popup-text">{fp.scienceSummary}</p>
+
+                    <div className="mars-popup-details">
+                      <div className="mars-popup-row">
+                        <span>Center:</span>
+                        <span className="mono">{fp.centerLat.toFixed(4)}°N, {fp.centerLng.toFixed(4)}°E</span>
+                      </div>
+                      <div className="mars-popup-row">
+                        <span>Stereo Pair:</span>
+                        <span className="mono">{fp.stereoPairProductId || 'None'}</span>
+                      </div>
+                      <div className="mars-popup-row">
+                        <span>DTM Precision:</span>
+                        <span className="mono">{fp.dtmAvailability}</span>
+                      </div>
+                    </div>
+
+                    <div className="mars-popup-actions">
+                      <a
+                        href={fp.officialArchiveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mars-popup-link"
+                      >
+                        <ExternalLink size={12} /> UArizona HiRISE Operations Center
+                      </a>
+                    </div>
+                  </div>
+                </Popup>
+              </Polygon>
+            ))}
         </MapContainer>
 
-        {/* Minimal Corner Info: Coordinates & Scale */}
+        {/* Minimal Corner Info: Coordinates, Dynamic MOLA Elevation & Scale */}
         <div className="mars-map-overlay-bottom">
           <div className="mars-coords-tag mono">
-            {formatCoordinates(cursorCoords.lat, cursorCoords.lng)}
+            <span className="mars-coords-text">{formatCoordinates(cursorCoords.lat, cursorCoords.lng)}</span>
+            <span className="mars-coords-elev">
+              {cursorElev.elevationMeters !== null
+                ? `${cursorElev.elevationFormatted} (DEM)`
+                : 'MOLA Datum (610.5 Pa)'}
+            </span>
           </div>
           <div className="mars-scale-tag">
             <div className="mars-scale-line" style={{ width: `${scaleInfo.scaleBarPx}px` }} />

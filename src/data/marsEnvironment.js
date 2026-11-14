@@ -40,7 +40,7 @@ const marsEnvironment = {
     data: {
       surfacePressure: {
         label: 'Mean Surface Atmospheric Pressure',
-        value: '6.36 mbar (636 Pa)',
+        value: '6.10–6.36 mbar (610–636 Pa)',
         range: '4.0 mbar (Olympus Mons summit) to 11.5 mbar (Hellas Basin floor)',
         detail: 'Approximately 0.6% of Earth sea-level pressure (1,013.25 mbar). Falls below the Armstrong limit (63 mbar).',
         status: 'Verified In-Situ Measurement',
