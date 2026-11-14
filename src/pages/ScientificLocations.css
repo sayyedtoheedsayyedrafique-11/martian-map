@@ -1,0 +1,391 @@
+/* ScientificLocations.css — Minimalist Black + Warm Yellow Field Tool */
+
+.locations-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.locations-page__header {
+  margin-bottom: 2px;
+}
+
+.locations-page__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+  letter-spacing: -0.2px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.locations-page__subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  max-width: 800px;
+}
+
+/* Controls */
+.locations-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.locations-filter-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.locations-filter-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-mono);
+}
+
+.locations-filter-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.locations-filter-btn--active {
+  background: var(--accent-yellow);
+  border-color: var(--accent-yellow);
+  color: #080909;
+  font-weight: 700;
+}
+
+.locations-filter-btn--active:hover {
+  background: var(--accent-yellow-hover);
+  color: #080909;
+}
+
+/* Empty State */
+.locations-empty {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 0;
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.locations-reset-btn {
+  background: #080909;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-mono);
+}
+
+.locations-reset-btn:hover {
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow);
+}
+
+/* Grid of Locations */
+.locations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 12px;
+}
+
+.location-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 0;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  transition: border-color var(--transition-fast);
+}
+
+.location-card:hover {
+  border-color: var(--border-light);
+}
+
+.location-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.location-card__tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.location-tag {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: #080909;
+  border: 1px solid var(--border-color);
+  padding: 1px 5px;
+  border-radius: 0;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
+.location-status {
+  font-size: 0.68rem;
+  color: var(--status-online);
+  font-family: var(--font-mono);
+}
+
+.location-catalog {
+  font-size: 0.64rem;
+  color: var(--text-muted);
+  background: #080909;
+  padding: 1px 5px;
+  border-radius: 0;
+  border: 1px solid var(--border-color);
+}
+
+.location-card__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.location-card__mission {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.location-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.location-card__desc {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.location-card__discovery {
+  background: #080909;
+  border: 1px solid var(--border-color);
+  border-left: 2px solid var(--accent-yellow);
+  padding: 6px 8px;
+  border-radius: 0;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.location-card__discovery strong {
+  color: var(--text-primary);
+}
+
+.location-card__meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background: #080909;
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  border-radius: 0;
+}
+
+.location-meta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.location-meta-label {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
+.location-meta-value {
+  font-size: 0.74rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.location-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-color);
+  padding-top: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.location-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.location-action-btn {
+  background: #080909;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--transition-fast);
+  font-family: var(--font-mono);
+}
+
+.location-action-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow);
+}
+
+.location-action-btn--jezero {
+  background: var(--mars-rust-subtle);
+  border-color: rgba(193, 68, 14, 0.45);
+  color: #ff936b;
+  font-weight: 600;
+}
+
+.location-action-btn--jezero:hover {
+  background: var(--mars-rust);
+  border-color: var(--mars-rust);
+  color: #ffffff !important;
+}
+
+.location-source-link {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-mono);
+}
+
+.location-source-link:hover {
+  color: var(--accent-yellow);
+}
+
+/* --- New Scientific Locations Tags & Strips --- */
+
+.locations-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.locations-sys-tag {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 2px 7px;
+  text-transform: uppercase;
+}
+
+.locations-sys-tag--accent {
+  color: var(--accent-yellow);
+  border-color: rgba(245, 197, 66, 0.4);
+  background: rgba(245, 197, 66, 0.06);
+}
+
+.locations-summary-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+}
+
+.locations-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.locations-summary-key {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.locations-summary-val {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.locations-agency-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.locations-agency-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.locations-agency-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.locations-agency-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.locations-agency-btn--active {
+  background: var(--accent-yellow);
+  color: #080909;
+  border-color: var(--accent-yellow);
+  font-weight: 700;
+}
+

@@ -1,0 +1,89 @@
+/* ErrorBoundary.css — Minimalist Black + Warm Yellow Field Error */
+
+.error-fallback {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+}
+
+.error-fallback__card {
+  max-width: 580px;
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-top: 3px solid var(--accent-yellow);
+  border-radius: 0;
+  padding: 24px;
+}
+
+.error-fallback__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.error-fallback__icon {
+  color: var(--accent-yellow);
+  flex-shrink: 0;
+}
+
+.error-fallback__header h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.error-fallback__message {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.error-fallback__details {
+  background: #080909;
+  border: 1px solid var(--border-color);
+  border-radius: 0;
+  padding: 10px;
+  font-size: 0.74rem;
+  font-family: var(--font-mono);
+  color: var(--accent-yellow);
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin-bottom: 18px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.error-fallback__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.error-fallback__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-yellow);
+  color: #080909;
+  border: 1px solid var(--accent-yellow);
+  border-radius: 0;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  font-family: var(--font-mono);
+}
+
+.error-fallback__btn:hover {
+  background: var(--accent-yellow-hover);
+}

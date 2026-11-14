@@ -1,0 +1,153 @@
+/* About.css — Minimalist Black + Warm Yellow Field Tool */
+
+.about-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.about-page__header {
+  margin-bottom: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.about-page__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #080909;
+  border: 1px solid var(--border-color);
+  color: var(--accent-yellow);
+  padding: 3px 8px;
+  border-radius: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+}
+
+.about-page__heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  letter-spacing: -0.2px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.about-page__subtitle {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  max-width: 760px;
+  line-height: 1.45;
+}
+
+.about-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.about-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.about-list li {
+  position: relative;
+  padding-left: 14px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.about-list li::before {
+  content: '■';
+  position: absolute;
+  left: 0;
+  top: 1px;
+  font-size: 0.5rem;
+  color: var(--accent-yellow);
+}
+
+.about-limitation-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #080909;
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent-yellow);
+  border-radius: 0;
+  padding: 8px 10px;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.about-limitation-box strong {
+  color: var(--accent-yellow);
+  font-family: var(--font-mono);
+}
+
+/* Challenge Requirements Matrix */
+.about-page__matrix {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 0;
+  padding: 14px;
+}
+
+.about-matrix-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.matrix-table-wrap {
+  overflow-x: auto;
+}
+
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.76rem;
+  text-align: left;
+}
+
+.matrix-table th {
+  background: #080909;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color);
+  font-family: var(--font-mono);
+}
+
+.matrix-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.matrix-table tr:last-child td {
+  border-bottom: none;
+}
+
+.matrix-table tr:hover td {
+  background: var(--bg-card-hover);
+}

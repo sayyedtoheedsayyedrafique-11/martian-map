@@ -1,0 +1,250 @@
+/* ==========================================================================
+   MARS PATHFINDER — NASA Planetary GIS Exploration Platform
+   Scientific Palette:
+     - Near-Black Primary:     #070809 (Deep Space / Regolith Base)
+     - Elevated Panels:        #0E1113 (Planetary Console Surface)
+     - Card / Nav Surface:     #13171A (HUD Interface Panels)
+     - Clean White Typography: #FFFFFF (Primary Readouts & Headings)
+     - High-Contrast Text:     #CBD5E1 (Slate Body Text)
+     - Technical Muted Text:   #8492A6 (Secondary Metadata & Provenance)
+     - Warm Yellow Accent:     #F5C542 (NASA Mission Gold / Active States)
+     - Natural Mars Rust:      #C1440E (Areographic Features & Landers)
+     - Mars Red Subtle:        rgba(193, 68, 14, 0.16)
+     - Structural Hairlines:   #22272B (Console Dividers)
+   ========================================================================== */
+
+:root {
+  /* Scientific Deep Dark Bases */
+  --bg-primary: #070809;
+  --bg-secondary: #0d1012;
+  --bg-card: #121619;
+  --bg-card-hover: #191e22;
+  --bg-sidebar: #0f1215;
+  --bg-input: #080a0c;
+
+  /* Clean White Typography Hierarchy */
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --text-muted: #8492a6;
+
+  /* Warm Yellow NASA Mission Gold (Restrained highlights, active nav, primary controls) */
+  --accent-yellow: #f5c542;
+  --accent-yellow-hover: #e5b32e;
+  --accent-yellow-subtle: rgba(245, 197, 66, 0.12);
+
+  /* Natural Mars Rust / Red (Areographic monuments, geological features, rover waypoints) */
+  --mars-rust: #c1440e;
+  --mars-rust-hover: #d9531e;
+  --mars-rust-subtle: rgba(193, 68, 14, 0.18);
+  --mars-sand: #d88350;
+
+  /* Functional Status Indicators */
+  --status-online: #10b981;
+  --status-warning: #f5c542;
+  --status-critical: #ef4444;
+  --status-info: #38bdf8;
+
+  /* Structural Console Hairlines */
+  --border-color: #22272b;
+  --border-light: #333a41;
+  --border-accent: #f5c542;
+  --border-mars: #c1440e;
+
+  /* Layout Spacing */
+  --sidebar-width: 230px;
+  --header-height: 50px;
+  --content-padding: 20px;
+
+  /* Planetary Cartographic Typography */
+  --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', Helvetica, Arial, sans-serif;
+  --font-mono: 'Consolas', 'SF Mono', 'Courier New', monospace;
+
+  /* Transitions */
+  --transition-fast: 120ms ease;
+  --transition-normal: 180ms ease;
+
+  /* Sharp Geometry: Clean Planetary Instrument HUD */
+  --radius-sm: 0px;
+  --radius-md: 2px;
+  --radius-lg: 3px;
+
+  /* Shadows */
+  --shadow-sm: none;
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 6px 24px rgba(0, 0, 0, 0.9);
+}
+
+/* --- Reset & Base --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 15px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-primary);
+}
+
+body {
+  font-family: var(--font-main);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.45;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--accent-yellow);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-light);
+}
+
+/* Monospace & Scientific Tabular Numerals */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Technical HUD Stamp */
+.tech-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.tech-stamp--accent {
+  color: var(--accent-yellow);
+  border-color: rgba(245, 197, 66, 0.35);
+  background: rgba(245, 197, 66, 0.05);
+}
+
+.tech-stamp--mars {
+  color: #ff7d50;
+  border-color: rgba(193, 68, 14, 0.45);
+  background: rgba(193, 68, 14, 0.08);
+}
+
+.tech-stamp--active {
+  color: var(--status-online);
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+/* Minimal fade */
+.fade-in {
+  animation: simpleFade 120ms ease-out;
+}
+
+@keyframes simpleFade {
+  from { opacity: 0.94; }
+  to { opacity: 1; }
+}
+
+/* Leaflet Container & Overrides (Natural planetary imagery colors strictly preserved) */
+.leaflet-container {
+  background: #080909 !important;
+  font-family: var(--font-main) !important;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid var(--border-color) !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  border-radius: 0 !important;
+  transition: background var(--transition-fast) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--bg-card-hover) !important;
+  color: var(--accent-yellow) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-radius: 2px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.9) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+  font-size: 0.82rem !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(8, 9, 9, 0.94) !important;
+  color: var(--text-muted) !important;
+  font-size: 0.66rem !important;
+  border-top-left-radius: 0 !important;
+  border: 1px solid var(--border-color) !important;
+  border-right: none !important;
+  border-bottom: none !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--text-secondary) !important;
+}

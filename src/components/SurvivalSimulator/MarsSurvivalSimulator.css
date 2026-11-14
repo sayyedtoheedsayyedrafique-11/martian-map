@@ -1,0 +1,633 @@
+/* ==========================================================================
+   MARS SURVIVAL SIMULATOR — Component Styles
+   Palette: Black (#080909) + Panels (#141616) + Warm Yellow (#F5C542)
+   ========================================================================== */
+
+.mss-root {
+  width: 100%;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --- Header & Scientific Protocol --- */
+.mss-header {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mss-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mss-sys-tag {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.mss-sys-tag--accent {
+  background: var(--accent-yellow-subtle);
+  color: var(--accent-yellow);
+  border-color: var(--accent-yellow);
+  font-weight: 600;
+}
+
+.mss-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.mss-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 950px;
+}
+
+/* Mandatory Ethics & Empirical Integrity Banner */
+.mss-ethics-banner {
+  background: rgba(245, 197, 66, 0.06);
+  border: 1px solid var(--accent-yellow);
+  padding: 14px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.mss-ethics-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.mss-ethics-text strong {
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* --- Location Selection Toolbar --- */
+.mss-location-toolbar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mss-toolbar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.mss-toolbar-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.mss-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mss-reset-btn:hover {
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow);
+  background: rgba(245, 197, 66, 0.08);
+}
+
+.mss-quick-locations {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mss-loc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mss-loc-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.mss-loc-btn--active {
+  background: var(--accent-yellow);
+  color: #080909;
+  border-color: var(--accent-yellow);
+}
+
+.mss-loc-btn--active:hover {
+  background: var(--accent-yellow-hover);
+  color: #080909;
+}
+
+/* Location Status Banner */
+.mss-location-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mss-location-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.mss-location-title-group h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.mss-location-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.mss-sensor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.mss-sensor-badge--insitu {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.mss-sensor-badge--modeled {
+  background: rgba(245, 197, 66, 0.12);
+  color: var(--accent-yellow);
+  border: 1px solid rgba(245, 197, 66, 0.4);
+}
+
+.mss-location-meta-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 10px;
+}
+
+.mss-loc-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mss-loc-meta-key {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.mss-loc-meta-val {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* --- Section Navigation Modes --- */
+.mss-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.mss-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mss-tab-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.mss-tab-btn--active {
+  background: var(--accent-yellow);
+  color: #080909;
+  border-color: var(--accent-yellow);
+}
+
+.mss-tab-btn--active:hover {
+  background: var(--accent-yellow-hover);
+  color: #080909;
+}
+
+/* --- Environmental Conditions Cards --- */
+.mss-conditions-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mss-condition-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color var(--transition-fast);
+}
+
+.mss-condition-card:hover {
+  border-color: var(--border-light);
+}
+
+.mss-condition-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.mss-condition-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mss-condition-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.mss-measurement-pill {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 3px 8px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+.mss-measurement-pill--insitu {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.mss-measurement-pill--modeled {
+  background: rgba(245, 197, 66, 0.1);
+  color: var(--accent-yellow);
+  border: 1px solid rgba(245, 197, 66, 0.3);
+}
+
+.mss-condition-value-box {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mss-condition-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent-yellow);
+}
+
+.mss-condition-unit {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.mss-condition-notes {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.mss-condition-implication {
+  background: rgba(0, 0, 0, 0.35);
+  border-left: 3px solid var(--accent-yellow);
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.mss-condition-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-color);
+  padding-top: 10px;
+}
+
+.mss-condition-source-link {
+  color: var(--accent-yellow);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mss-condition-source-link:hover {
+  text-decoration: underline;
+}
+
+/* --- Survival Challenges Section --- */
+.mss-challenges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.mss-challenge-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mss-challenge-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.mss-challenge-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.mss-challenge-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.mss-impact-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mss-impact-label {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--accent-yellow);
+}
+
+/* --- Survival Readiness Assessment Matrix --- */
+.mss-readiness-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mss-readiness-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mss-readiness-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.mss-readiness-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.mss-severity-tag {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 3px 8px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.mss-readiness-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 850px) {
+  .mss-readiness-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mss-readiness-block {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mss-readiness-block-title {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: var(--accent-yellow);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mss-readiness-block-content {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.mss-bullet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.mss-bullet-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.mss-bullet-dot {
+  color: var(--accent-yellow);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+/* --- Scientific Terms Glossary Modal / Drawer --- */
+.mss-glossary-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.mss-glossary-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  max-width: 800px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+}
+
+.mss-glossary-modal-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-secondary);
+}
+
+.mss-glossary-modal-body {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mss-glossary-item {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mss-glossary-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.mss-glossary-term {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-yellow);
+}
+
+.mss-glossary-category {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.mss-glossary-exp {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.mss-glossary-cite {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}

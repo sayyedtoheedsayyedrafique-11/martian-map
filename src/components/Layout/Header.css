@@ -1,0 +1,165 @@
+/* Header.css — Compact Minimalist Black Field Bar */
+
+.header {
+  height: var(--header-height);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--content-padding);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-sizing: border-box;
+}
+
+.header__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header__menu-btn {
+  display: none;
+  background: #080909;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 5px 8px;
+  border-radius: 0;
+  transition: all var(--transition-fast);
+}
+
+.header__menu-btn:hover {
+  border-color: var(--accent-yellow);
+  color: var(--text-primary);
+}
+
+.header__brand-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header__brand-tag {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
+.header__divider {
+  color: var(--border-light);
+  font-weight: 300;
+  font-size: 0.9rem;
+}
+
+.header__section-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent-yellow);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  margin: 0;
+}
+
+.header__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header__status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #080909;
+  border: 1px solid var(--border-color);
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.2px;
+}
+
+.header__status-indicator {
+  width: 6px;
+  height: 6px;
+  background: var(--status-online);
+  border-radius: 0;
+  flex-shrink: 0;
+}
+
+.header__coords-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #080909;
+  border: 1px solid var(--border-color);
+  padding: 4px 10px;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+}
+
+.header__quick-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 4px 9px;
+  border-radius: var(--radius-md);
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.header__quick-tool-btn--jezero {
+  background: var(--mars-rust-subtle);
+  color: #ff9166;
+  border: 1px solid rgba(193, 68, 14, 0.4);
+}
+
+.header__quick-tool-btn--jezero:hover {
+  background: var(--mars-rust);
+  color: #ffffff;
+  border-color: var(--mars-rust);
+  text-decoration: none;
+}
+
+.header__quick-tool-btn--globe {
+  background: var(--accent-yellow-subtle);
+  color: var(--accent-yellow);
+  border: 1px solid rgba(245, 197, 66, 0.35);
+}
+
+.header__quick-tool-btn--globe:hover {
+  background: var(--accent-yellow);
+  color: #070809;
+  border-color: var(--accent-yellow);
+  text-decoration: none;
+}
+
+@media (max-width: 860px) {
+  .header__coords-pill {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .header__menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header__status-badge {
+    display: none;
+  }
+}

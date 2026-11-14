@@ -1,0 +1,1363 @@
+/* JezeroTerrain3D.css — Authentic 3D & 2D Martian Elevation Workstation */
+
+.jezero-3d-wrapper {
+  position: relative;
+  width: 100%;
+  background: var(--bg-primary, #080909);
+  border: 1px solid var(--border-color, #242a30);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Top Mission Workstation HUD Bar */
+.jezero-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: var(--bg-card, #0e1114);
+  border-bottom: 1px solid var(--border-color, #242a30);
+  flex-wrap: wrap;
+  gap: 8px;
+  z-index: 10;
+}
+
+.jezero-top-bar__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.jezero-brand-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent-yellow, #f5c542);
+  background: rgba(245, 197, 66, 0.08);
+  padding: 3px 8px;
+  border: 1px solid rgba(245, 197, 66, 0.25);
+}
+
+.jezero-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-yellow, #f5c542);
+  box-shadow: 0 0 6px var(--accent-yellow, #f5c542);
+  animation: jezeroPulse 2s infinite ease-in-out;
+}
+
+@keyframes jezeroPulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.jezero-datum-chip {
+  font-size: 9.5px;
+  color: var(--text-secondary, #94a3b8);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 3px 7px;
+  border: 1px solid var(--border-color, #242a30);
+}
+
+/* Prominent Vertical Scale Badge (Requirement 2 & 3) */
+.jezero-scale-indicator-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  background: rgba(14, 17, 20, 0.95);
+  border: 1px solid var(--border-color, #2d3640);
+  padding: 3px 8px;
+}
+
+.jezero-scale-tag {
+  color: var(--text-muted, #64748b);
+  letter-spacing: 0.04em;
+}
+
+.jezero-scale-val {
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+}
+
+.jezero-scale-val--true {
+  color: #10b981;
+}
+
+/* View Mode Switcher: 3D Surface vs 2D Map */
+.jezero-view-mode-switch {
+  display: inline-flex;
+  background: var(--bg-input, #060809);
+  border: 1px solid var(--border-color, #242a30);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.jezero-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border-color, #242a30);
+  color: var(--text-secondary, #94a3b8);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 5px 11px;
+  cursor: pointer;
+  transition: all var(--transition-fast, 120ms ease);
+}
+
+.jezero-mode-btn:last-child {
+  border-right: none;
+}
+
+.jezero-mode-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.jezero-mode-btn--active {
+  background: rgba(245, 197, 66, 0.15);
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+}
+
+/* Action Toolbar Buttons */
+.jezero-top-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.jezero-hud-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-input, #080a0c);
+  border: 1px solid var(--border-color, #242a30);
+  color: var(--text-secondary, #94a3b8);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 5px 9px;
+  cursor: pointer;
+  transition: all var(--transition-fast, 120ms ease);
+}
+
+.jezero-hud-btn:hover {
+  border-color: var(--accent-yellow, #f5c542);
+  color: #ffffff;
+}
+
+.jezero-hud-btn--active {
+  background: rgba(245, 197, 66, 0.16);
+  border-color: var(--accent-yellow, #f5c542);
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+}
+
+.jezero-hud-btn--accent {
+  background: rgba(193, 68, 14, 0.22);
+  border-color: var(--mars-rust, #c1440e);
+  color: #fca5a5;
+  font-weight: 700;
+}
+
+/* Viewport Area */
+.jezero-viewport-container {
+  position: relative;
+  width: 100%;
+  background: #060708;
+  overflow: hidden;
+}
+
+.jezero-three-canvas {
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+/* 2D Field Map View */
+.jezero-2d-canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #060708;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jezero-2d-canvas {
+  cursor: grab;
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;
+}
+
+.jezero-2d-canvas:active {
+  cursor: grabbing;
+}
+
+.jezero-2d-pan-hint {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 8.5px;
+  color: var(--text-muted, #64748b);
+  background: rgba(8, 10, 12, 0.88);
+  padding: 3px 8px;
+  border: 1px solid var(--border-color, #242a30);
+  pointer-events: none;
+}
+
+.jezero-2d-zoom-cluster {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 15;
+}
+
+.jezero-2d-zoom-readout {
+  font-size: 8.5px;
+  color: var(--text-secondary, #94a3b8);
+  text-align: center;
+  background: rgba(8, 10, 12, 0.9);
+  padding: 2px 4px;
+  border: 1px solid var(--border-color, #242a30);
+}
+
+/* Loader Overlay */
+.jezero-loader-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 7, 8, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  backdrop-filter: blur(4px);
+}
+
+.jezero-loader-box {
+  width: min(90%, 380px);
+  background: var(--bg-card, #0e1114);
+  border: 1px solid var(--border-color, #242a30);
+  padding: 16px;
+}
+
+.jezero-loader-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9.5px;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: 8px;
+}
+
+.jezero-loader-pct {
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+}
+
+.jezero-loader-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.jezero-loader-bar {
+  height: 100%;
+  background: var(--accent-yellow, #f5c542);
+  transition: width 200ms ease;
+}
+
+.jezero-loader-status {
+  font-size: 9px;
+  color: var(--text-muted, #64748b);
+  margin: 0;
+}
+
+/* 3D Screen Overlay Labels */
+.jezero-labels-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.jezero-screen-marker {
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  transform-origin: center bottom;
+  transition: transform 60ms linear;
+  z-index: 12;
+}
+
+.jezero-marker-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(8, 10, 12, 0.92);
+  border: 1px solid var(--border-color, #2d3640);
+  padding: 2px 7px;
+  font-size: 9px;
+  color: #ffffff;
+  transform: translate(-50%, -100%);
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  transition: border-color var(--transition-fast, 120ms ease);
+}
+
+.jezero-screen-marker:hover .jezero-marker-pill {
+  border-color: var(--accent-yellow, #f5c542);
+}
+
+.jezero-screen-marker--selected .jezero-marker-pill {
+  border-color: var(--accent-yellow, #f5c542);
+  background: rgba(245, 197, 66, 0.16);
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+}
+
+.jezero-screen-marker--landing .jezero-marker-pill {
+  border-color: #38bdf8;
+  color: #e0f2fe;
+}
+
+.jezero-marker-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-yellow, #f5c542);
+}
+
+.jezero-screen-marker--landing .jezero-marker-dot {
+  background: #38bdf8;
+}
+
+.jezero-marker-elev {
+  font-size: 8px;
+  color: var(--text-muted, #94a3b8);
+}
+
+/* Interactive Navigation Pad (Right Side) */
+.jezero-nav-dpad-cluster {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(10, 13, 16, 0.94);
+  border: 1px solid var(--border-color, #242a30);
+  padding: 8px;
+  z-index: 18;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+/* Compass Rose */
+.jezero-nav-compass-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  margin-bottom: 2px;
+}
+
+.jezero-compass-needle {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 80ms ease-out;
+}
+
+.jezero-needle-north {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 9px solid #ef4444;
+  font-size: 7px;
+  font-weight: 800;
+  color: #ef4444;
+  line-height: 0;
+  position: relative;
+  top: -2px;
+}
+
+.jezero-needle-south {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 9px solid #94a3b8;
+  position: relative;
+  bottom: -2px;
+}
+
+.jezero-compass-deg {
+  font-size: 8px;
+  color: var(--accent-yellow, #f5c542);
+  margin-top: 2px;
+}
+
+/* Directional Pan Pad */
+.jezero-dpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 20px);
+  grid-template-rows: repeat(3, 20px);
+  gap: 2px;
+}
+
+.jezero-dpad-cell {
+  width: 20px;
+  height: 20px;
+}
+
+.jezero-dpad-btn {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input, #060809);
+  border: 1px solid var(--border-color, #242a30);
+  color: var(--text-secondary, #94a3b8);
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--transition-fast, 120ms ease);
+}
+
+.jezero-dpad-btn:hover {
+  border-color: var(--accent-yellow, #f5c542);
+  color: #ffffff;
+}
+
+.jezero-dpad-btn--center {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.jezero-nav-rot-strip,
+.jezero-nav-zoom-strip {
+  display: flex;
+  gap: 3px;
+}
+
+.jezero-nav-btn {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input, #060809);
+  border: 1px solid var(--border-color, #242a30);
+  color: var(--text-secondary, #94a3b8);
+  cursor: pointer;
+  padding: 0;
+  font-size: 10px;
+  transition: all var(--transition-fast, 120ms ease);
+}
+
+.jezero-nav-btn:hover {
+  border-color: var(--accent-yellow, #f5c542);
+  color: #ffffff;
+}
+
+.jezero-nav-btn--active {
+  background: rgba(245, 197, 66, 0.16);
+  border-color: var(--accent-yellow, #f5c542);
+  color: var(--accent-yellow, #f5c542);
+}
+
+/* Hover Elevation Inspector HUD */
+.jezero-cursor-hud {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(8, 10, 12, 0.94);
+  border: 1px solid var(--accent-yellow, #f5c542);
+  padding: 6px 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.85);
+  z-index: 25;
+  white-space: nowrap;
+}
+
+.jezero-cursor-hud__elev {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.jezero-hud-dim {
+  color: var(--text-muted, #64748b);
+  font-size: 8.5px;
+}
+
+.jezero-hud-val {
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+}
+
+.jezero-cursor-hud__coords {
+  font-size: 9px;
+  color: #ffffff;
+  margin-top: 2px;
+}
+
+.jezero-cursor-hud__extra {
+  font-size: 8.5px;
+  color: var(--text-secondary, #94a3b8);
+  margin-top: 2px;
+  display: flex;
+  gap: 4px;
+}
+
+.jezero-cursor-hud__extra strong {
+  color: #ffffff;
+}
+
+.jezero-cursor-hud__measure-hint {
+  font-size: 8.5px;
+  color: var(--accent-yellow, #f5c542);
+  margin-top: 4px;
+  border-top: 1px dashed rgba(245, 197, 66, 0.35);
+  padding-top: 2px;
+}
+
+/* Click-to-Measure Result Card */
+.jezero-measure-result-card {
+  position: absolute;
+  top: 55px;
+  left: 14px;
+  background: rgba(10, 13, 16, 0.95);
+  border: 1px solid var(--accent-yellow, #f5c542);
+  padding: 10px 12px;
+  font-size: 9.5px;
+  z-index: 22;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.85);
+  min-width: 250px;
+}
+
+.jezero-measure-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-color, #242a30);
+}
+
+.jezero-measure-tag {
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+  font-size: 9px;
+}
+
+.jezero-measure-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.jezero-measure-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.jezero-measure-grid div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.jezero-dim-k {
+  color: var(--text-muted, #64748b);
+}
+
+/* Quick Regional Feature Selector Strip */
+.jezero-feature-pills-bar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(10, 13, 16, 0.92);
+  border: 1px solid var(--border-color, #242a30);
+  padding: 5px 8px;
+  max-width: calc(100% - 130px);
+  z-index: 18;
+  backdrop-filter: blur(4px);
+}
+
+.jezero-pills-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary, #94a3b8);
+  white-space: nowrap;
+}
+
+.jezero-pills-scroll {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.jezero-pills-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.jezero-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-input, #060809);
+  border: 1px solid var(--border-color, #242a30);
+  color: #ffffff;
+  font-size: 9.5px;
+  padding: 2px 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast, 120ms ease);
+}
+
+.jezero-pill-btn:hover {
+  border-color: var(--accent-yellow, #f5c542);
+  color: var(--accent-yellow, #f5c542);
+}
+
+.jezero-pill-btn--active {
+  background: rgba(245, 197, 66, 0.16);
+  border-color: var(--accent-yellow, #f5c542);
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+}
+
+.jezero-pill-btn--landing {
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.jezero-pill-btn--landing.jezero-pill-btn--active {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.jezero-pill-elev {
+  font-size: 8.5px;
+  color: var(--accent-yellow, #f5c542);
+}
+
+.jezero-pill-btn--landing .jezero-pill-elev {
+  color: #38bdf8;
+}
+
+/* Floating Selected Feature Card */
+.jezero-feature-card {
+  position: absolute;
+  top: 50px;
+  right: 12px;
+  width: 310px;
+  background: rgba(10, 13, 16, 0.95);
+  border: 1px solid var(--accent-yellow, #f5c542);
+  padding: 10px 12px;
+  z-index: 22;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+}
+
+.jezero-feature-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.jezero-card-type {
+  display: block;
+  font-size: 8.5px;
+  letter-spacing: 0.06em;
+  color: var(--accent-yellow, #f5c542);
+  text-transform: uppercase;
+  margin-bottom: 1px;
+}
+
+.jezero-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.jezero-card-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 1px;
+}
+
+.jezero-card-close:hover {
+  color: #ffffff;
+}
+
+.jezero-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-color, #242a30);
+  padding: 6px 8px;
+  margin-bottom: 8px;
+}
+
+.jezero-card-k {
+  display: block;
+  font-size: 7.5px;
+  color: var(--text-muted, #64748b);
+}
+
+.jezero-card-v {
+  font-size: 10px;
+  color: #ffffff;
+}
+
+.jezero-card-v--elev {
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+}
+
+.jezero-card-desc {
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0 0 8px;
+}
+
+.jezero-card-action-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: var(--accent-yellow, #f5c542);
+  border: 1px solid var(--accent-yellow, #f5c542);
+  color: #080909;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: background var(--transition-fast, 120ms ease);
+}
+
+.jezero-card-action-btn:hover {
+  background: #e5b32e;
+}
+
+/* Topographic Transect Profile Card */
+.jezero-transect-card {
+  position: absolute;
+  top: 50px;
+  left: 12px;
+  width: min(94%, 540px);
+  background: rgba(10, 13, 16, 0.96);
+  border: 1px solid var(--border-color, #2d3640);
+  padding: 10px 12px;
+  z-index: 24;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(6px);
+}
+
+.jezero-transect-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.jezero-transect-tag {
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--accent-yellow, #f5c542);
+  display: block;
+}
+
+.jezero-transect-title {
+  font-size: 11px;
+  color: #ffffff;
+  margin: 2px 0 0;
+  font-weight: 600;
+}
+
+.jezero-transect-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border-color, #242a30);
+  padding-bottom: 6px;
+}
+
+.jezero-transect-tab-btn {
+  background: var(--bg-input, #060809);
+  border: 1px solid var(--border-color, #242a30);
+  color: var(--text-secondary, #94a3b8);
+  font-size: 9px;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast, 120ms ease);
+}
+
+.jezero-transect-tab-btn:hover {
+  color: #ffffff;
+  border-color: var(--accent-yellow, #f5c542);
+}
+
+.jezero-transect-tab-btn--active {
+  background: rgba(245, 197, 66, 0.15);
+  border-color: var(--accent-yellow, #f5c542);
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+}
+
+.jezero-transect-chart-wrap {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  background: #060708;
+  border: 1px solid var(--border-color, #242a30);
+  margin-bottom: 6px;
+}
+
+.jezero-transect-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.jezero-transect-scrubber-track {
+  position: absolute;
+  top: 15px;
+  bottom: 20px;
+  left: 60px;
+  right: 20px;
+  cursor: crosshair;
+}
+
+.jezero-transect-readout {
+  padding: 4px 6px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-color, #242a30);
+  font-size: 8.5px;
+}
+
+.jezero-readout-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.jezero-readout-row strong {
+  color: #ffffff;
+}
+
+.jezero-readout-prompt {
+  color: var(--text-muted, #64748b);
+  display: block;
+  text-align: center;
+}
+
+/* Bottom Elevation Legend & Controls Dock */
+.jezero-bottom-dock {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 22;
+  pointer-events: none;
+  flex-wrap: wrap;
+}
+
+/* Elevation Color Legend Card */
+.jezero-legend-card {
+  pointer-events: auto;
+  background: rgba(10, 13, 16, 0.95);
+  border: 1px solid var(--border-color, #242a30);
+  padding: 7px 10px;
+  width: min(100%, 460px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.jezero-legend-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 8.5px;
+  color: var(--text-secondary, #94a3b8);
+  letter-spacing: 0.05em;
+  margin-bottom: 5px;
+}
+
+.jezero-legend-datum {
+  color: var(--accent-yellow, #f5c542);
+}
+
+.jezero-legend-gradient-wrapper {
+  position: relative;
+  width: 100%;
+  height: 10px;
+  margin-bottom: 5px;
+}
+
+.jezero-legend-gradient {
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.jezero-legend-gradient--realistic,
+.jezero-legend-gradient--contour {
+  background: linear-gradient(
+    to right,
+    #3c180f 0%,
+    #5a2b1a 20%,
+    #7d3e23 40%,
+    #a65c36 60%,
+    #ca8350 80%,
+    #e8a975 100%
+  );
+}
+
+.jezero-legend-gradient--scientific,
+.jezero-legend-gradient--wireframe {
+  background: linear-gradient(
+    to right,
+    #371982 0%,    /* -3400m Deep Basin */
+    #1e5ac8 18%,   /* -2900m Floor Sinks */
+    #14b4b4 32%,   /* -2600m Lakebed Floor */
+    #2db950 48%,   /* -2300m Delta Fan */
+    #f0d723 64%,   /* -1900m Rim Inlets */
+    #f0731e 78%,   /* -1400m Rim Scarps */
+    #d72d23 90%,   /* -900m Highlands */
+    #fff5f0 100%   /* -500m Crests */
+  );
+}
+
+.jezero-legend-gradient--slope {
+  background: linear-gradient(
+    to right,
+    #10b981 0%,    /* 0° - 8° Optimal traverse */
+    #f5c542 35%,   /* 8° - 15° Moderate incline */
+    #f97316 65%,   /* 15° - 25° High slip scarp */
+    #ef4444 100%   /* > 25° Cliff face / impassable */
+  );
+}
+
+/* Dynamic Hover Elevation Cursor Needle on Legend */
+.jezero-legend-indicator {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  background: #ffffff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: left 80ms ease-out;
+}
+
+.jezero-indicator-arrow {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #ffffff;
+}
+
+.jezero-indicator-label {
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 7.5px;
+  font-weight: 700;
+  background: #080909;
+  color: var(--accent-yellow, #f5c542);
+  padding: 1px 3px;
+  border: 1px solid var(--accent-yellow, #f5c542);
+  white-space: nowrap;
+}
+
+.jezero-legend-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7.5px;
+  color: var(--text-secondary, #94a3b8);
+  text-align: center;
+}
+
+.jezero-legend-ticks small {
+  display: block;
+  font-size: 6.5px;
+  color: var(--text-muted, #64748b);
+  margin-top: 1px;
+}
+
+.jezero-tick-highlight {
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+}
+
+.jezero-tick-highlight small {
+  color: var(--accent-yellow, #f5c542);
+}
+
+/* Controls Cluster */
+.jezero-controls-cluster {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(10, 13, 16, 0.95);
+  border: 1px solid var(--border-color, #242a30);
+  padding: 6px 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  flex-wrap: wrap;
+  backdrop-filter: blur(4px);
+}
+
+.jezero-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.jezero-control-group-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 8.5px;
+  color: var(--text-muted, #94a3b8);
+  letter-spacing: 0.05em;
+}
+
+.jezero-btn-segmented {
+  display: inline-flex;
+  background: var(--bg-input, #060809);
+  border: 1px solid var(--border-color, #242a30);
+}
+
+.jezero-seg-btn {
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border-color, #242a30);
+  color: var(--text-secondary, #94a3b8);
+  font-size: 9.5px;
+  padding: 4px 7px;
+  cursor: pointer;
+  transition: all var(--transition-fast, 120ms ease);
+}
+
+.jezero-seg-btn:last-child {
+  border-right: none;
+}
+
+.jezero-seg-btn:hover {
+  color: #ffffff;
+}
+
+.jezero-seg-btn--active {
+  background: rgba(245, 197, 66, 0.16);
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+}
+
+.jezero-seg-btn--truescale {
+  color: #10b981;
+}
+
+.jezero-slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 8.5px;
+  color: var(--text-muted, #94a3b8);
+}
+
+.jezero-scale-tag-pill {
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+  font-size: 8.5px;
+}
+
+.jezero-scale-tag-pill--true {
+  color: #10b981;
+}
+
+.jezero-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-input, #060809);
+  border: 1px solid var(--border-color, #242a30);
+  color: #ffffff;
+  font-size: 9.5px;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast, 120ms ease);
+}
+
+.jezero-toggle-btn:hover {
+  border-color: var(--accent-yellow, #f5c542);
+  color: var(--accent-yellow, #f5c542);
+}
+
+.jezero-toggle-btn--active {
+  background: rgba(245, 197, 66, 0.12);
+  border-color: var(--accent-yellow, #f5c542);
+  color: var(--accent-yellow, #f5c542);
+}
+
+/* Scientific Transparency Footer Strip */
+.jezero-meta-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 14px;
+  background: var(--bg-card, #0e1114);
+  border-top: 1px solid var(--border-color, #242a30);
+  font-size: 8.5px;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.jezero-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.jezero-meta-key {
+  color: var(--accent-yellow, #f5c542);
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.jezero-meta-val {
+  color: var(--text-secondary, #94a3b8);
+}
+
+.jezero-meta-badge {
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color, #242a30);
+  padding: 1px 4px;
+  font-size: 7.5px;
+}
+
+/* Modal Dialog for Dataset Specification */
+.jezero-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.jezero-modal-card {
+  background: var(--bg-card, #0e1114);
+  border: 1px solid var(--accent-yellow, #f5c542);
+  width: min(100%, 560px);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.95);
+}
+
+.jezero-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color, #242a30);
+}
+
+.jezero-modal-title {
+  font-size: 13px;
+  color: #ffffff;
+  margin: 0;
+  font-weight: 600;
+}
+
+.jezero-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #64748b);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.jezero-modal-close:hover {
+  color: #ffffff;
+}
+
+.jezero-modal-body {
+  padding: 14px;
+}
+
+.jezero-modal-spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color, #242a30);
+  padding: 8px 10px;
+  margin-bottom: 12px;
+}
+
+.jezero-spec-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.jezero-spec-k {
+  font-size: 7.5px;
+  color: var(--text-muted, #64748b);
+}
+
+.jezero-spec-v {
+  font-size: 10px;
+  color: var(--accent-yellow, #f5c542);
+}
+
+.jezero-modal-text h4 {
+  font-size: 11px;
+  color: #ffffff;
+  margin: 0 0 5px;
+}
+
+.jezero-modal-text p {
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0 0 8px;
+}
+
+.jezero-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color, #242a30);
+}
+
+.jezero-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-input, #060809);
+  border: 1px solid var(--border-color, #242a30);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 5px 11px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--transition-fast, 120ms ease);
+}
+
+.jezero-modal-btn:hover {
+  border-color: var(--accent-yellow, #f5c542);
+  color: var(--accent-yellow, #f5c542);
+}
+
+.jezero-modal-btn--accent {
+  background: var(--accent-yellow, #f5c542);
+  border-color: var(--accent-yellow, #f5c542);
+  color: #080909;
+}
+
+.jezero-modal-btn--accent:hover {
+  background: #e5b32e;
+  color: #080909;
+}
+
+/* Responsive */
+@media (max-width: 860px) {
+  .jezero-bottom-dock {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .jezero-legend-card {
+    width: 100%;
+  }
+  .jezero-controls-cluster {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .jezero-feature-card {
+    width: calc(100% - 24px);
+    right: 12px;
+    top: 48px;
+  }
+  .jezero-transect-card {
+    width: calc(100% - 24px);
+    left: 12px;
+    top: 48px;
+  }
+  .jezero-feature-pills-bar {
+    max-width: calc(100% - 24px);
+  }
+  .jezero-nav-dpad-cluster {
+    top: auto;
+    bottom: 110px;
+    right: 12px;
+  }
+  .jezero-modal-spec-grid {
+    grid-template-columns: 1fr;
+  }
+}

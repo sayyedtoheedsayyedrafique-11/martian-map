@@ -1,0 +1,27 @@
+/* Badge.css — Minimalist Rectangular Badge */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 0;
+  font-size: 0.66rem;
+  font-weight: 600;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.badge--default {
+  background: #080909;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.badge--colored {
+  background: #080909;
+  color: var(--badge-color);
+  border: 1px solid var(--badge-color);
+}

@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex Cloud — Enterprise SaaS Analytics & Revenue Operations</title>
+  
+  <!-- Modern Typography: Plus Jakarta Sans for UI + JetBrains Mono for Tabular Data -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN with dark mode selector -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js for Interactive Data Visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            },
+            accent: {
+              orange: '#ea580c',
+              emerald: '#10b981',
+              amber: '#f59e0b',
+              rose: '#f43f5e',
+              violet: '#8b5cf6',
+            }
+          },
+          boxShadow: {
+            'glow': '0 0 20px -5px rgba(99, 102, 241, 0.25)',
+            'card-light': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
+            'card-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Tabular numeric alignments */
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    
+    /* Custom scrollbar for clean dashboard feel */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.25);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.45);
+    }
+    
+    /* Glassmorphic border shimmer */
+    .glass-panel {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    
+    /* Reduced motion accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-delay: -1ms !important;
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        background-attachment: initial !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0s !important;
+        transition-delay: 0s !important;
+      }
+    }
+  </style>
+</head>
+<body class="h-full bg-slate-50 text-slate-800 dark:bg-[#0B0F19] dark:text-slate-100 transition-colors duration-200 antialiased overflow-hidden flex flex-col font-sans">
+
+  <!-- ======================================================== -->
+  <!-- TOP APP HEADER / CONTEXT BAR                             -->
+  <!-- ======================================================== -->
+  <header class="h-14 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-[#0F172A]/90 glass-panel sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
+    <div class="flex items-center gap-3">
+      <!-- Mobile sidebar toggle -->
+      <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Toggle Navigation">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Organization Switcher -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-brand-500/20">
+          <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-1.5 cursor-pointer group">
+            <span class="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-brand-600 transition">Apex Global Inc.</span>
+            <span class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">Live</span>
+            <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition"></i>
+          </div>
+          <span class="text-[11px] text-slate-500 dark:text-slate-400">Production Cluster · us-east-1</span>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center ml-4 pl-4 border-l border-slate-200 dark:border-slate-800 space-x-1.5 text-xs text-slate-500 dark:text-slate-400">
+        <span>Workspace</span>
+        <span>/</span>
+        <span class="text-slate-800 dark:text-slate-200 font-medium">Revenue Analytics</span>
+      </div>
+    </div>
+
+    <!-- Right Header Utilities -->
+    <div class="flex items-center gap-2.5 sm:gap-3">
+      <!-- Quick Command Bar (Cmd+K) -->
+      <button id="cmdBarTrigger" class="hidden sm:flex items-center gap-3 px-3 py-1.5 text-xs font-medium text-slate-500 bg-slate-100/90 dark:bg-slate-800/90 hover:bg-slate-200/70 dark:hover:bg-slate-700/70 border border-slate-200 dark:border-slate-700/80 rounded-lg transition shadow-sm" aria-label="Open command palette">
+        <div class="flex items-center gap-1.5">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>Search or jump to...</span>
+        </div>
+        <kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-slate-500 dark:text-slate-400">⌘K</kbd>
+      </button>
+
+      <!-- System Health Indicator -->
+      <div class="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 text-xs">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span class="text-slate-600 dark:text-slate-300 font-medium text-[11px]">Systems 99.99%</span>
+      </div>
+
+      <!-- Quick Action: Export / Share -->
+      <button onclick="showToast('Exporting executive report (PDF & CSV)...', 'success')" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg transition" title="Export Dashboard Report">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+        <span>Export</span>
+      </button>
+
+      <!-- Dark/Light Theme Toggle -->
+      <button id="themeToggleBtn" class="p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Toggle dark/light mode">
+        <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i>
+      </button>
+
+      <!-- Notification Center with indicator -->
+      <div class="relative">
+        <button id="notifBellBtn" class="p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition relative" aria-label="Notifications">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-500 rounded-full ring-2 ring-white dark:ring-slate-900"></span>
+        </button>
+      </div>
+
+      <div class="h-5 w-px bg-slate-200 dark:bg-slate-800"></div>
+
+      <!-- User Avatar / Profile Menu -->
+      <div class="flex items-center gap-2 cursor-pointer group">
+        <div class="relative">
+          <img class="w-7 h-7 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700 group-hover:ring-brand-500 transition" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Sarah Chen profile avatar">
+          <span class="absolute bottom-0 right-0 w-2 h-2 bg-emerald-500 rounded-full ring-1 ring-white dark:ring-slate-900"></span>
+        </div>
+        <div class="hidden lg:flex flex-col text-left">
+          <span class="text-xs font-semibold text-slate-800 dark:text-slate-200 leading-tight">Sarah Chen</span>
+          <span class="text-[10px] text-slate-500 dark:text-slate-400">VP Operations</span>
+        </div>
+        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition hidden lg:block"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- MAIN SHELL (SIDEBAR + SCROLLABLE DASHBOARD VIEWPORT)     -->
+  <!-- ======================================================== -->
+  <div class="flex flex-1 overflow-hidden relative">
+
+    <!-- Backdrop for mobile drawer -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-slate-900/60 z-40 hidden lg:hidden transition-opacity"></div>
+
+    <!-- ====================================================== -->
+    <!-- NAVIGATION SIDEBAR                                     -->
+    <!-- ====================================================== -->
+    <aside id="mainSidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white dark:bg-[#0D1322] border-r border-slate-200/80 dark:border-slate-800/80 flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      
+      <!-- Upper Navigation Links -->
+      <div class="flex-1 overflow-y-auto px-3.5 py-4 space-y-6">
+        
+        <!-- Group: Analytics & Core -->
+        <div>
+          <div class="px-2.5 mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            Analytics & Core
+          </div>
+          <nav class="space-y-1">
+            <a href="#" class="flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 border border-brand-200/70 dark:border-brand-800/40">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-600 dark:text-brand-400"></i>
+                <span>Executive Overview</span>
+              </div>
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-600 dark:bg-brand-400"></span>
+            </a>
+
+            <a href="#" class="flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="trending-up" class="w-4 h-4"></i>
+                <span>MRR & Retention</span>
+              </div>
+              <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500">+14%</span>
+            </a>
+
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition">
+              <i data-lucide="users" class="w-4 h-4"></i>
+              <span>Customer Accounts</span>
+            </a>
+
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition">
+              <i data-lucide="pie-chart" class="w-4 h-4"></i>
+              <span>Cohorts & Churn</span>
+            </a>
+
+            <a href="#" class="flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="activity" class="w-4 h-4"></i>
+                <span>Live Event Stream</span>
+              </div>
+              <span class="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            </a>
+          </nav>
+        </div>
+
+        <!-- Group: Infrastructure & Billing -->
+        <div>
+          <div class="px-2.5 mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            Billing & Operations
+          </div>
+          <nav class="space-y-1">
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition">
+              <i data-lucide="credit-card" class="w-4 h-4"></i>
+              <span>Subscriptions & Invoices</span>
+            </a>
+
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition">
+              <i data-lucide="cpu" class="w-4 h-4"></i>
+              <span>Usage Meters & Quotas</span>
+            </a>
+
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition">
+              <i data-lucide="webhook" class="w-4 h-4"></i>
+              <span>Webhooks & Integrations</span>
+            </a>
+          </nav>
+        </div>
+
+        <!-- Group: Governance & Settings -->
+        <div>
+          <div class="px-2.5 mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            Settings & Security
+          </div>
+          <nav class="space-y-1">
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+              <span>Audit Log & SOC2</span>
+            </a>
+
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition">
+              <i data-lucide="sliders" class="w-4 h-4"></i>
+              <span>Workspace Preferences</span>
+            </a>
+          </nav>
+        </div>
+
+      </div>
+
+      <!-- Bottom Card: Enterprise Tier Status & Quota -->
+      <div class="p-3.5 border-t border-slate-200/80 dark:border-slate-800/80">
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Scale Tier Quota</span>
+            <span class="text-[11px] font-mono font-medium text-slate-500">78%</span>
+          </div>
+          <!-- Progress bar -->
+          <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mb-2">
+            <div class="bg-gradient-to-r from-brand-500 to-indigo-500 h-1.5 rounded-full" style="width: 78%"></div>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-500">
+            <span>3.9M / 5.0M events</span>
+            <button onclick="showToast('Upgrade portal opened', 'info')" class="text-brand-600 dark:text-brand-400 font-semibold hover:underline">Manage</button>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ====================================================== -->
+    <!-- MAIN CONTENT VIEWPORT (SCROLLABLE)                    -->
+    <!-- ====================================================== -->
+    <main class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+      <!-- ==================================================== -->
+      <!-- VIEW TITLE & DATE RANGE FILTER CONTROLS              -->
+      <!-- ==================================================== -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-slate-800/60">
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Revenue & Operations</h1>
+            <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/80">Q3 Realtime</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Continuous financial synchronization across Stripe, Snowflake, and AWS.</p>
+        </div>
+
+        <!-- Date Range Filters -->
+        <div class="flex items-center flex-wrap gap-2">
+          <div class="inline-flex p-1 rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 text-xs font-medium">
+            <button class="filter-period-btn px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" data-period="24h">24H</button>
+            <button class="filter-period-btn px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" data-period="7d">7D</button>
+            <button class="filter-period-btn px-2.5 py-1 rounded-md bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm font-semibold transition" data-period="30d">30D</button>
+            <button class="filter-period-btn px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" data-period="90d">90D</button>
+            <button class="filter-period-btn px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" data-period="ytd">YTD</button>
+          </div>
+
+          <button id="customRangeBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 transition shadow-sm">
+            <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+            <span>Oct 1 – Oct 31, 2026</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================================================== -->
+      <!-- TOP BENTO METRICS GRID (4 PRIMARY KPI TILES)         -->
+      <!-- ==================================================== -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Key Performance Indicators">
+        
+        <!-- KPI 1: ARR -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 shadow-card-light hover:shadow-card-hover transition duration-200 flex flex-col justify-between">
+          <div class="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
+            <span class="flex items-center gap-1.5">
+              <span>Annual Recurring Revenue</span>
+              <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400" title="Normalized annualized subscription run-rate"></i>
+            </span>
+            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50">
+              <i data-lucide="arrow-up-right" class="w-3 h-3"></i>
+              +14.8%
+            </span>
+          </div>
+
+          <div class="flex items-baseline justify-between">
+            <div class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white tabular-nums font-mono">
+              $2,842,500
+            </div>
+          </div>
+
+          <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+            <span>Net ARR addition: <strong class="text-slate-700 dark:text-slate-300 font-mono">+$84,200</strong></span>
+            <span class="text-slate-400">vs prev 30d</span>
+          </div>
+        </div>
+
+        <!-- KPI 2: Net Revenue Retention (NRR) -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 shadow-card-light hover:shadow-card-hover transition duration-200 flex flex-col justify-between">
+          <div class="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
+            <span class="flex items-center gap-1.5">
+              <span>Net Revenue Retention</span>
+              <i data-lucide="award" class="w-3.5 h-3.5 text-amber-500" title="Cohort expansion minus contraction and churn"></i>
+            </span>
+            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50">
+              <i data-lucide="check" class="w-3 h-3"></i>
+              Top Decile
+            </span>
+          </div>
+
+          <div class="flex items-baseline justify-between">
+            <div class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white tabular-nums font-mono">
+              122.4%
+            </div>
+          </div>
+
+          <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+            <span>Logo Churn: <strong class="text-slate-700 dark:text-slate-300 font-mono">0.42%</strong></span>
+            <span class="text-slate-400">Target > 115%</span>
+          </div>
+        </div>
+
+        <!-- KPI 3: Active Paid Customers -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 shadow-card-light hover:shadow-card-hover transition duration-200 flex flex-col justify-between">
+          <div class="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
+            <span class="flex items-center gap-1.5">
+              <span>Enterprise Customers</span>
+            </span>
+            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] font-semibold bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-400 border border-brand-200/80 dark:border-brand-800/50">
+              <i data-lucide="plus" class="w-3 h-3"></i>
+              +38 new
+            </span>
+          </div>
+
+          <div class="flex items-baseline justify-between">
+            <div class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white tabular-nums font-mono">
+              1,428
+            </div>
+          </div>
+
+          <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+            <span>Avg ACV: <strong class="text-slate-700 dark:text-slate-300 font-mono">$19,905</strong></span>
+            <span class="text-slate-400">98% renewal</span>
+          </div>
+        </div>
+
+        <!-- KPI 4: Infrastructure & Ingestion Latency -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 shadow-card-light hover:shadow-card-hover transition duration-200 flex flex-col justify-between">
+          <div class="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
+            <span class="flex items-center gap-1.5">
+              <span>API Ingestion Pulse</span>
+            </span>
+            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Healthy
+            </span>
+          </div>
+
+          <div class="flex items-baseline justify-between">
+            <div class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white tabular-nums font-mono">
+              28<span class="text-base font-normal text-slate-500 ml-0.5">ms</span>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+            <span>Volume: <strong class="text-slate-700 dark:text-slate-300 font-mono">142.8M reqs</strong></span>
+            <span class="text-slate-400">Error: 0.003%</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- CHARTS SECTION: PRIMARY REVENUE TREND + BREAKDOWN     -->
+      <!-- ==================================================== -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Main Revenue Chart (Span 2 Columns) -->
+        <div class="lg:col-span-2 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 shadow-card-light flex flex-col justify-between">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white">Monthly Recurring Revenue Trajectory</h3>
+                <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full">+18.4% YoY</span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Historical performance with 90-day AI confidence corridor</p>
+            </div>
+
+            <!-- Series Metric Filter Badges -->
+            <div class="flex items-center gap-2">
+              <button id="toggleExpansionBtn" class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                <span class="w-2.5 h-2.5 rounded-full bg-brand-500"></span>
+                <span>Gross MRR</span>
+              </button>
+              <button id="toggleTargetBtn" class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <span>Expansion</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Chart Container -->
+          <div class="relative h-64 sm:h-72 w-full">
+            <canvas id="revenueChart"></canvas>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 grid grid-cols-3 gap-2 text-center">
+            <div>
+              <div class="text-[11px] text-slate-500">New Bookings</div>
+              <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white font-mono mt-0.5">+$142,300</div>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-500">Account Expansion</div>
+              <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white font-mono mt-0.5">+$64,900</div>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-500">Contraction / Churn</div>
+              <div class="text-xs sm:text-sm font-bold text-rose-600 dark:text-rose-400 font-mono mt-0.5">-$8,400</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Secondary Chart: Customer Segment / Revenue Source (1 Column) -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 shadow-card-light flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Revenue by Segment</h3>
+              <i data-lucide="more-horizontal" class="w-4 h-4 text-slate-400 cursor-pointer"></i>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Enterprise tier accounts generate 68% of total MRR</p>
+            
+            <div class="relative h-48 w-full flex items-center justify-center">
+              <canvas id="segmentDonutChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Segment Breakdown Legend -->
+          <div class="space-y-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 text-xs">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Enterprise (Dedicated VPC)</span>
+              </div>
+              <span class="font-mono font-semibold text-slate-900 dark:text-white">68.2%</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Growth Tier</span>
+              </div>
+              <span class="font-mono font-semibold text-slate-900 dark:text-white">22.4%</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Starter Teams</span>
+              </div>
+              <span class="font-mono font-semibold text-slate-900 dark:text-white">9.4%</span>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- DATA TABLE: HIGH DENSITY ENTERPRISE CUSTOMERS         -->
+      <!-- ==================================================== -->
+      <section class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 shadow-card-light overflow-hidden">
+        
+        <!-- Table Control Toolbar -->
+        <div class="p-4 sm:p-5 border-b border-slate-200/80 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-bold text-slate-900 dark:text-white">Enterprise Subscriptions & Usage</h2>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold">1,428 accounts</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Filter by renewal status, seat threshold, or health score tier.</p>
+          </div>
+
+          <div class="flex items-center flex-wrap gap-2.5">
+            <!-- Search Input -->
+            <div class="relative">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input id="customerSearchInput" type="text" placeholder="Filter company, domain or ID..." class="w-56 sm:w-64 pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
+            </div>
+
+            <!-- Tier Filter Dropdown -->
+            <select id="planFilter" class="px-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="all">All Plans</option>
+              <option value="enterprise">Enterprise VPC</option>
+              <option value="growth">Growth Scale</option>
+              <option value="starter">Starter Pro</option>
+            </select>
+
+            <!-- Status Filter Dropdown -->
+            <select id="statusFilter" class="px-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="all">All Statuses</option>
+              <option value="active">Active (Good)</option>
+              <option value="expanding">Expanding</option>
+              <option value="review">At Risk</option>
+            </select>
+
+            <!-- Bulk Action Trigger -->
+            <button onclick="showToast('Bulk selection exported to CSV', 'success')" class="px-3 py-1.5 text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white rounded-lg transition shadow-sm flex items-center gap-1.5">
+              <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+              <span>Export CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Table Responsive Container -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50/80 dark:bg-slate-950/40 border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <th class="py-3 px-4 w-10">
+                  <input type="checkbox" class="rounded border-slate-300 dark:border-slate-700 text-brand-600 focus:ring-brand-500">
+                </th>
+                <th class="py-3 px-4">Customer Account</th>
+                <th class="py-3 px-4">Tier & Plan</th>
+                <th class="py-3 px-4">Contract ARR</th>
+                <th class="py-3 px-4">Seat Utilization</th>
+                <th class="py-3 px-4">Health Index</th>
+                <th class="py-3 px-4">Last Sync</th>
+                <th class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customerTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/60">
+              
+              <!-- Row 1 -->
+              <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition group">
+                <td class="py-3.5 px-4">
+                  <input type="checkbox" class="rounded border-slate-300 dark:border-slate-700 text-brand-600 focus:ring-brand-500">
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold flex items-center justify-center text-xs">
+                      NS
+                    </div>
+                    <div>
+                      <div class="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <span>NovaSignal AI</span>
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-500" title="Verified SOC2 Customer"></i>
+                      </div>
+                      <span class="text-slate-400 font-mono text-[11px]">novasignal.io · ID: #CUST-9481</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                    Enterprise Dedicated
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="font-mono font-bold text-slate-900 dark:text-white tabular-nums">$94,000 / yr</div>
+                  <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Billed annually</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="w-36">
+                    <div class="flex items-center justify-between text-[11px] mb-1 font-mono">
+                      <span class="text-slate-600 dark:text-slate-300">184 / 200</span>
+                      <span class="font-semibold text-slate-800 dark:text-slate-200">92%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 92%"></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
+                    <i data-lucide="trending-up" class="w-3 h-3"></i>
+                    98 / 100
+                  </span>
+                </td>
+                <td class="py-3.5 px-4 text-slate-500 dark:text-slate-400 text-[11px] font-mono">
+                  2 mins ago
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <button onclick="showToast('Customer Novasignal inspected', 'info')" class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition" title="Inspect Customer Record">
+                      <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition" title="More options">
+                      <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2 -->
+              <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition group">
+                <td class="py-3.5 px-4">
+                  <input type="checkbox" class="rounded border-slate-300 dark:border-slate-700 text-brand-600 focus:ring-brand-500">
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold flex items-center justify-center text-xs">
+                      QL
+                    </div>
+                    <div>
+                      <div class="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <span>Quantum Logic Labs</span>
+                      </div>
+                      <span class="text-slate-400 font-mono text-[11px]">quantumlabs.dev · ID: #CUST-9420</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                    Enterprise Dedicated
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="font-mono font-bold text-slate-900 dark:text-white tabular-nums">$68,500 / yr</div>
+                  <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">+15 seats upgrade</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="w-36">
+                    <div class="flex items-center justify-between text-[11px] mb-1 font-mono">
+                      <span class="text-slate-600 dark:text-slate-300">112 / 120</span>
+                      <span class="font-semibold text-slate-800 dark:text-slate-200">93%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 93%"></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
+                    <i data-lucide="trending-up" class="w-3 h-3"></i>
+                    95 / 100
+                  </span>
+                </td>
+                <td class="py-3.5 px-4 text-slate-500 dark:text-slate-400 text-[11px] font-mono">
+                  14 mins ago
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <button onclick="showToast('Customer Quantum Logic inspected', 'info')" class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition">
+                      <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition">
+                      <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3 -->
+              <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition group">
+                <td class="py-3.5 px-4">
+                  <input type="checkbox" class="rounded border-slate-300 dark:border-slate-700 text-brand-600 focus:ring-brand-500">
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-bold flex items-center justify-center text-xs">
+                      HX
+                    </div>
+                    <div>
+                      <div class="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <span>Helix Healthcare Corp</span>
+                      </div>
+                      <span class="text-slate-400 font-mono text-[11px]">helixhealth.net · ID: #CUST-8812</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                    Growth Scale
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="font-mono font-bold text-slate-900 dark:text-white tabular-nums">$32,400 / yr</div>
+                  <span class="text-[10px] text-slate-500 font-medium">Billed monthly</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="w-36">
+                    <div class="flex items-center justify-between text-[11px] mb-1 font-mono">
+                      <span class="text-slate-600 dark:text-slate-300">42 / 50</span>
+                      <span class="font-semibold text-slate-800 dark:text-slate-200">84%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-blue-500 h-1.5 rounded-full" style="width: 84%"></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
+                    <i data-lucide="trending-up" class="w-3 h-3"></i>
+                    88 / 100
+                  </span>
+                </td>
+                <td class="py-3.5 px-4 text-slate-500 dark:text-slate-400 text-[11px] font-mono">
+                  1 hour ago
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <button class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition">
+                      <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition">
+                      <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4 -->
+              <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition group">
+                <td class="py-3.5 px-4">
+                  <input type="checkbox" class="rounded border-slate-300 dark:border-slate-700 text-brand-600 focus:ring-brand-500">
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold flex items-center justify-center text-xs">
+                      VT
+                    </div>
+                    <div>
+                      <div class="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <span>Vortex Media Stream</span>
+                      </div>
+                      <span class="text-slate-400 font-mono text-[11px]">vortexmedia.io · ID: #CUST-7210</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    Renewal Pending
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="font-mono font-bold text-slate-900 dark:text-white tabular-nums">$24,000 / yr</div>
+                  <span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium">Expires in 12 days</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="w-36">
+                    <div class="flex items-center justify-between text-[11px] mb-1 font-mono">
+                      <span class="text-slate-600 dark:text-slate-300">18 / 30</span>
+                      <span class="font-semibold text-slate-800 dark:text-slate-200">60%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-amber-500 h-1.5 rounded-full" style="width: 60%"></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60">
+                    <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                    64 / 100
+                  </span>
+                </td>
+                <td class="py-3.5 px-4 text-slate-500 dark:text-slate-400 text-[11px] font-mono">
+                  3 hours ago
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <button class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition">
+                      <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button class="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition">
+                      <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination & Footer -->
+        <div class="px-4 py-3 bg-slate-50/80 dark:bg-slate-950/40 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+          <div class="flex items-center gap-2">
+            <span>Showing <strong class="text-slate-700 dark:text-slate-300">1-4</strong> of <strong class="text-slate-700 dark:text-slate-300">1,428</strong> accounts</span>
+            <span class="text-slate-300 dark:text-slate-700">|</span>
+            <label class="flex items-center gap-1">
+              <span>Per page:</span>
+              <select class="bg-transparent border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none">
+                <option>25</option>
+                <option>50</option>
+                <option>100</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <button class="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 transition" disabled>
+              Previous
+            </button>
+            <button class="px-2.5 py-1 rounded bg-brand-600 text-white font-semibold">1</button>
+            <button class="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">2</button>
+            <button class="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">3</button>
+            <span class="px-1 text-slate-400">...</span>
+            <button class="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">58</button>
+            <button class="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+              Next
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- BOTTOM GRID: LIVE WEBHOOKS FEED + REGIONAL BREAKDOWN -->
+      <!-- ==================================================== -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
+        
+        <!-- Live Webhooks & Event Ingestion Stream -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 shadow-card-light">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Realtime Event Stream</h3>
+            </div>
+            <span class="text-[11px] font-mono text-slate-400">4,812 ev/sec</span>
+          </div>
+
+          <div class="space-y-2.5 text-xs">
+            
+            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="p-1 rounded bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                </span>
+                <div>
+                  <div class="font-semibold text-slate-800 dark:text-slate-200">invoice.payment_succeeded</div>
+                  <div class="text-[11px] text-slate-500">Customer: Novasignal AI · Amount: $7,833.33</div>
+                </div>
+              </div>
+              <span class="text-[11px] font-mono text-slate-400">0.4s ago</span>
+            </div>
+
+            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="p-1 rounded bg-brand-100 dark:bg-brand-950/80 text-brand-600 dark:text-brand-400">
+                  <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5"></i>
+                </span>
+                <div>
+                  <div class="font-semibold text-slate-800 dark:text-slate-200">subscription.tier_upgraded</div>
+                  <div class="text-[11px] text-slate-500">Quantum Labs added 15 seats (+ $1,250 MRR)</div>
+                </div>
+              </div>
+              <span class="text-[11px] font-mono text-slate-400">2.1s ago</span>
+            </div>
+
+            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="p-1 rounded bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400">
+                  <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                </span>
+                <div>
+                  <div class="font-semibold text-slate-800 dark:text-slate-200">security.sso_login_authorized</div>
+                  <div class="text-[11px] text-slate-500">Okta SAML 2.0 payload verified (IP: 192.88.99.12)</div>
+                </div>
+              </div>
+              <span class="text-[11px] font-mono text-slate-400">8.9s ago</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Regional Infrastructure & Cloud Distribution -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 shadow-card-light">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Global Edge Node Latency</h3>
+            <span class="text-[11px] font-semibold text-brand-600 dark:text-brand-400">9 Edge Points</span>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between text-slate-700 dark:text-slate-300 font-medium mb-1">
+                <span>North America (Virginia, Oregon)</span>
+                <span class="font-mono font-semibold">14ms · 99.99%</span>
+              </div>
+              <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div class="bg-brand-600 h-2 rounded-full" style="width: 95%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-slate-700 dark:text-slate-300 font-medium mb-1">
+                <span>Europe (Frankfurt, Dublin)</span>
+                <span class="font-mono font-semibold">22ms · 99.98%</span>
+              </div>
+              <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div class="bg-indigo-500 h-2 rounded-full" style="width: 82%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-slate-700 dark:text-slate-300 font-medium mb-1">
+                <span>Asia-Pacific (Tokyo, Singapore)</span>
+                <span class="font-mono font-semibold">38ms · 99.95%</span>
+              </div>
+              <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div class="bg-sky-500 h-2 rounded-full" style="width: 68%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between text-[11px] text-slate-500">
+            <span>Primary Gateway: AWS us-east-1</span>
+            <button onclick="showToast('Diagnostics network ping complete: 0 loss', 'success')" class="text-brand-600 dark:text-brand-400 font-semibold hover:underline">Run Network Trace</button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- COMMAND PALETTE MODAL (CMD + K)                          -->
+  <!-- ======================================================== -->
+  <div id="cmdPaletteModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-start justify-center pt-20 sm:pt-28 px-4" role="dialog" aria-modal="true">
+    <div class="w-full max-w-xl bg-white dark:bg-[#0F172A] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all">
+      <div class="p-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+        <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
+        <input id="cmdSearchInput" type="text" placeholder="Type a command, navigate, or search customers..." class="w-full bg-transparent text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none">
+        <kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-slate-500">ESC</kbd>
+      </div>
+
+      <div class="p-2 max-h-80 overflow-y-auto space-y-1 text-xs">
+        <div class="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">Quick Actions</div>
+        
+        <button onclick="showToast('Navigating to Invoices...', 'info'); toggleCmdPalette();" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="receipt" class="w-4 h-4 text-brand-500"></i>
+            <span>Create New Invoice or Billing Link</span>
+          </div>
+          <span class="text-[10px] font-mono text-slate-400">G then I</span>
+        </button>
+
+        <button onclick="showToast('Export triggered', 'success'); toggleCmdPalette();" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="download" class="w-4 h-4 text-emerald-500"></i>
+            <span>Download Full Accounting CSV</span>
+          </div>
+          <span class="text-[10px] font-mono text-slate-400">⌘E</span>
+        </button>
+
+        <button onclick="toggleTheme(); toggleCmdPalette();" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="moon" class="w-4 h-4 text-amber-500"></i>
+            <span>Switch Color Mode (Dark / Light)</span>
+          </div>
+          <span class="text-[10px] font-mono text-slate-400">⌘D</span>
+        </button>
+
+        <div class="px-3 py-1.5 mt-2 text-[10px] uppercase font-bold text-slate-400 tracking-wider">Recent Customers</div>
+
+        <button onclick="showToast('Novasignal AI customer profile opened', 'info'); toggleCmdPalette();" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition">
+          <div class="flex items-center gap-2.5">
+            <div class="w-5 h-5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold flex items-center justify-center text-[10px]">NS</div>
+            <span>NovaSignal AI ($94,000 / yr)</span>
+          </div>
+          <span class="text-[10px] text-emerald-500 font-semibold">Active</span>
+        </button>
+      </div>
+      
+      <div class="p-2.5 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+        <span>Use <kbd class="px-1 bg-white dark:bg-slate-800 border rounded">↑</kbd> <kbd class="px-1 bg-white dark:bg-slate-800 border rounded">↓</kbd> to navigate</span>
+        <span>Press <kbd class="px-1 bg-white dark:bg-slate-800 border rounded">ESC</kbd> to exit</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- TOAST NOTIFICATION CONTAINER                             -->
+  <!-- ======================================================== -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ======================================================== -->
+  <!-- CLIENT JAVASCRIPT: DATA VISUALIZATION & INTERACTIONS     -->
+  <!-- ======================================================== -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Theme state management
+    const htmlEl = document.documentElement;
+    const themeIcon = document.getElementById('themeIcon');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+    // Default to dark mode for high-end SaaS feel, or honor localStorage
+    const savedTheme = localStorage.getItem('apex_theme') || 'dark';
+    if (savedTheme === 'dark') {
+      htmlEl.classList.add('dark');
+      updateThemeIcon(true);
+    } else {
+      htmlEl.classList.remove('dark');
+      updateThemeIcon(false);
+    }
+
+    function updateThemeIcon(isDark) {
+      if (themeIcon) {
+        themeIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+        lucide.createIcons();
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = htmlEl.classList.toggle('dark');
+      localStorage.setItem('apex_theme', isDark ? 'dark' : 'light');
+      updateThemeIcon(isDark);
+      updateChartThemes(isDark);
+      showToast(`Switched to ${isDark ? 'Dark' : 'Light'} Mode`, 'info');
+    }
+
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', toggleTheme);
+    }
+
+    // Mobile Sidebar Drawer Toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mainSidebar = document.getElementById('mainSidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+    function toggleMobileMenu() {
+      const isClosed = mainSidebar.classList.contains('-translate-x-full');
+      if (isClosed) {
+        mainSidebar.classList.remove('-translate-x-full');
+        sidebarBackdrop.classList.remove('hidden');
+      } else {
+        mainSidebar.classList.add('-translate-x-full');
+        sidebarBackdrop.classList.add('hidden');
+      }
+    }
+
+    if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', toggleMobileMenu);
+
+    // Command Palette Logic
+    const cmdBarTrigger = document.getElementById('cmdBarTrigger');
+    const cmdPaletteModal = document.getElementById('cmdPaletteModal');
+    const cmdSearchInput = document.getElementById('cmdSearchInput');
+
+    function toggleCmdPalette() {
+      const isHidden = cmdPaletteModal.classList.contains('hidden');
+      if (isHidden) {
+        cmdPaletteModal.classList.remove('hidden');
+        cmdSearchInput.focus();
+      } else {
+        cmdPaletteModal.classList.add('hidden');
+      }
+    }
+
+    if (cmdBarTrigger) cmdBarTrigger.addEventListener('click', toggleCmdPalette);
+
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        toggleCmdPalette();
+      } else if (e.key === 'Escape' && !cmdPaletteModal.classList.contains('hidden')) {
+        toggleCmdPalette();
+      }
+    });
+
+    cmdPaletteModal.addEventListener('click', (e) => {
+      if (e.target === cmdPaletteModal) toggleCmdPalette();
+    });
+
+    // Toast Notification utility
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      let borderClass = 'border-slate-200 dark:border-slate-700';
+      let iconName = 'info';
+      let iconColor = 'text-brand-500';
+
+      if (type === 'success') {
+        borderClass = 'border-emerald-500/40';
+        iconName = 'check-circle';
+        iconColor = 'text-emerald-500';
+      } else if (type === 'warn') {
+        borderClass = 'border-amber-500/40';
+        iconName = 'alert-triangle';
+        iconColor = 'text-amber-500';
+      }
+
+      toast.className = `flex items-center gap-3 px-4 py-3 rounded-xl bg-white dark:bg-slate-900 shadow-xl border ${borderClass} text-xs font-semibold text-slate-800 dark:text-slate-100 pointer-events-auto transform transition duration-200 translate-y-2 opacity-0`;
+      toast.innerHTML = `
+        <i data-lucide="${iconName}" class="w-4 h-4 ${iconColor}"></i>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 250);
+      }, 3200);
+    }
+
+    // Chart.js Revenue Line Chart
+    let revenueChartInstance = null;
+    let segmentChartInstance = null;
+
+    function initCharts() {
+      const isDark = htmlEl.classList.contains('dark');
+      const textColor = isDark ? '#94A3B8' : '#64748B';
+      const gridColor = isDark ? 'rgba(51, 65, 85, 0.35)' : 'rgba(226, 232, 240, 0.8)';
+
+      const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+      
+      // Gradient fill for MRR
+      const mrrGradient = ctxRevenue.createLinearGradient(0, 0, 0, 300);
+      mrrGradient.addColorStop(0, 'rgba(79, 70, 229, 0.35)');
+      mrrGradient.addColorStop(1, 'rgba(79, 70, 229, 0.00)');
+
+      const expansionGradient = ctxRevenue.createLinearGradient(0, 0, 0, 300);
+      expansionGradient.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
+      expansionGradient.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
+
+      revenueChartInstance = new Chart(ctxRevenue, {
+        type: 'line',
+        data: {
+          labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct (Actual)', 'Nov (Proj)', 'Dec (Proj)'],
+          datasets: [
+            {
+              label: 'Gross MRR ($k)',
+              data: [1920, 2040, 2180, 2320, 2560, 2842, 3050, 3280],
+              borderColor: '#6366F1',
+              backgroundColor: mrrGradient,
+              borderWidth: 2.5,
+              tension: 0.38,
+              fill: true,
+              pointBackgroundColor: '#6366F1',
+              pointHoverRadius: 6,
+              pointRadius: 3,
+            },
+            {
+              label: 'Expansion ARR ($k)',
+              data: [320, 380, 440, 510, 620, 780, 890, 990],
+              borderColor: '#10B981',
+              backgroundColor: expansionGradient,
+              borderWidth: 2,
+              tension: 0.38,
+              fill: true,
+              pointBackgroundColor: '#10B981',
+              pointHoverRadius: 5,
+              pointRadius: 2.5,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+              titleColor: isDark ? '#FFFFFF' : '#0F172A',
+              bodyColor: isDark ? '#CBD5E1' : '#475569',
+              borderColor: isDark ? '#334155' : '#E2E8F0',
+              borderWidth: 1,
+              padding: 10,
+              boxPadding: 4,
+              usePointStyle: true,
+              callbacks: {
+                label: function(context) {
+                  return ` ${context.dataset.label}: $${context.parsed.y}k`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'transparent' },
+              ticks: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 11 } }
+            },
+            y: {
+              grid: { color: gridColor },
+              ticks: { 
+                color: textColor, 
+                font: { family: 'JetBrains Mono', size: 11 },
+                callback: function(value) { return '$' + value + 'k'; }
+              }
+            }
+          }
+        }
+      });
+
+      // Donut Chart
+      const ctxSegment = document.getElementById('segmentDonutChart').getContext('2d');
+      segmentChartInstance = new Chart(ctxSegment, {
+        type: 'doughnut',
+        data: {
+          labels: ['Enterprise VPC', 'Growth Scale', 'Starter Pro'],
+          datasets: [{
+            data: [68.2, 22.4, 9.4],
+            backgroundColor: ['#4F46E5', '#818CF8', '#94A3B8'],
+            borderColor: isDark ? '#0F172A' : '#FFFFFF',
+            borderWidth: 3,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '72%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+              titleColor: isDark ? '#FFFFFF' : '#0F172A',
+              bodyColor: isDark ? '#CBD5E1' : '#475569',
+              borderColor: isDark ? '#334155' : '#E2E8F0',
+              borderWidth: 1,
+              callbacks: {
+                label: function(context) { return ` ${context.label}: ${context.raw}%`; }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateChartThemes(isDark) {
+      if (!revenueChartInstance || !segmentChartInstance) return;
+      const textColor = isDark ? '#94A3B8' : '#64748B';
+      const gridColor = isDark ? 'rgba(51, 65, 85, 0.35)' : 'rgba(226, 232, 240, 0.8)';
+
+      revenueChartInstance.options.scales.x.ticks.color = textColor;
+      revenueChartInstance.options.scales.y.ticks.color = textColor;
+      revenueChartInstance.options.scales.y.grid.color = gridColor;
+      revenueChartInstance.options.plugins.tooltip.backgroundColor = isDark ? '#0F172A' : '#FFFFFF';
+      revenueChartInstance.options.plugins.tooltip.titleColor = isDark ? '#FFFFFF' : '#0F172A';
+      revenueChartInstance.options.plugins.tooltip.bodyColor = isDark ? '#CBD5E1' : '#475569';
+      revenueChartInstance.options.plugins.tooltip.borderColor = isDark ? '#334155' : '#E2E8F0';
+      revenueChartInstance.update();
+
+      segmentChartInstance.data.datasets[0].borderColor = isDark ? '#0F172A' : '#FFFFFF';
+      segmentChartInstance.update();
+    }
+
+    // Client-side quick filter on customer table
+    const customerSearchInput = document.getElementById('customerSearchInput');
+    const tableBody = document.getElementById('customerTableBody');
+
+    if (customerSearchInput && tableBody) {
+      customerSearchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const rows = tableBody.querySelectorAll('tr');
+        rows.forEach(row => {
+          const text = row.innerText.toLowerCase();
+          row.style.display = text.includes(query) ? '' : 'none';
+        });
+      });
+    }
+
+    // Filter period buttons
+    document.querySelectorAll('.filter-period-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.filter-period-btn').forEach(b => {
+          b.className = 'filter-period-btn px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition';
+        });
+        e.target.className = 'filter-period-btn px-2.5 py-1 rounded-md bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm font-semibold transition';
+        showToast(`Metrics recalculated for period: ${e.target.dataset.period.toUpperCase()}`, 'info');
+      });
+    });
+
+    // Run chart initialization on DOM ready
+    window.addEventListener('DOMContentLoaded', () => {
+      initCharts();
+    });
+  </script>
+</body>
+</html>

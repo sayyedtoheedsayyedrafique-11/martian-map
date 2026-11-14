@@ -1,0 +1,565 @@
+/* SurvivalAnalysis.css — Minimalist Black + Warm Yellow Field Dossier */
+
+.survival-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Header */
+.survival-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.survival-page__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.survival-page__desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  max-width: 820px;
+}
+
+/* Disclaimer banner */
+.survival-disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent-yellow);
+  border-radius: 0;
+  padding: 10px 12px;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.survival-disclaimer__icon {
+  color: var(--accent-yellow);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.survival-disclaimer strong {
+  display: block;
+  font-size: 0.76rem;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.3px;
+}
+
+.survival-disclaimer p {
+  margin: 0;
+}
+
+/* Risk summary grid (chips row) */
+.survival-summary-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.survival-summary-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 0;
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.survival-summary-chip__badge {
+  font-weight: 700;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+
+/* Cards list */
+.survival-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Individual hazard card */
+.survival-card {
+  border: 1px solid var(--border-color);
+  border-left-width: 3px;
+  border-radius: 0;
+  overflow: hidden;
+  background: var(--bg-card) !important;
+}
+
+/* Clickable header row */
+.survival-card__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-primary);
+  border-radius: 0;
+}
+
+.survival-card__header:hover {
+  background: var(--bg-card-hover);
+}
+
+.survival-card__icon-wrap {
+  flex-shrink: 0;
+}
+
+.survival-card__title {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.survival-card__toggle {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* Severity badge */
+.survival-severity-badge {
+  font-size: 0.64rem;
+  font-weight: 700;
+  border: 1px solid currentColor;
+  padding: 1px 6px;
+  border-radius: 0;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-family: var(--font-mono);
+}
+
+/* Summary line */
+.survival-card__summary {
+  padding: 0 12px 10px 38px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Expanded body */
+.survival-card__body {
+  border-top: 1px solid var(--border-color);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #080909;
+}
+
+/* Detail data table */
+.survival-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.74rem;
+}
+
+.survival-detail-table tr {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.survival-detail-table tr:last-child {
+  border-bottom: none;
+}
+
+.survival-detail-label {
+  padding: 6px 8px 6px 0;
+  color: var(--text-muted);
+  vertical-align: top;
+  width: 220px;
+  min-width: 160px;
+  font-family: var(--font-mono);
+}
+
+.survival-detail-value {
+  padding: 6px 10px 6px 0;
+  color: var(--text-primary);
+  font-weight: 600;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.survival-detail-note {
+  padding: 6px 0;
+  color: var(--text-secondary);
+  vertical-align: top;
+  line-height: 1.35;
+}
+
+/* Implication note */
+.survival-implication {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #141616;
+  border: 1px solid var(--border-color);
+  border-left: 2px solid var(--accent-yellow);
+  padding: 8px 10px;
+  border-radius: 0;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.survival-implication__icon {
+  color: var(--accent-yellow);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.survival-implication p {
+  margin: 0;
+}
+
+/* Data limitation notice */
+.survival-limitation-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  background: #141616;
+  border: 1px solid var(--border-color);
+  border-left: 2px solid var(--text-muted);
+  padding: 6px 8px;
+  border-radius: 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+/* Card footer with source link */
+.survival-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border-color);
+  padding-top: 8px;
+}
+
+.survival-card__source {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.survival-source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: var(--accent-yellow);
+  text-decoration: none;
+  font-family: var(--font-mono);
+}
+
+.survival-source-link:hover {
+  text-decoration: underline;
+}
+
+/* Sources footer */
+.survival-sources-footer {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 0;
+  padding: 12px 14px;
+}
+
+.survival-sources-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.survival-sources-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.survival-sources-list li {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  padding-left: 8px;
+  border-left: 2px solid var(--border-color);
+}
+
+.survival-sources-list a {
+  color: var(--accent-yellow);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-mono);
+}
+
+.survival-sources-list a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 680px) {
+  .survival-detail-table,
+  .survival-detail-table tbody,
+  .survival-detail-table tr,
+  .survival-detail-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .survival-detail-label {
+    width: 100%;
+    padding-bottom: 2px;
+    font-weight: 600;
+  }
+
+  .survival-detail-value {
+    padding-bottom: 2px;
+    white-space: normal;
+  }
+
+  .survival-detail-note {
+    padding-bottom: 6px;
+  }
+}
+
+/* --- New In-Situ Survival Calculator & Header Tags --- */
+
+.survival-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.survival-sys-tag {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 2px 7px;
+  text-transform: uppercase;
+}
+
+.survival-sys-tag--accent {
+  color: var(--accent-yellow);
+  border-color: rgba(245, 197, 66, 0.4);
+  background: rgba(245, 197, 66, 0.06);
+}
+
+.survival-calc-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent-yellow);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.survival-calc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.survival-calc-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.survival-calc-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.survival-calc-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.survival-calc-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.survival-site-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.76rem;
+  font-family: var(--font-mono);
+  padding: 5px 10px;
+  cursor: pointer;
+  outline: none;
+  border-radius: 0;
+}
+
+.survival-site-select:focus {
+  border-color: var(--accent-yellow);
+}
+
+.survival-site-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.survival-site-meta strong {
+  color: var(--text-primary);
+}
+
+.survival-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.survival-metric-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.survival-metric-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.survival-metric-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.survival-metric-value small {
+  font-size: 0.76rem;
+  color: var(--accent-yellow);
+  font-weight: 400;
+}
+
+.survival-metric-note {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 4px 0 0 0;
+}
+
+.survival-calc-footer {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+.survival-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-yellow);
+  color: #080909;
+  font-size: 0.74rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  padding: 7px 12px;
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+.survival-action-btn:hover {
+  opacity: 0.9;
+}
+
+.survival-action-btn--sec {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.survival-action-btn--sec:hover {
+  color: var(--text-primary);
+  border-color: var(--border-light);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.survival-pillars-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.survival-pillars-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  margin: 0;
+}
+

@@ -1,0 +1,50 @@
+/* InfoBanner.css — Rectangular Field Banner */
+
+.info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 0;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.info-banner--info {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent-yellow);
+  color: var(--text-secondary);
+}
+
+.info-banner--info strong {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.info-banner--warning {
+  background: #141616;
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent-yellow);
+  color: var(--text-secondary);
+}
+
+.info-banner--warning strong {
+  color: var(--accent-yellow);
+  font-family: var(--font-mono);
+}
+
+.info-banner__icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--accent-yellow);
+}
+
+.info-banner--warning .info-banner__icon {
+  color: var(--accent-yellow);
+}
+
+.info-banner__text {
+  flex: 1;
+}

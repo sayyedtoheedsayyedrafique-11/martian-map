@@ -1,0 +1,866 @@
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import MarsMap from '../components/MarsMap/MarsMap';
+import marsLocations from '../data/marsLocations';
+import {
+  calculateMarsDistance,
+  formatCoordinates,
+  calculateBearing,
+  generateGeodesicPoints,
+  MARS_RADIUS_KM,
+} from '../utils/helpers';
+import {
+  JEZERO_LANDMARKS,
+  MOBILITY_MODELS,
+  calculateRouteComparison,
+  haversineDistanceKm,
+  calculateAzimuth,
+} from '../services/marsRouteService';
+import { loadJezeroDemData } from '../services/marsDataService';
+import {
+  Navigation,
+  ShieldAlert,
+  AlertTriangle,
+  RotateCcw,
+  XCircle,
+  RefreshCw,
+  Sliders,
+  CheckCircle2,
+  Info,
+  Layers,
+  ArrowRight,
+  TrendingUp,
+  MapPin,
+  Mountain,
+  Crosshair,
+  ExternalLink,
+  Compass,
+} from 'lucide-react';
+import './RoutePlanner.css';
+
+// SVG Topographic Elevation Profile Component
+function RouteElevationProfile({ routeData, activeRouteKey = 'routeA' }) {
+  const [hoverPoint, setHoverPoint] = useState(null);
+  const activeRoute = routeData[activeRouteKey] || routeData.routeA;
+
+  if (!routeData.isFullJezeroDemCoverage || !activeRoute.profilePoints || activeRoute.profilePoints.length < 2) {
+    return (
+      <div className="route-profile-empty mono">
+        <Info size={14} color="var(--accent-yellow)" />
+        <div>
+          <strong>HIGH-RESOLUTION TERRAIN DATA UNAVAILABLE FOR THIS REGION</strong>
+          <p>
+            Continuous sub-kilometer slope profiling is supported exclusively within the Jezero Crater 20m CTX DEM footprint (17.58°N–19.29°N, 77.00°E–78.58°E). For global Mars traverses, intermediate slope profiles are withheld to preserve scientific integrity.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const points = activeRoute.profilePoints;
+  const maxDist = activeRoute.totalDistKm || 1;
+  const elevs = points.map((p) => p.elev).filter((e) => e !== null);
+  const minElev = Math.min(...elevs);
+  const maxElev = Math.max(...elevs);
+  const elevSpan = Math.max(10, maxElev - minElev);
+
+  // Chart Dimensions
+  const width = 600;
+  const height = 150;
+  const padding = { top: 18, right: 20, bottom: 25, left: 55 };
+  const graphW = width - padding.left - padding.right;
+  const graphH = height - padding.top - padding.bottom;
+
+  const getX = (dist) => padding.left + (dist / maxDist) * graphW;
+  const getY = (elev) => padding.top + graphH - ((elev - minElev) / elevSpan) * graphH;
+
+  // Build SVG Path
+  const pathD = points.reduce((acc, p, i) => {
+    const x = getX(p.distKm);
+    const y = getY(p.elev);
+    return i === 0 ? `M ${x} ${y}` : `${acc} L ${x} ${y}`;
+  }, '');
+
+  const areaD = `${pathD} L ${getX(points[points.length - 1].distKm)} ${padding.top + graphH} L ${getX(0)} ${padding.top + graphH} Z`;
+
+  return (
+    <div className="route-elevation-chart-box">
+      <div className="route-chart-header mono">
+        <div className="route-chart-title">
+          <TrendingUp size={13} color="var(--accent-yellow)" />
+          <span>TOPOGRAPHIC ELEVATION TRANSECT (USGS CTX 20m DEM)</span>
+        </div>
+        <div className="route-chart-stats">
+          <span>MIN: {minElev} m</span>
+          <span>•</span>
+          <span>MAX: {maxElev} m</span>
+          <span>•</span>
+          <span>RELIEF Δ: {Math.round(maxElev - minElev)} m</span>
+        </div>
+      </div>
+
+      <div className="route-svg-wrapper">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          className="route-profile-svg"
+          onMouseLeave={() => setHoverPoint(null)}
+        >
+          {/* Elevation Horizontal Grid Lines */}
+          {[0, 0.25, 0.5, 0.75, 1].map((pct, idx) => {
+            const elevVal = Math.round(minElev + pct * elevSpan);
+            const y = padding.top + graphH - pct * graphH;
+            return (
+              <g key={idx}>
+                <line
+                  x1={padding.left}
+                  y1={y}
+                  x2={padding.left + graphW}
+                  y2={y}
+                  stroke="rgba(255, 255, 255, 0.08)"
+                  strokeDasharray="3,3"
+                />
+                <text
+                  x={padding.left - 6}
+                  y={y + 3}
+                  fill="#94a3b8"
+                  fontSize="8"
+                  textAnchor="end"
+                  fontFamily="monospace"
+                >
+                  {elevVal}m
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Distance Ticks */}
+          {[0, 0.25, 0.5, 0.75, 1].map((pct, idx) => {
+            const distVal = (pct * maxDist).toFixed(1);
+            const x = padding.left + pct * graphW;
+            return (
+              <g key={idx}>
+                <line
+                  x1={x}
+                  y1={padding.top + graphH}
+                  x2={x}
+                  y2={padding.top + graphH + 4}
+                  stroke="rgba(255, 255, 255, 0.2)"
+                />
+                <text
+                  x={x}
+                  y={padding.top + graphH + 15}
+                  fill="#94a3b8"
+                  fontSize="8"
+                  textAnchor="middle"
+                  fontFamily="monospace"
+                >
+                  {distVal} km
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Area Fill Gradient */}
+          <defs>
+            <linearGradient id="elevAreaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#f5c542" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#f5c542" stopOpacity="0.0" />
+            </linearGradient>
+          </defs>
+          <path d={areaD} fill="url(#elevAreaGrad)" />
+
+          {/* Colored Segments based on Slope Thresholds */}
+          {points.map((pt, i) => {
+            if (i === 0) return null;
+            const prev = points[i - 1];
+            const x1 = getX(prev.distKm);
+            const y1 = getY(prev.elev);
+            const x2 = getX(pt.distKm);
+            const y2 = getY(pt.elev);
+
+            const slope = pt.slopeDeg || 0;
+            const strokeColor = slope > 15 ? '#ef4444' : slope > 7 ? '#f59e0b' : '#10b981';
+
+            return (
+              <line
+                key={i}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke={strokeColor}
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+            );
+          })}
+
+          {/* Invisible Scrubber overlay */}
+          {points.map((pt, i) => {
+            const x = getX(pt.distKm);
+            return (
+              <rect
+                key={`rect-${i}`}
+                x={x - graphW / (points.length * 2)}
+                y={padding.top}
+                width={graphW / points.length}
+                height={graphH}
+                fill="transparent"
+                style={{ cursor: 'crosshair' }}
+                onMouseEnter={() => setHoverPoint(pt)}
+              />
+            );
+          })}
+
+          {/* Hover Marker & Callout */}
+          {hoverPoint && (
+            <g>
+              <line
+                x1={getX(hoverPoint.distKm)}
+                y1={padding.top}
+                x2={getX(hoverPoint.distKm)}
+                y2={padding.top + graphH}
+                stroke="#ffffff"
+                strokeWidth="1"
+                strokeDasharray="2,2"
+              />
+              <circle
+                cx={getX(hoverPoint.distKm)}
+                cy={getY(hoverPoint.elev)}
+                r="4"
+                fill="#f5c542"
+                stroke="#080909"
+                strokeWidth="1.5"
+              />
+            </g>
+          )}
+        </svg>
+      </div>
+
+      {/* Hover Info Tooltip */}
+      <div className="route-scrub-readout mono">
+        {hoverPoint ? (
+          <>
+            <span>DISTANCE: {hoverPoint.distKm} km</span>
+            <span>ELEVATION: {hoverPoint.elev} m MOLA</span>
+            <span style={{ color: hoverPoint.slopeDeg > 15 ? '#ef4444' : hoverPoint.slopeDeg > 7 ? '#f59e0b' : '#10b981' }}>
+              SLOPE: {hoverPoint.slopeDeg}° ({hoverPoint.slopeDeg > 15 ? 'HAZARDOUS SCARP' : hoverPoint.slopeDeg > 7 ? 'MODERATE' : 'TRAVERSABLE'})
+            </span>
+          </>
+        ) : (
+          <span className="route-scrub-hint">
+            Hover along elevation cross-section to inspect local terrain slopes and MOLA datum elevations
+          </span>
+        )}
+      </div>
+
+      {/* Slope Color Legend */}
+      <div className="route-slope-legend mono">
+        <span className="route-legend-chip">
+          <span className="route-legend-box" style={{ background: '#10b981' }} />
+          <span>&lt;7° Flat / Safe</span>
+        </span>
+        <span className="route-legend-chip">
+          <span className="route-legend-box" style={{ background: '#f59e0b' }} />
+          <span>7°–15° Incline</span>
+        </span>
+        <span className="route-legend-chip">
+          <span className="route-legend-box" style={{ background: '#ef4444' }} />
+          <span>&gt;15° Critical Scarp</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export default function RoutePlanner() {
+  const [searchParams] = useSearchParams();
+  const urlStart = searchParams.get('start');
+  const urlDest = searchParams.get('dest');
+
+  // Planning scope: 'jezero' (Tactical 20m DEM) vs 'global' (Interplanetary Mars)
+  const [scopeMode, setScopeMode] = useState('jezero');
+  const [activeRouteKey, setActiveRouteKey] = useState('routeA'); // 'routeA' | 'routeB' | 'both'
+
+  // Endpoint selections
+  const [startPoint, setStartPoint] = useState({
+    id: 'octavia-butler',
+    name: 'Octavia E. Butler Landing (Perseverance)',
+    lat: 18.4447,
+    lng: 77.4508,
+    elevation: '-2,568 m',
+    elevationMeters: -2568,
+    isCustomClick: false,
+  });
+
+  const [destPoint, setDestPoint] = useState({
+    id: 'delta-front',
+    name: 'Jezero Western Delta Front (Scarp Base)',
+    lat: 18.5200,
+    lng: 77.3200,
+    elevation: '-2,329 m',
+    elevationMeters: -2329,
+    isCustomClick: false,
+  });
+
+  // Click-to-set waypoint mode: 'none' | 'start' | 'dest'
+  const [clickMode, setClickMode] = useState('none');
+
+  // Mobility Speed Model
+  const [selectedSpeedId, setSelectedSpeedId] = useState('standard-rover');
+
+  // Route Analysis and Comparison State
+  const [routeComparison, setRouteComparison] = useState(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+
+  // Map center/view controller
+  const [centerView, setCenterView] = useState({ lat: 18.45, lng: 77.40, zoom: 7 });
+
+  const selectedSpeed = MOBILITY_MODELS.find((m) => m.id === selectedSpeedId) || MOBILITY_MODELS[0];
+
+  // Re-run terrain-aware route comparison whenever endpoints change
+  useEffect(() => {
+    let isCancelled = false;
+    setIsCalculating(true);
+
+    calculateRouteComparison(startPoint, destPoint)
+      .then((comp) => {
+        if (!isCancelled) {
+          setRouteComparison(comp);
+          setIsCalculating(false);
+        }
+      })
+      .catch((err) => {
+        if (!isCancelled) {
+          console.warn('Route comparison failed:', err);
+          setIsCalculating(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [startPoint.lat, startPoint.lng, destPoint.lat, destPoint.lng]);
+
+  // Handle map click to place waypoints
+  const handleMapClick = (latlng) => {
+    const lat = Math.round(latlng.lat * 10000) / 10000;
+    const lng = Math.round(latlng.lng * 10000) / 10000;
+    const coordsStr = formatCoordinates(lat, lng);
+
+    if (clickMode === 'start') {
+      setStartPoint({
+        id: `custom-start-${Date.now()}`,
+        name: `Origin: ${coordsStr}`,
+        lat,
+        lng,
+        isCustomClick: true,
+      });
+      setClickMode('none');
+    } else if (clickMode === 'dest') {
+      setDestPoint({
+        id: `custom-dest-${Date.now()}`,
+        name: `Destination: ${coordsStr}`,
+        lat,
+        lng,
+        isCustomClick: true,
+      });
+      setClickMode('none');
+    } else {
+      // Default: cycle setting Point A then Point B
+      if (startPoint && destPoint) {
+        setStartPoint({
+          id: `custom-start-${Date.now()}`,
+          name: `Origin: ${coordsStr}`,
+          lat,
+          lng,
+          isCustomClick: true,
+        });
+      } else if (!startPoint) {
+        setStartPoint({
+          id: `custom-start-${Date.now()}`,
+          name: `Origin: ${coordsStr}`,
+          lat,
+          lng,
+          isCustomClick: true,
+        });
+      } else {
+        setDestPoint({
+          id: `custom-dest-${Date.now()}`,
+          name: `Destination: ${coordsStr}`,
+          lat,
+          lng,
+          isCustomClick: true,
+        });
+      }
+    }
+  };
+
+  // Preset Route Scenarios
+  const loadPresetRoute = (type) => {
+    if (type === 'delta-front') {
+      setScopeMode('jezero');
+      const start = JEZERO_LANDMARKS.find((l) => l.id === 'octavia-butler');
+      const dest = JEZERO_LANDMARKS.find((l) => l.id === 'delta-front');
+      setStartPoint(start);
+      setDestPoint(dest);
+      setCenterView({ lat: 18.48, lng: 77.38, zoom: 7 });
+    } else if (type === 'belva') {
+      setScopeMode('jezero');
+      const start = JEZERO_LANDMARKS.find((l) => l.id === 'delta-front');
+      const dest = JEZERO_LANDMARKS.find((l) => l.id === 'belva-crater');
+      setStartPoint(start);
+      setDestPoint(dest);
+      setCenterView({ lat: 18.50, lng: 77.35, zoom: 8 });
+    } else if (type === 'neretva-rim') {
+      setScopeMode('jezero');
+      const start = JEZERO_LANDMARKS.find((l) => l.id === 'delta-front');
+      const dest = JEZERO_LANDMARKS.find((l) => l.id === 'neretva-inflow');
+      setStartPoint(start);
+      setDestPoint(dest);
+      setCenterView({ lat: 18.68, lng: 77.42, zoom: 7 });
+    } else if (type === 'global-msl') {
+      setScopeMode('global');
+      const start = marsLocations.find((l) => l.id === 'perseverance');
+      const dest = marsLocations.find((l) => l.id === 'curiosity');
+      setStartPoint(start);
+      setDestPoint(dest);
+      setCenterView({ lat: 6.0, lng: 105.0, zoom: 3 });
+    }
+  };
+
+  const swapEndpoints = () => {
+    const temp = startPoint;
+    setStartPoint(destPoint);
+    setDestPoint(temp);
+  };
+
+  const clearRoute = () => {
+    setStartPoint(null);
+    setDestPoint(null);
+  };
+
+  const isValidRoute = Boolean(
+    startPoint &&
+    destPoint &&
+    typeof startPoint.lat === 'number' &&
+    typeof destPoint.lat === 'number' &&
+    (startPoint.lat !== destPoint.lat || startPoint.lng !== destPoint.lng)
+  );
+
+  return (
+    <div className="route-page fade-in">
+      {/* Header */}
+      <div className="route-header">
+        <div className="route-header__left">
+          <div className="route-tag-strip mono">
+            <span className="route-tag route-tag--accent">USGS ASTROGEOLOGY CTX 20m DEM</span>
+            <span className="route-tag">MOLA 610.5 Pa DATUM</span>
+            <span className="route-tag">AUTONAV SLOPE LIMIT: 15°</span>
+          </div>
+          <h1 className="route-heading">
+            <Navigation size={22} className="route-heading-icon" />
+            Mars Surface Route Planner & Slope Analyzer
+          </h1>
+          <p className="route-desc">
+            Plan surface traverses across Jezero Crater with terrain-aware elevation profiling. Compare direct straight-line paths with low-slope navigational bypasses, evaluate slope hazards, and review real USGS/CTX digital elevation metrics.
+          </p>
+        </div>
+
+        {/* Scope Mode Switcher */}
+        <div className="route-scope-toggle mono">
+          <button
+            type="button"
+            className={`route-scope-btn ${scopeMode === 'jezero' ? 'route-scope-btn--active' : ''}`}
+            onClick={() => {
+              setScopeMode('jezero');
+              loadPresetRoute('delta-front');
+            }}
+          >
+            <Crosshair size={12} /> Jezero Crater (20m DEM Focus)
+          </button>
+          <button
+            type="button"
+            className={`route-scope-btn ${scopeMode === 'global' ? 'route-scope-btn--active' : ''}`}
+            onClick={() => {
+              setScopeMode('global');
+              loadPresetRoute('global-msl');
+            }}
+          >
+            <Compass size={12} /> Global Mars Overview
+          </button>
+        </div>
+      </div>
+
+      {/* Preset Scenarios Strip */}
+      <div className="route-presets-strip">
+        <span className="route-presets-label mono">
+          <Crosshair size={12} /> VERIFIED MISSION TRAVERSES:
+        </span>
+        <div className="route-preset-buttons">
+          <button
+            type="button"
+            className="route-preset-btn"
+            onClick={() => loadPresetRoute('delta-front')}
+          >
+            Landing Site → Delta Front (8.6 km)
+          </button>
+          <button
+            type="button"
+            className="route-preset-btn"
+            onClick={() => loadPresetRoute('belva')}
+          >
+            Delta Front → Belva Crater Rim (6.4 km)
+          </button>
+          <button
+            type="button"
+            className="route-preset-btn"
+            onClick={() => loadPresetRoute('neretva-rim')}
+          >
+            Delta Front → Neretva Inflow Gorge (37.8 km)
+          </button>
+          <button
+            type="button"
+            className="route-preset-btn"
+            onClick={() => loadPresetRoute('global-msl')}
+          >
+            Global: Perseverance → Curiosity (3,710 km)
+          </button>
+        </div>
+      </div>
+
+      {/* Main Workspace Grid */}
+      <div className="route-grid">
+        {/* Left Column: Interactive Map */}
+        <div className="route-map-panel">
+          {/* Map Toolbar */}
+          <div className="route-map-toolbar">
+            <div className="route-toolbar-left mono">
+              <span>CLICK TO SET:</span>
+              <button
+                type="button"
+                className={`route-tool-btn ${clickMode === 'start' ? 'route-tool-btn--active' : ''}`}
+                onClick={() => setClickMode(clickMode === 'start' ? 'none' : 'start')}
+              >
+                Set Point A (Origin)
+              </button>
+              <button
+                type="button"
+                className={`route-tool-btn ${clickMode === 'dest' ? 'route-tool-btn--active' : ''}`}
+                onClick={() => setClickMode(clickMode === 'dest' ? 'none' : 'dest')}
+              >
+                Set Point B (Destination)
+              </button>
+            </div>
+
+            <div className="route-toolbar-right mono">
+              <button
+                type="button"
+                className="route-tool-btn"
+                onClick={swapEndpoints}
+                disabled={!isValidRoute}
+                title="Swap origin and destination"
+              >
+                <RotateCcw size={11} /> Swap Endpoints
+              </button>
+              <button
+                type="button"
+                className="route-tool-btn route-tool-btn--danger"
+                onClick={clearRoute}
+                title="Clear current route"
+              >
+                <XCircle size={11} /> Clear Route
+              </button>
+            </div>
+          </div>
+
+          {/* Interactive Map Visualizer */}
+          <div className="route-canvas-box">
+            <MarsMap
+              routePoints={isValidRoute && routeComparison?.routeA?.waypoints ? routeComparison.routeA.waypoints : null}
+              alternativeRoutePoints={
+                isValidRoute && routeComparison?.isFullJezeroDemCoverage && (activeRouteKey === 'routeB' || activeRouteKey === 'both')
+                  ? routeComparison.routeB.waypoints
+                  : null
+              }
+              routeStartLoc={startPoint}
+              routeDestLoc={destPoint}
+              onMapClick={handleMapClick}
+              centerView={centerView}
+              filteredLocations={scopeMode === 'jezero' ? JEZERO_LANDMARKS : marsLocations}
+              canvasClassName="mars-map-canvas--route-planner"
+            />
+          </div>
+
+          {/* Map Legend Strip */}
+          <div className="route-map-legend mono">
+            <div className="route-legend-group">
+              <span className="route-legend-badge route-legend-badge--a">A</span>
+              <span>ORIGIN: {startPoint ? startPoint.name : 'Click to Set'}</span>
+            </div>
+            <div className="route-legend-group">
+              <span className="route-legend-badge route-legend-badge--b">B</span>
+              <span>DEST: {destPoint ? destPoint.name : 'Click to Set'}</span>
+            </div>
+            {isValidRoute && routeComparison?.isFullJezeroDemCoverage && (
+              <div className="route-legend-routes">
+                <span className="route-path-chip route-path-chip--a">
+                  ── Option A: Direct Geodesic
+                </span>
+                <span className="route-path-chip route-path-chip--b">
+                  ┄┄ Option B: Low-Slope Bypass
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Route Controls, Elevation Profile, & Comparison Inspector */}
+        <div className="route-inspector-panel">
+          {/* Endpoint Selection Card */}
+          <div className="route-card">
+            <h3 className="route-card-title mono">
+              <Crosshair size={13} color="var(--accent-yellow)" /> SURFACE WAYPOINT CONFIGURATION
+            </h3>
+
+            <div className="route-field">
+              <label className="route-label mono">Point A (Origin)</label>
+              {scopeMode === 'jezero' ? (
+                <select
+                  className="route-select mono"
+                  value={startPoint?.id || ''}
+                  onChange={(e) => {
+                    const found = JEZERO_LANDMARKS.find((l) => l.id === e.target.value);
+                    if (found) setStartPoint(found);
+                  }}
+                >
+                  <option value="">-- Choose Jezero Landmark --</option>
+                  {JEZERO_LANDMARKS.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name} ({l.elevationMeters}m)
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <select
+                  className="route-select mono"
+                  value={startPoint?.id || ''}
+                  onChange={(e) => {
+                    const found = marsLocations.find((l) => l.id === e.target.value);
+                    if (found) setStartPoint(found);
+                  }}
+                >
+                  <option value="">-- Choose Planetary Monument --</option>
+                  {marsLocations.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {startPoint && (
+                <div className="route-coord-hint mono">
+                  {formatCoordinates(startPoint.lat, startPoint.lng)} • {startPoint.elevation || `${startPoint.elevationMeters}m MOLA`}
+                </div>
+              )}
+            </div>
+
+            <div className="route-field">
+              <label className="route-label mono">Point B (Destination)</label>
+              {scopeMode === 'jezero' ? (
+                <select
+                  className="route-select mono"
+                  value={destPoint?.id || ''}
+                  onChange={(e) => {
+                    const found = JEZERO_LANDMARKS.find((l) => l.id === e.target.value);
+                    if (found) setDestPoint(found);
+                  }}
+                >
+                  <option value="">-- Choose Jezero Landmark --</option>
+                  {JEZERO_LANDMARKS.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name} ({l.elevationMeters}m)
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <select
+                  className="route-select mono"
+                  value={destPoint?.id || ''}
+                  onChange={(e) => {
+                    const found = marsLocations.find((l) => l.id === e.target.value);
+                    if (found) setDestPoint(found);
+                  }}
+                >
+                  <option value="">-- Choose Planetary Monument --</option>
+                  {marsLocations.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {destPoint && (
+                <div className="route-coord-hint mono">
+                  {formatCoordinates(destPoint.lat, destPoint.lng)} • {destPoint.elevation || `${destPoint.elevationMeters}m MOLA`}
+                </div>
+              )}
+            </div>
+
+            <div className="route-field">
+              <label className="route-label mono">Mobility Model Pace</label>
+              <select
+                className="route-select mono"
+                value={selectedSpeedId}
+                onChange={(e) => setSelectedSpeedId(e.target.value)}
+              >
+                {MOBILITY_MODELS.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+              <span className="route-coord-hint mono">{selectedSpeed.note}</span>
+            </div>
+          </div>
+
+          {/* Elevation Profile Section */}
+          {isValidRoute && routeComparison && (
+            <div className="route-card">
+              <div className="route-tab-row mono">
+                <span className="route-tab-title">TERRAIN TRANSECT</span>
+                {routeComparison.isFullJezeroDemCoverage && (
+                  <div className="route-route-selector">
+                    <button
+                      type="button"
+                      className={`route-tab-btn ${activeRouteKey === 'routeA' ? 'route-tab-btn--active' : ''}`}
+                      onClick={() => setActiveRouteKey('routeA')}
+                    >
+                      Option A (Direct)
+                    </button>
+                    <button
+                      type="button"
+                      className={`route-tab-btn ${activeRouteKey === 'routeB' ? 'route-tab-btn--active' : ''}`}
+                      onClick={() => setActiveRouteKey('routeB')}
+                    >
+                      Option B (Low-Slope)
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <RouteElevationProfile
+                routeData={routeComparison}
+                activeRouteKey={activeRouteKey}
+              />
+            </div>
+          )}
+
+          {/* Route Comparison Matrix Card */}
+          {isValidRoute && routeComparison && routeComparison.isFullJezeroDemCoverage && (
+            <div className="route-card">
+              <h3 className="route-card-title mono">
+                <Layers size={13} color="var(--accent-yellow)" /> COMPARATIVE TRAVERSE MATRIX
+              </h3>
+
+              <div className="route-comparison-table-wrapper mono">
+                <table className="route-comparison-table">
+                  <thead>
+                    <tr>
+                      <th>Metric</th>
+                      <th>Option A (Direct)</th>
+                      <th>Option B (Low-Slope)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Traverse Distance</td>
+                      <td>{routeComparison.routeA.totalDistKm} km</td>
+                      <td>{routeComparison.routeB.totalDistKm} km</td>
+                    </tr>
+                    <tr>
+                      <td>Total Vertical Climb (Ascent)</td>
+                      <td>+{routeComparison.routeA.totalAscentM} m</td>
+                      <td>+{routeComparison.routeB.totalAscentM} m</td>
+                    </tr>
+                    <tr>
+                      <td>Total Vertical Descent</td>
+                      <td>-{routeComparison.routeA.totalDescentM} m</td>
+                      <td>-{routeComparison.routeB.totalDescentM} m</td>
+                    </tr>
+                    <tr>
+                      <td>Maximum Slope Angle</td>
+                      <td style={{ color: routeComparison.routeA.maxSlopeDeg > 15 ? '#ef4444' : '#10b981' }}>
+                        {routeComparison.routeA.maxSlopeDeg}° {routeComparison.routeA.maxSlopeDeg > 15 && '⚠'}
+                      </td>
+                      <td style={{ color: routeComparison.routeB.maxSlopeDeg > 15 ? '#ef4444' : '#10b981' }}>
+                        {routeComparison.routeB.maxSlopeDeg}°
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Average Slope Grade</td>
+                      <td>{routeComparison.routeA.avgSlopeDeg}°</td>
+                      <td>{routeComparison.routeB.avgSlopeDeg}°</td>
+                    </tr>
+                    <tr>
+                      <td>Critical Hazard Segments (&gt;15°)</td>
+                      <td style={{ color: routeComparison.routeA.steepPercent > 0 ? '#ef4444' : '#10b981' }}>
+                        {routeComparison.routeA.steepPercent}%
+                      </td>
+                      <td style={{ color: routeComparison.routeB.steepPercent > 0 ? '#ef4444' : '#10b981' }}>
+                        {routeComparison.routeB.steepPercent}%
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Estimated Sol Duration</td>
+                      <td>~{Math.round(routeComparison.routeA.totalDistKm / selectedSpeed.solKm)} Sols</td>
+                      <td>~{Math.round(routeComparison.routeB.totalDistKm / selectedSpeed.solKm)} Sols</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mission Planning Evaluation Callout */}
+              <div className="route-evaluation-box mono">
+                <div className="route-eval-header">
+                  <CheckCircle2 size={13} color="var(--accent-yellow)" />
+                  <strong>MISSION TRAVERSABILITY ASSESSMENT:</strong>
+                </div>
+                <p className="route-eval-text">{routeComparison.comparisonRationale}</p>
+              </div>
+
+              {/* Mandatory Planetary Safety Protocol Warning */}
+              <div className="route-safety-alert mono">
+                <ShieldAlert size={15} color="var(--accent-yellow)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <div>
+                  <strong>SAFETY LIMITATION DISCLOSURE:</strong>
+                  <p>
+                    No route across the Martian surface is completely safe. Even low-slope options may encounter unresolved sub-pixel boulder clusters (&lt;20m), loose wheel-trapping drift sand, or steep bedrock fissures below the Context Camera DEM resolution threshold. Autonomous driving requires continuous visual odometry hazard avoidance.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Missing Data / Incomplete State */}
+          {!isValidRoute && (
+            <div className="route-card route-card--empty mono">
+              <Navigation size={28} color="var(--accent-yellow)" style={{ opacity: 0.7 }} />
+              <h4>AWAITING ROUTE WAYPOINTS</h4>
+              <p>
+                Click any two points on the map or choose curated landmarks from the dropdowns above to initiate terrain-aware routing and continuous elevation analysis.
+              </p>
+              <button
+                type="button"
+                className="route-preset-btn route-preset-btn--primary"
+                onClick={() => loadPresetRoute('delta-front')}
+              >
+                Load Sample Jezero Route
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
