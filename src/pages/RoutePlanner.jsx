@@ -20,6 +20,7 @@ import {
   Crosshair,
   ExternalLink,
   Compass,
+  Layers,
 } from 'lucide-react';
 import './RoutePlanner.css';
 
@@ -395,7 +396,7 @@ export default function RoutePlanner() {
     return () => {
       isCancelled = true;
     };
-  }, [startPoint.lat, startPoint.lng, destPoint.lat, destPoint.lng]);
+  }, [startPoint, destPoint]);
 
   // Handle map click to place waypoints
   const handleMapClick = (latlng) => {

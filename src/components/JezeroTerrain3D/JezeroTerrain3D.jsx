@@ -24,12 +24,9 @@ import {
   Crosshair,
   Grid,
   Sun,
-  Activity,
   Ruler,
   TrendingUp,
-  AlertTriangle,
   CheckCircle2,
-  ShieldAlert,
 } from 'lucide-react';
 import './JezeroTerrain3D.css';
 

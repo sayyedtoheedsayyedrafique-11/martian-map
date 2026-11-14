@@ -48,7 +48,7 @@ function createObservationIcon(isGroundTruth = false, isSelected = false) {
       iconAnchor: [13, 34],
       popupAnchor: [0, -34],
     });
-  } catch (err) {
+  } catch (_err) {
     return undefined;
   }
 }
@@ -71,7 +71,7 @@ function createReticleIcon() {
       iconSize: [32, 32],
       iconAnchor: [16, 16],
     });
-  } catch (err) {
+  } catch (_err) {
     return undefined;
   }
 }
@@ -444,6 +444,11 @@ export default function MarsDataExplorer() {
               <div className="mde-map-loading-indicator mono">
                 <span className="mde-spinner" />
                 <span>STREAMING SCIENTIFIC TILES: {activeLayer.shortLabel}...</span>
+              </div>
+            )}
+            {tileLoadError && !isTilesLoading && (
+              <div className="mde-map-loading-indicator mono" style={{ background: 'rgba(239, 68, 68, 0.85)', color: '#fff' }}>
+                <span>REMOTE TILE STREAMING LIMITED — DISPLAYING BEST-EFFORT MAP CACHE</span>
               </div>
             )}
 
