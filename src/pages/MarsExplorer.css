@@ -335,6 +335,46 @@
   margin: 0;
 }
 
+/* Collapsible Technical Metadata Accordion */
+.mars-tech-accordion {
+  background: var(--bg-panel, #181c23);
+  border: 1px solid var(--border-subtle, #242933);
+  border-radius: var(--radius-sm, 2px);
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.mars-tech-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 9px;
+  font-size: 0.64rem;
+  color: var(--text-muted, #8c93a0);
+  cursor: pointer;
+  background: var(--bg-secondary, #12151a);
+  user-select: none;
+  transition: color var(--transition-fast, 80ms ease);
+}
+
+.mars-tech-summary:hover {
+  color: var(--text-primary, #f2f0e6);
+}
+
+.mars-tech-chevron {
+  transition: transform var(--transition-normal, 140ms ease);
+  color: var(--text-dim, #5c6370);
+}
+
+.mars-tech-accordion[open] .mars-tech-chevron {
+  transform: rotate(180deg);
+}
+
+.mars-tech-body {
+  padding: 6px 8px;
+  border-top: 1px solid var(--border-subtle, #242933);
+}
+
 /* Drawer Action Buttons */
 .mars-drawer-actions {
   display: flex;

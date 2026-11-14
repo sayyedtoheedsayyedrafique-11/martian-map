@@ -1,13 +1,10 @@
 import { NavLink } from 'react-router-dom';
 import {
   Globe,
-  MapPin,
   Route,
   Database,
   Info,
   ShieldAlert,
-  Mountain,
-  Rocket,
   X,
   Thermometer,
   Layers,
@@ -16,39 +13,39 @@ import {
 } from 'lucide-react';
 import './Sidebar.css';
 
-const navSections = [
+const primaryNav = [
   {
-    title: 'Planetary Cartography',
-    items: [
-      { to: '/', icon: Globe, label: '3D Globe & Map', badge: '3D/2D' },
-      { to: '/data-explorer', icon: Database, label: 'Mars Data Explorer', badge: 'PDS/CTX' },
-      { to: '/jezero', icon: Mountain, label: '3D Jezero Terrain', badge: 'DEM 20m' },
-      { to: '/locations', icon: MapPin, label: 'Scientific Locations' },
-    ],
+    to: '/',
+    icon: Globe,
+    label: 'Explore Map',
+    subtitle: '2D Map & 3D Terrain',
+    end: true,
   },
   {
-    title: 'Mission Flight Ops',
-    items: [
-      { to: '/missions', icon: Rocket, label: 'Mission Intelligence' },
-      { to: '/raw-images', icon: Camera, label: 'Perseverance Raw Images', badge: 'NASA' },
-      { to: '/route-planner', icon: Route, label: 'Smart Route Planner' },
-      { to: '/conditions', icon: Thermometer, label: 'Surface Conditions' },
-    ],
+    to: '/route-planner',
+    icon: Route,
+    label: 'Rover Routes',
+    subtitle: 'Traverse & Survival',
   },
   {
-    title: 'Terrain & Survival',
-    items: [
-      { to: '/terrain', icon: Layers, label: 'Terrain & Hazards' },
-      { to: '/survival', icon: ShieldAlert, label: 'Survival Simulator' },
-    ],
+    to: '/conditions',
+    icon: Thermometer,
+    label: 'Surface & Weather',
+    subtitle: 'Atmosphere & Geology',
   },
   {
-    title: 'Research & Archive',
-    items: [
-      { to: '/data-sources', icon: Database, label: 'NASA Data Sources' },
-      { to: '/about', icon: Info, label: 'Mission & Specs' },
-    ],
+    to: '/missions',
+    icon: Camera,
+    label: 'Rover Gallery',
+    subtitle: 'Perseverance Raw Photos',
   },
+];
+
+const secondaryNav = [
+  { to: '/terrain', icon: Layers, label: 'Terrain & Hazards' },
+  { to: '/survival', icon: ShieldAlert, label: 'Survival Simulator' },
+  { to: '/data-sources', icon: Database, label: 'NASA Data Sources' },
+  { to: '/about', icon: Info, label: 'Mission & Specs' },
 ];
 
 function Sidebar({ isOpen, onClose }) {
@@ -74,26 +71,49 @@ function Sidebar({ isOpen, onClose }) {
       </div>
 
       <nav className="sidebar__nav">
-        {navSections.map((section) => (
-          <div key={section.title} className="sidebar__section">
-            <div className="sidebar__nav-label mono">{section.title}</div>
-            {section.items.map(({ to, icon: Icon, label, badge }) => (
+        {/* 4 Clear Primary Categories */}
+        <div className="sidebar__section">
+          <div className="sidebar__nav-label mono">Mission Navigation</div>
+          <div className="sidebar__primary-list">
+            {primaryNav.map(({ to, icon: Icon, label, subtitle, end }) => (
               <NavLink
                 key={to}
                 to={to}
-                end={to === '/'}
+                end={end}
                 className={({ isActive }) =>
-                  `sidebar__link ${isActive ? 'sidebar__link--active' : ''}`
+                  `sidebar__link sidebar__link--primary ${isActive ? 'sidebar__link--active' : ''}`
                 }
                 onClick={onClose}
               >
-                <Icon size={15} className="sidebar__link-icon" />
-                <span className="sidebar__link-text">{label}</span>
-                {badge && <span className="sidebar__link-badge mono">{badge}</span>}
+                <div className="sidebar__link-icon-box">
+                  <Icon size={16} className="sidebar__link-icon" />
+                </div>
+                <div className="sidebar__link-content">
+                  <span className="sidebar__link-title">{label}</span>
+                  <span className="sidebar__link-sub mono">{subtitle}</span>
+                </div>
               </NavLink>
             ))}
           </div>
-        ))}
+        </div>
+
+        {/* Secondary Specialized Science Tools */}
+        <div className="sidebar__section sidebar__section--secondary">
+          <div className="sidebar__nav-label mono">Archive & Advanced</div>
+          {secondaryNav.map(({ to, icon: Icon, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                `sidebar__link sidebar__link--compact ${isActive ? 'sidebar__link--active' : ''}`
+              }
+              onClick={onClose}
+            >
+              <Icon size={13} className="sidebar__link-icon" />
+              <span className="sidebar__link-text">{label}</span>
+            </NavLink>
+          ))}
+        </div>
       </nav>
 
       <div className="sidebar__footer">

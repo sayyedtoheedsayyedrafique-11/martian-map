@@ -23,6 +23,7 @@ import {
   Box,
   Camera,
   SlidersHorizontal,
+  ChevronDown,
 } from 'lucide-react';
 import './MarsExplorer.css';
 
@@ -135,7 +136,7 @@ function MarsExplorer() {
           aria-expanded={isDrawerOpen}
         >
           <SlidersHorizontal size={12} />
-          <span>Target Dossier</span>
+          <span>{isDrawerOpen ? 'Hide Info' : 'Site Info'}</span>
           {selectedLocation && <span className="mars-drawer-indicator" />}
         </button>
       </div>
@@ -238,26 +239,34 @@ function MarsExplorer() {
                   </div>
                 )}
 
-                {/* Standardized Scientific Metadata Inspector */}
-                <MetadataInspector
-                  title="TARGET SCIENTIFIC PROVENANCE"
-                  classification="actual"
-                  customClassificationLabel="NASA PDS / USGS DATUM"
-                  platform={selectedLocation.mission}
-                  instrument={selectedLocation.terrainLabel}
-                  sol={selectedLocation.status?.includes('Sol') ? selectedLocation.status.match(/Sol\s+(\d+\+?)/)?.[0] : undefined}
-                  coordinates={{
-                    lat: selectedLocation.lat,
-                    lng: selectedLocation.lng,
-                    datum: 'MOLA Areoid (610.5 Pa)',
-                  }}
-                  elevation={selectedLocation.elevation}
-                  geologicUnit={selectedLocation.geologicalEra || 'USGS SIM 3292'}
-                  sourceName={selectedLocation.source || 'NASA Planetary Data System (PDS)'}
-                  sourceUrl={selectedLocation.sourceUrl}
-                  doiOrCatalogId={selectedLocation.catalogId}
-                  processingStatus="Verified Planetary Telemetry"
-                />
+                {/* Collapsible Scientific Metadata Accordion */}
+                <details className="mars-tech-accordion">
+                  <summary className="mars-tech-summary mono">
+                    <span>Technical Metadata & Planetary Datum</span>
+                    <ChevronDown size={13} className="mars-tech-chevron" />
+                  </summary>
+                  <div className="mars-tech-body">
+                    <MetadataInspector
+                      title="TARGET SCIENTIFIC PROVENANCE"
+                      classification="actual"
+                      customClassificationLabel="NASA PDS / USGS DATUM"
+                      platform={selectedLocation.mission}
+                      instrument={selectedLocation.terrainLabel}
+                      sol={selectedLocation.status?.includes('Sol') ? selectedLocation.status.match(/Sol\s+(\d+\+?)/)?.[0] : undefined}
+                      coordinates={{
+                        lat: selectedLocation.lat,
+                        lng: selectedLocation.lng,
+                        datum: 'MOLA Areoid (610.5 Pa)',
+                      }}
+                      elevation={selectedLocation.elevation}
+                      geologicUnit={selectedLocation.geologicalEra || 'USGS SIM 3292'}
+                      sourceName={selectedLocation.source || 'NASA Planetary Data System (PDS)'}
+                      sourceUrl={selectedLocation.sourceUrl}
+                      doiOrCatalogId={selectedLocation.catalogId}
+                      processingStatus="Verified Planetary Telemetry"
+                    />
+                  </div>
+                </details>
 
                 {/* Deep-Link Actions */}
                 <div className="mars-drawer-actions">

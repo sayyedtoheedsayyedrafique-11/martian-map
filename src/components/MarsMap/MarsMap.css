@@ -77,10 +77,52 @@
 
 .mars-button-group {
   display: inline-flex;
-  border: 1px solid var(--border-subtle, #232832);
+  border: 1px solid var(--border-subtle, #242933);
   border-radius: var(--radius-sm, 2px);
   overflow: hidden;
   flex-shrink: 0;
+}
+
+/* Custom Scientific Dropdown Selectors */
+.mars-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.mars-control-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--bg-panel, #181c23);
+  border: 1px solid var(--border-subtle, #242933);
+  color: var(--text-primary, #f2f0e6);
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 3px 22px 3px 8px;
+  border-radius: var(--radius-sm, 2px);
+  cursor: pointer;
+  outline: none;
+  font-family: var(--font-mono, monospace);
+  transition: border-color var(--transition-fast, 80ms ease);
+}
+
+.mars-control-select:hover,
+.mars-control-select:focus {
+  border-color: var(--accent-amber, #d99b26);
+}
+
+.mars-control-select option {
+  background: #14171c;
+  color: #f2f0e6;
+  font-family: var(--font-mono, monospace);
+  padding: 4px;
+}
+
+.mars-select-chevron {
+  position: absolute;
+  right: 6px;
+  pointer-events: none;
+  color: var(--text-dim, #5c6370);
 }
 
 /* Physical Avionics Switch: Crisp borders, subtle hover, no bouncy animation */

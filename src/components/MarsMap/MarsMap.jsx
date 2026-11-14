@@ -8,7 +8,7 @@ import HIRISE_FOOTPRINTS from '../../data/hiriseFootprints';
 import { formatCoordinates } from '../../utils/helpers';
 import { getElevationAtCoordinate } from '../../services/marsDataService';
 import ClassificationBadge from '../ui/ClassificationBadge';
-import { RotateCcw, ExternalLink, Route, Compass, MapPin, Eye } from 'lucide-react';
+import { RotateCcw, ExternalLink, Route, Compass, MapPin, Eye, ChevronDown } from 'lucide-react';
 import './MarsMap.css';
 
 // Resilient Leaflet namespace resolution
@@ -295,15 +295,25 @@ function MapInvalidateController() {
   useEffect(() => {
     if (!map) return;
     map.invalidateSize();
-    const t1 = setTimeout(() => map.invalidateSize(), 80);
-    const t2 = setTimeout(() => map.invalidateSize(), 250);
+    const t1 = setTimeout(() => map.invalidateSize(), 50);
+    const t2 = setTimeout(() => map.invalidateSize(), 200);
     const t3 = setTimeout(() => map.invalidateSize(), 600);
+
+    const container = map.getContainer();
+    let ro = null;
+    if (typeof ResizeObserver !== 'undefined' && container) {
+      ro = new ResizeObserver(() => {
+        map.invalidateSize();
+      });
+      ro.observe(container);
+    }
     const handleResize = () => map.invalidateSize();
     window.addEventListener('resize', handleResize);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
+      if (ro) ro.disconnect();
       window.removeEventListener('resize', handleResize);
     };
   }, [map]);
@@ -407,21 +417,48 @@ function MarsMap({
       {/* Top Map Toolbar */}
       {!hideToolbar && (
         <div className="mars-map-controls-bar">
-          {/* Basemap Selection */}
+          {/* Basemap Dropdown Selector */}
           <div className="mars-map-control-group">
-            <span className="mars-control-label">Basemap:</span>
-            <div className="mars-button-group">
-              {Object.values(TILE_LAYERS).map((layer) => (
-                <button
-                  key={layer.id}
-                  type="button"
-                  className={`mars-control-btn ${effectiveLayerKey === layer.id ? 'mars-control-btn--active' : ''}`}
-                  onClick={() => handleSelectLayer(layer.id)}
-                  title={layer.description}
-                >
-                  {layer.shortLabel}
-                </button>
-              ))}
+            <label htmlFor="mars-basemap-select" className="mars-control-label">Basemap:</label>
+            <div className="mars-select-wrapper">
+              <select
+                id="mars-basemap-select"
+                className="mars-control-select mono"
+                value={effectiveLayerKey}
+                onChange={(e) => handleSelectLayer(e.target.value)}
+                title={currentLayer.description}
+              >
+                {Object.values(TILE_LAYERS).map((layer) => (
+                  <option key={layer.id} value={layer.id}>
+                    {layer.shortLabel}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={11} className="mars-select-chevron" />
+            </div>
+          </div>
+
+          {/* Landmark Quick-Jump Dropdown Selector */}
+          <div className="mars-map-control-group mars-hide-mobile">
+            <label htmlFor="mars-landmark-select" className="mars-control-label">Jump to Site:</label>
+            <div className="mars-select-wrapper">
+              <select
+                id="mars-landmark-select"
+                className="mars-control-select mono"
+                value={selectedLocation?.id || ''}
+                onChange={(e) => {
+                  const loc = marsLocations.find((l) => l.id === e.target.value);
+                  if (loc && onLocationSelect) onLocationSelect(loc);
+                }}
+              >
+                <option value="" disabled>Select Target Landmark…</option>
+                {quickJumpTargets.map((target) => (
+                  <option key={target.id} value={target.id}>
+                    {target.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={11} className="mars-select-chevron" />
             </div>
           </div>
 
@@ -457,28 +494,6 @@ function MarsMap({
                 ? 'Streaming Planetary GIS Tiles...'
                 : 'Basemap Online (Verified Surface Imagery)'}
             </span>
-          </div>
-
-          {/* Quick Landmarks Jump Bar */}
-          <div className="mars-map-control-group mars-hide-mobile">
-            <span className="mars-control-label">Landmarks:</span>
-            <div className="mars-button-group">
-              {quickJumpTargets.map((target) => {
-                const loc = marsLocations.find((l) => l.id === target.id);
-                if (!loc) return null;
-                const isSelected = selectedLocation?.id === target.id;
-                return (
-                  <button
-                    key={target.id}
-                    type="button"
-                    className={`mars-control-btn ${isSelected ? 'mars-control-btn--active' : ''}`}
-                    onClick={() => onLocationSelect && onLocationSelect(loc)}
-                  >
-                    {target.label}
-                  </button>
-                );
-              })}
-            </div>
           </div>
 
           {/* Reset View */}
@@ -541,7 +556,15 @@ function MarsMap({
                 setIsTilesLoading(false);
               },
               tileerror: () => {
-                setTileErrorCount((c) => c + 1);
+                setTileErrorCount((c) => {
+                  const newCount = c + 1;
+                  // If CTX network times out, gracefully fallback to high-reliability NASA Viking basemap
+                  if (newCount > 4 && effectiveLayerKey === 'ctx') {
+                    console.warn('CTX tile endpoint unreachable, falling back to NASA Viking Color Mosaic');
+                    handleSelectLayer('viking');
+                  }
+                  return newCount;
+                });
               },
             }}
           />

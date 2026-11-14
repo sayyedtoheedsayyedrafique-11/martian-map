@@ -84,33 +84,39 @@
 
 .sidebar__nav {
   flex: 1;
-  padding: 10px 8px;
+  padding: 12px 10px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .sidebar__section {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .sidebar__nav-label {
-  font-size: 0.56rem;
+  font-size: 0.58rem;
   font-weight: 700;
   color: var(--text-dim, #5c6370);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   padding: 2px 8px;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
+}
+
+.sidebar__primary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .sidebar__link {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   padding: 6px 8px;
   border-radius: var(--radius-sm, 2px);
   color: var(--text-muted, #8c93a0);
@@ -120,6 +126,69 @@
   border-left: 3px solid transparent;
   background: transparent;
   transition: all var(--transition-fast, 80ms ease);
+}
+
+.sidebar__link--primary {
+  padding: 7px 9px;
+  background: var(--bg-panel, #181c23);
+  border: 1px solid var(--border-subtle, #242933);
+  border-left: 3px solid transparent;
+}
+
+.sidebar__link--primary:hover {
+  background: var(--bg-panel-elevated, #1e232c);
+  border-color: var(--border-medium, #2e3543);
+  border-left-color: var(--border-medium, #2e3543);
+}
+
+.sidebar__link--primary.sidebar__link--active {
+  background: var(--bg-panel-active, #252b36);
+  border-color: var(--border-subtle, #242933);
+  border-left: 3px solid var(--accent-amber, #d99b26);
+}
+
+.sidebar__link-icon-box {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-dim, #5c6370);
+}
+
+.sidebar__link--active .sidebar__link-icon-box {
+  color: var(--accent-amber, #d99b26);
+}
+
+.sidebar__link-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.sidebar__link-title {
+  font-size: 0.77rem;
+  font-weight: 600;
+  color: var(--text-primary, #f2f0e6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.sidebar__link-sub {
+  font-size: 0.54rem;
+  color: var(--text-dim, #5c6370);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+}
+
+.sidebar__link--compact {
+  padding: 5px 8px;
 }
 
 .sidebar__link-icon {
