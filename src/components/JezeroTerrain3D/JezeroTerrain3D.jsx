@@ -1022,6 +1022,7 @@ function JezeroTerrain3D({
     setViewPreset('angled');
     animateCameraTo(new THREE.Vector3(-25, 45, 65), new THREE.Vector3(0, 3, 0));
   };
+  const handleAngledView = handleResetCamera;
 
   const handleTopDownView = () => {
     setIsFlyoverActive(false);
