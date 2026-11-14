@@ -3,8 +3,14 @@ import { Link } from 'react-router-dom';
 import marsMissions from '../../data/marsMissions';
 import marsLocations, { locationTypes } from '../../data/marsLocations';
 import { MARS_RAW_IMAGES } from '../../data/marsRawImages';
+import {
+  INSIGHT_MISSION_METADATA,
+  MARS_INTERIOR_STRUCTURE,
+  INSIGHT_MARSQUAKE_EVENTS,
+} from '../../data/marsQuakeCatalog';
 import MarsMap from '../MarsMap/MarsMap';
 import PerseveranceRawGallery from '../RawImages/PerseveranceRawGallery';
+import ClassificationBadge from '../ui/ClassificationBadge';
 import { formatCoordinates } from '../../utils/helpers';
 import {
   Rocket,
@@ -461,6 +467,104 @@ function MarsMissionIntelligence({ defaultMissionId = 'perseverance', initialMod
               ))}
             </div>
           </div>
+
+          {/* InSight-Specific: Seismic Activity & Planetary Interior Structure Module */}
+          {selectedMission.id === 'insight' && (
+            <div className="mmi-panel" style={{ borderTop: '3px solid #ef4444' }}>
+              <div className="mmi-panel-header">
+                <div>
+                  <h3 className="mmi-panel-title">
+                    <Activity className="mmi-panel-title-icon" size={16} /> Seismic Activity & Interior Structure (NASA InSight / SEIS / IRIS)
+                  </h3>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px' }}>
+                    <ClassificationBadge type="actual" customLabel="ACTUAL SEISMIC TELEMETRY" size="sm" />
+                    <span className="mono" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                      MQS Catalog V11 • IRIS Network Code: XB
+                    </span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <a
+                    href={INSIGHT_MISSION_METADATA.irisUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mmi-btn-secondary mono"
+                    style={{ fontSize: '0.74rem' }}
+                  >
+                    IRIS Data Center <ExternalLink size={10} />
+                  </a>
+                  <a
+                    href={INSIGHT_MISSION_METADATA.pdsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mmi-btn-primary mono"
+                    style={{ fontSize: '0.74rem' }}
+                  >
+                    PDS SEIS Archive <ExternalLink size={10} />
+                  </a>
+                </div>
+              </div>
+
+              {/* Notable Marsquake Events List */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px', marginBottom: '16px' }}>
+                {INSIGHT_MARSQUAKE_EVENTS.slice(0, 4).map((ev) => (
+                  <div
+                    key={ev.id}
+                    style={{
+                      background: 'var(--bg-input)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '6px',
+                      padding: '12px',
+                      borderLeft: `3px solid ${ev.magnitudeMw >= 4.5 ? '#ef4444' : ev.magnitudeMw >= 4.0 ? '#d97706' : '#38bdf8'}`,
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <strong style={{ color: '#f5f5f0', fontSize: '0.86rem' }}>Event {ev.id}</strong>
+                      <span className="mono" style={{ fontSize: '0.75rem', fontWeight: 700, color: ev.magnitudeMw >= 4.5 ? '#ef4444' : '#d97706' }}>
+                        {ev.magnitudeFormatted}
+                      </span>
+                    </div>
+                    <div className="mono" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                      Sol {ev.sol} • {ev.type}
+                    </div>
+                    <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', margin: '0 0 6px 0', lineHeight: 1.4 }}>
+                      {ev.scientificImpact}
+                    </p>
+                    <div className="mono" style={{ fontSize: '0.70rem', color: 'var(--text-muted)' }}>
+                      Origin: {ev.sourceRegion} (~{ev.epicentralDistanceKm.toLocaleString()} km)
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 3-Layer Interior Structure Summary */}
+              <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '12px' }}>
+                <h4 style={{ color: 'var(--accent-amber)', fontSize: '0.82rem', margin: '0 0 8px 0' }} className="mono">
+                  MARTIAN 3-LAYER INTERIOR STRUCTURE MODEL (KNAPMEYER-ENDRUN ET AL., SCIENCE 2021)
+                </h4>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+                  <div>
+                    <strong style={{ fontSize: '0.78rem', color: '#f5f5f0' }}>1. Crust:</strong>
+                    <div className="mono" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                      {MARS_INTERIOR_STRUCTURE.crust.thicknessRange}
+                    </div>
+                  </div>
+                  <div>
+                    <strong style={{ fontSize: '0.78rem', color: '#38bdf8' }}>2. Mantle:</strong>
+                    <div className="mono" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                      {MARS_INTERIOR_STRUCTURE.mantle.thicknessRange}
+                    </div>
+                  </div>
+                  <div>
+                    <strong style={{ fontSize: '0.78rem', color: '#ef4444' }}>3. Core:</strong>
+                    <div className="mono" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                      Radius: {MARS_INTERIOR_STRUCTURE.core.radiusKm}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Embedded Interactive 2D Mars Surface Map */}
           <div ref={mapSectionRef} className="mmi-map-section">
