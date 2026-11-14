@@ -715,6 +715,13 @@ async function runTestSuite() {
 
   await runTest('T2.C1', 'Null, undefined, or NaN coordinates handled safely in elevation service', async () => {
     assert.strictEqual(isInsideJezeroDem(null, undefined, dem), false, 'Null coordinate returns false');
+    assert.strictEqual(isInsideJezeroDem(NaN, 77.45, dem), false, 'NaN lat is not inside DEM');
+    assert.strictEqual(isInsideJezeroDem(18.45, NaN, dem), false, 'NaN lon is not inside DEM');
+    assert.strictEqual(sampleDemElevation(NaN, 77.45, dem), null, 'sampleDemElevation with NaN lat returns null');
+    assert.strictEqual(sampleDemElevation(undefined, 77.45, dem), null, 'sampleDemElevation with undefined lat returns null');
+    assert.strictEqual(sampleDemElevation(18.45, NaN, dem), null, 'sampleDemElevation with NaN lon returns null');
+    assert.strictEqual(sampleDemElevation(18.45, undefined, dem), null, 'sampleDemElevation with undefined lon returns null');
+    assert.strictEqual(sampleDemElevation(null, null, dem), null, 'sampleDemElevation with null coords returns null');
     const nanRes = await getElevationAtCoordinate(NaN, NaN);
     assert.strictEqual(nanRes.elevationMeters, null, 'NaN coordinate returns null elevation');
     assert.strictEqual(nanRes.isInsideJezeroDem, false, 'NaN is not inside DEM');

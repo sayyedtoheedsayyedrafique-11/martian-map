@@ -1,13 +1,13 @@
-/* Header.css — Precision Planetary GIS Mission Bar */
+/* Header.css — Flat Minimalist Single-Line Mission Telemetry Bar */
 
 .header {
-  height: var(--header-height);
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-subtle);
+  height: var(--header-height, 40px);
+  background: var(--bg-secondary, #18191e);
+  border-bottom: 1px solid var(--border-subtle, #242731);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--content-padding);
+  padding: 0 14px;
   position: sticky;
   top: 0;
   z-index: 50;
@@ -17,18 +17,18 @@
 .header__left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .header__menu-btn {
   display: none;
-  background: var(--bg-panel);
+  background: transparent;
   border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
+  color: var(--text-muted);
   cursor: pointer;
-  padding: 5px 8px;
+  padding: 4px 6px;
   border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
+  transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .header__menu-btn:hover {
@@ -43,101 +43,91 @@
 }
 
 .header__brand-tag {
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: 0.74rem;
+  font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  font-family: var(--font-mono);
 }
 
 .header__divider {
-  color: var(--border-medium);
-  font-weight: 400;
-  font-size: 0.85rem;
+  color: var(--border-strong);
+  font-weight: 300;
+  font-size: 0.8rem;
 }
 
 .header__section-title {
-  font-size: 0.76rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 500;
   color: var(--accent-amber);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  font-family: var(--font-mono);
   margin: 0;
 }
 
 .header__right {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.header__status-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-subtle);
-  padding: 3px 8px;
+  gap: 14px;
   font-size: 0.68rem;
-  color: var(--text-secondary);
-  border-radius: var(--radius-sm);
 }
 
-.header__status-indicator {
-  width: 6px;
-  height: 6px;
-  background: var(--status-nominal);
+.header__telemetry-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+}
+
+.header__telemetry-label {
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.header__telemetry-value {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.header__status-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--status-nominal, #22c55e);
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.header__coords-pill {
+.header__quick-tools {
   display: flex;
   align-items: center;
-  gap: 5px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-subtle);
-  padding: 3px 8px;
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  border-radius: var(--radius-sm);
+  gap: 6px;
+  border-left: 1px solid var(--border-subtle);
+  padding-left: 10px;
 }
 
-.header__quick-tool-btn {
+.header__quick-link {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  background: var(--bg-panel);
+  gap: 4px;
+  background: transparent;
   border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-  font-size: 0.68rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  padding: 4px 9px;
+  color: var(--text-muted);
+  font-size: 0.64rem;
+  font-weight: 500;
+  padding: 3px 7px;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
 }
 
-.header__quick-tool-btn:hover {
-  background: var(--bg-panel-elevated);
+.header__quick-link:hover {
+  background: var(--bg-panel);
   border-color: var(--border-medium);
   color: var(--text-primary);
 }
 
-.header__quick-tool-btn--jezero:hover {
-  border-color: var(--mars-rust);
-  color: #ff9170;
-}
-
-.header__quick-tool-btn--globe:hover {
-  border-color: var(--accent-amber);
-  color: var(--accent-amber);
-}
-
-@media (max-width: 900px) {
-  .header__coords-pill:last-of-type {
+@media (max-width: 960px) {
+  .header__telemetry-item--hide-sm {
     display: none;
   }
 }
@@ -148,10 +138,8 @@
     align-items: center;
     justify-content: center;
   }
-  .header__status-badge {
-    display: none;
-  }
-  .header__coords-pill {
+
+  .header__telemetry-item:not(:first-child) {
     display: none;
   }
 }

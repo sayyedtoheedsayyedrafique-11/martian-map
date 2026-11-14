@@ -342,7 +342,7 @@
   flex-direction: column;
   gap: 6px;
   pointer-events: none;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  box-shadow: none;
 }
 
 .jezero-card-top {

@@ -397,6 +397,9 @@ export function calculateAzimuth(lat1, lon1, lat2, lon2) {
  */
 export function isInsideJezeroDem(lat, lon, dem) {
   if (!dem) return false;
+  if (typeof lat !== 'number' || typeof lon !== 'number' || isNaN(lat) || isNaN(lon)) {
+    return false;
+  }
   const normLon = lon < 0 ? lon + 360 : lon;
   const inLon = (lon >= dem.lonMin && lon <= dem.lonMax) ||
                 (normLon >= dem.lonMin && normLon <= dem.lonMax);
@@ -409,6 +412,9 @@ export function isInsideJezeroDem(lat, lon, dem) {
  */
 export function sampleDemElevation(lat, lon, dem) {
   if (!dem || !dem.elevations) return null;
+  if (typeof lat !== 'number' || typeof lon !== 'number' || isNaN(lat) || isNaN(lon)) {
+    return null;
+  }
   const normLon = lon < 0 ? lon + 360 : lon;
   const activeLon = (lon >= dem.lonMin && lon <= dem.lonMax) ? lon : normLon;
 

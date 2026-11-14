@@ -92,15 +92,12 @@ function MarsExplorer() {
 
   return (
     <div className="mars-page mars-page--workstation fade-in">
-      {/* Workstation Top Control Bar */}
+      {/* Workstation Top Control Bar (Single-Line Compact Toolbar) */}
       <header className="mars-workstation__header" aria-label="Mars GIS Mission Header">
         <div className="mars-workstation__title-box">
-          <div className="mars-tag-row">
-            <span className="mars-sys-tag mono">NASA PDS // IAU AREOGRAPHIC FRAME</span>
-            <ClassificationBadge type="actual" customLabel="ACTUAL PLANETARY GIS" size="sm" />
-            <span className="mars-sys-tag mono">DATUM: MOLA AREOID (610.5 Pa)</span>
-          </div>
-          <h1 className="mars-workstation__title">Mars Planetary GIS & Science Workstation</h1>
+          <h1 className="mars-workstation__title">MARS CARTOGRAPHY & GIS WORKSTATION</h1>
+          <span className="mars-sys-tag mono">MOLA AREOID (610.5 Pa)</span>
+          <ClassificationBadge type="actual" customLabel="ACTUAL GIS" size="sm" />
         </div>
 
         {/* View Mode Switcher & Basemap Controls */}
@@ -132,8 +129,8 @@ function MarsExplorer() {
               onClick={() => setViewMode('map')}
               title="2D Cartographic Basemap (USGS / NASA Mars Trek)"
             >
-              <Layers size={13} />
-              <span>2D Cartographic Map</span>
+              <Layers size={12} />
+              <span>2D Map</span>
             </button>
             <button
               type="button"
@@ -143,8 +140,8 @@ function MarsExplorer() {
               onClick={() => setViewMode('globe')}
               title="Interactive 3D Planetary Sphere"
             >
-              <Globe size={13} />
-              <span>3D Planetary Globe</span>
+              <Globe size={12} />
+              <span>3D Globe</span>
             </button>
             <button
               type="button"
@@ -154,8 +151,8 @@ function MarsExplorer() {
               onClick={() => setViewMode('terrain')}
               title="3D Jezero Crater DEM Elevation Mesh (20m/px)"
             >
-              <Box size={13} />
-              <span>3D Jezero DEM</span>
+              <Box size={12} />
+              <span>3D Jezero</span>
             </button>
           </div>
 
@@ -167,8 +164,8 @@ function MarsExplorer() {
             title="Toggle Mission Data Drawer"
             aria-expanded={isDrawerOpen}
           >
-            <SlidersHorizontal size={13} />
-            <span>Mission Drawer</span>
+            <SlidersHorizontal size={12} />
+            <span>Target Dossier</span>
             {selectedLocation && <span className="mars-drawer-indicator" />}
           </button>
         </div>
