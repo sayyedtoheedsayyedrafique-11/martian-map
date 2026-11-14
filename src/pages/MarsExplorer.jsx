@@ -39,7 +39,7 @@ function MarsExplorer() {
   const [viewMode, setViewMode] = useState(() => (viewParam === 'globe' ? 'globe' : viewParam === 'terrain' ? 'terrain' : 'map'));
   const [terrainFeatureId, setTerrainFeatureId] = useState('jezero-crater');
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-  const [activeBasemap, setActiveBasemap] = useState('ctx');
+  const [activeBasemap, setActiveBasemap] = useState('viking');
 
   const [selectedLocation, setSelectedLocation] = useState(() => {
     if (siteParam) {
@@ -81,45 +81,11 @@ function MarsExplorer() {
     setIsDrawerOpen(true);
   };
 
-  // Basemap definitions for floating header switcher
-  const basemapOptions = [
-    { id: 'ctx', label: 'USGS CTX 5m' },
-    { id: 'mola', label: 'USGS Shaded Relief' },
-    { id: 'viking', label: 'NASA Viking Color' },
-    { id: 'mola-color', label: 'MOLA Altimetry' },
-    { id: 'themis', label: 'THEMIS Night IR' },
-  ];
-
   return (
     <div className="mars-page mars-page--workstation fade-in">
-      {/* Workstation Top Control Bar (Single-Line Compact Toolbar) */}
-      <header className="mars-workstation__header" aria-label="Mars GIS Mission Header">
-        <div className="mars-workstation__title-box">
-          <h1 className="mars-workstation__title">MARS CARTOGRAPHY & GIS WORKSTATION</h1>
-          <span className="mars-sys-tag mono">MOLA AREOID (610.5 Pa)</span>
-          <ClassificationBadge type="actual" customLabel="ACTUAL GIS" size="sm" />
-        </div>
-
-        {/* View Mode Switcher & Basemap Controls */}
-        <div className="mars-workstation__controls">
-          {viewMode === 'map' && (
-            <div className="mars-workstation__basemap-group mono" aria-label="Basemap Switcher">
-              <span className="mars-control-label">BASEMAP:</span>
-              <div className="mars-button-group">
-                {basemapOptions.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    className={`mars-control-btn ${activeBasemap === opt.id ? 'mars-control-btn--active' : ''}`}
-                    onClick={() => setActiveBasemap(opt.id)}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
+      {/* Workstation Viewport Sub-Toolbar (Streamlined, Non-Redundant) */}
+      <div className="mars-workstation__subtoolbar" aria-label="Workstation View Controls">
+        <div className="mars-workstation__view-controls">
           <div className="mars-view-switcher" role="tablist" aria-label="Workstation View Modes">
             <button
               type="button"
@@ -156,20 +122,23 @@ function MarsExplorer() {
             </button>
           </div>
 
-          {/* Toggle Right Mission Data Drawer */}
-          <button
-            type="button"
-            className={`mars-drawer-toggle-btn ${isDrawerOpen ? 'mars-drawer-toggle-btn--active' : ''}`}
-            onClick={() => setIsDrawerOpen((prev) => !prev)}
-            title="Toggle Mission Data Drawer"
-            aria-expanded={isDrawerOpen}
-          >
-            <SlidersHorizontal size={12} />
-            <span>Target Dossier</span>
-            {selectedLocation && <span className="mars-drawer-indicator" />}
-          </button>
+          <span className="mars-sys-tag mono">MOLA AREOID (610.5 Pa)</span>
+          <ClassificationBadge type="actual" customLabel="ACTUAL GIS" size="sm" />
         </div>
-      </header>
+
+        {/* Toggle Right Mission Data Drawer */}
+        <button
+          type="button"
+          className={`mars-drawer-toggle-btn ${isDrawerOpen ? 'mars-drawer-toggle-btn--active' : ''}`}
+          onClick={() => setIsDrawerOpen((prev) => !prev)}
+          title="Toggle Target Science Dossier Drawer"
+          aria-expanded={isDrawerOpen}
+        >
+          <SlidersHorizontal size={12} />
+          <span>Target Dossier</span>
+          {selectedLocation && <span className="mars-drawer-indicator" />}
+        </button>
+      </div>
 
       {/* Main Expansive Viewport Workstation Canvas & Sliding Drawer Container */}
       <main className="mars-workstation-viewport" aria-label="Mars Surface Exploration Canvas">

@@ -287,6 +287,29 @@ const TILE_LAYERS = {
   },
 };
 
+/**
+ * Controller to ensure Leaflet recalculates viewport bounds inside flex layouts
+ */
+function MapInvalidateController() {
+  const map = useMap();
+  useEffect(() => {
+    if (!map) return;
+    map.invalidateSize();
+    const t1 = setTimeout(() => map.invalidateSize(), 80);
+    const t2 = setTimeout(() => map.invalidateSize(), 250);
+    const t3 = setTimeout(() => map.invalidateSize(), 600);
+    const handleResize = () => map.invalidateSize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [map]);
+  return null;
+}
+
 function MarsMap({
   selectedLocation = null,
   showMarkers = true,
@@ -308,7 +331,7 @@ function MarsMap({
 }) {
   const navigate = useNavigate();
   const [cursorCoords, setCursorCoords] = useState({ lat: 0, lng: 0 });
-  const [activeLayerKey, setActiveLayerKey] = useState('mola');
+  const [activeLayerKey, setActiveLayerKey] = useState('viking');
   const [resetTrigger, setResetTrigger] = useState(0);
   const [isTilesLoading, setIsTilesLoading] = useState(true);
   const [tilesLoadedCount, setTilesLoadedCount] = useState(0);
@@ -321,7 +344,7 @@ function MarsMap({
   const [showHiriseFootprints, setShowHiriseFootprints] = useState(true);
 
   const effectiveLayerKey = activeLayer || activeLayerKey;
-  const currentLayer = TILE_LAYERS[effectiveLayerKey] || TILE_LAYERS.mola;
+  const currentLayer = TILE_LAYERS[effectiveLayerKey] || TILE_LAYERS.viking;
 
   const handleSelectLayer = (id) => {
     if (onLayerChange) onLayerChange(id);
@@ -331,8 +354,27 @@ function MarsMap({
     setTileErrorCount(0);
   };
 
-  const cursorElev = useMemo(() => {
-    return getElevationAtCoordinate(cursorCoords.lat, cursorCoords.lng);
+  const [cursorElev, setCursorElev] = useState({
+    elevationMeters: null,
+    elevationFormatted: 'MOLA Datum (610.5 Pa)',
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    getElevationAtCoordinate(cursorCoords.lat, cursorCoords.lng)
+      .then((data) => {
+        if (isMounted && data) {
+          setCursorElev(data);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setCursorElev({ elevationMeters: null, elevationFormatted: 'MOLA Datum (610.5 Pa)' });
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
   }, [cursorCoords.lat, cursorCoords.lng]);
 
   useEffect(() => {
@@ -475,6 +517,7 @@ function MarsMap({
           maxBounds={[[-85, -180], [85, 180]]}
           maxBoundsViscosity={0.9}
         >
+          <MapInvalidateController />
           <MapController resetTrigger={resetTrigger} />
 
           {/* Actual planetary map layer with NO CSS filters */}

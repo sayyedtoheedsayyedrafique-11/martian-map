@@ -3,65 +3,38 @@
 .mars-page--workstation {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
 }
 
-/* Header & Avionics Control Bar: Single-Line Instrument Strip */
-.mars-workstation__header {
+/* Streamlined Sub-Toolbar: Clean, Non-Duplicative Instrument Bar (32px) */
+.mars-workstation__subtoolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  flex-wrap: wrap;
-  padding: 4px 0 6px 0;
-  border-bottom: 1px solid var(--border-subtle, #242933);
+  padding: 4px 6px;
+  background: var(--bg-secondary, #121417);
+  border: 1px solid var(--border-subtle, #232832);
+  border-radius: var(--radius-sm, 2px);
+  box-sizing: border-box;
 }
 
-.mars-workstation__title-box {
+.mars-workstation__view-controls {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
-}
-
-.mars-workstation__title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text-primary, #f2f0e6);
-  letter-spacing: 0.04em;
-  font-family: var(--font-mono, monospace);
-  text-transform: uppercase;
-  margin: 0;
 }
 
 .mars-sys-tag {
   font-size: 0.60rem;
   letter-spacing: 0.04em;
   color: var(--text-dim, #5c6370);
-  background: var(--bg-panel, #181c23);
-  border: 1px solid var(--border-subtle, #242933);
-  padding: 1px 5px;
+  background: var(--bg-panel, #181b20);
+  border: 1px solid var(--border-subtle, #232832);
+  padding: 2px 6px;
   border-radius: var(--radius-sm, 2px);
   text-transform: uppercase;
-}
-
-.mars-workstation__controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-/* Avionics-Style Basemap Switcher Group */
-.mars-workstation__basemap-group {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--bg-secondary, #12151a);
-  border: 1px solid var(--border-subtle, #242933);
-  padding: 2px 4px;
-  border-radius: var(--radius-sm, 2px);
 }
 
 .mars-control-label {
@@ -109,8 +82,8 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  background: var(--bg-secondary, #12151a);
-  border: 1px solid var(--border-subtle, #242933);
+  background: var(--bg-secondary, #121417);
+  border: 1px solid var(--border-subtle, #232832);
   padding: 2px;
   border-radius: var(--radius-sm, 2px);
 }
@@ -125,7 +98,7 @@
   font-size: 0.66rem;
   font-family: var(--font-mono, monospace);
   font-weight: 500;
-  padding: 3px 7px;
+  padding: 3px 8px;
   border-radius: var(--radius-sm, 2px);
   cursor: pointer;
   transition: all var(--transition-fast, 80ms ease);
@@ -133,12 +106,12 @@
 
 .mars-view-btn:hover {
   color: var(--text-primary, #f2f0e6);
-  border-color: var(--border-medium, #2e3543);
-  background: var(--bg-panel, #181c23);
+  border-color: var(--border-medium, #2c333f);
+  background: var(--bg-panel, #181b20);
 }
 
 .mars-view-btn--active {
-  background: var(--bg-panel, #181c23);
+  background: var(--bg-panel, #181b20);
   color: var(--accent-amber, #d99b26);
   border-color: var(--accent-amber, #d99b26);
   font-weight: 600;
@@ -149,8 +122,8 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: var(--bg-secondary, #12151a);
-  border: 1px solid var(--border-subtle, #242933);
+  background: var(--bg-secondary, #121417);
+  border: 1px solid var(--border-subtle, #232832);
   color: var(--text-muted, #8c93a0);
   font-size: 0.66rem;
   font-family: var(--font-mono, monospace);
@@ -163,7 +136,7 @@
 }
 
 .mars-drawer-toggle-btn:hover {
-  background: var(--bg-panel, #181c23);
+  background: var(--bg-panel, #181b20);
   border-color: var(--accent-amber, #d99b26);
   color: var(--text-primary, #f2f0e6);
 }
@@ -186,8 +159,8 @@
   display: flex;
   width: 100%;
   height: clamp(640px, 78vh, 940px);
-  background: var(--bg-space, #0b0d10);
-  border: 1px solid var(--border-subtle, #242933);
+  background: var(--bg-space, #0c0e11);
+  border: 1px solid var(--border-subtle, #232832);
   border-radius: var(--radius-sm, 2px);
   overflow: hidden;
   box-shadow: none;
