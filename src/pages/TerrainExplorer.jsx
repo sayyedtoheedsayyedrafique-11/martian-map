@@ -48,6 +48,9 @@ function TerrainExplorer() {
         <div className="terrain-header__title-area">
           <div className="terrain-tag-row">
             <span className="terrain-sys-tag mono">NASA MGS MOLA DATUM // AREOID 610.5 Pa</span>
+            <span className="terrain-sys-tag mono" style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' }}>
+              ● REAL DATA: USGS SIM 3292 & NASA MOLA
+            </span>
             <span className="terrain-sys-tag terrain-sys-tag--accent mono">USGS ASTROGEOLOGY CTX DEM</span>
             <Link to="/data-explorer" className="terrain-sys-tag mono" style={{ textDecoration: 'none', color: 'var(--accent-yellow)', borderColor: 'var(--accent-yellow)' }}>
               &rarr; LAUNCH PDS / CTX DATA EXPLORER
@@ -411,7 +414,12 @@ function TerrainExplorer() {
           <div className="terrain-usgs-banner">
             <Layers size={20} color="#38bdf8" style={{ flexShrink: 0, marginTop: '2px' }} />
             <div>
-              <strong>USGS SCIENTIFIC INVESTIGATIONS MAP 3292 // PLANETARY GEOLOGIC MAPPING PROGRAM</strong>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <strong>USGS SCIENTIFIC INVESTIGATIONS MAP 3292 // PLANETARY GEOLOGIC MAPPING PROGRAM</strong>
+                <span className="terrain-sys-tag mono" style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)', padding: '1px 6px', fontSize: '8px' }}>
+                  ● REAL DATA
+                </span>
+              </div>
               <p>
                 Mars chronostratigraphic architecture and rock-stratigraphic units based on the official USGS global geological map (Tanaka, Skinner, Dohm, et al., 2014) sponsored by NASA. Defines the 3 major planetary eras and lithologic map units governing rover mobility.
               </p>
@@ -439,8 +447,11 @@ function TerrainExplorer() {
               >
                 <div className="terrain-chrono-head">
                   <div>
-                    <h4 className="terrain-chrono-name" style={{ color: c.colorHex }}>{c.period}</h4>
-                    <span className="terrain-chrono-sub mono">{c.epochSpan}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <h4 className="terrain-chrono-name" style={{ color: c.colorHex }}>{c.period}</h4>
+                      <span style={{ color: '#10b981', fontSize: '8px', fontWeight: 700 }} className="mono">● REAL DATA</span>
+                    </div>
+                    <span className="terrain-chrono-sub mono">{c.epochSpan} • Prefix: {c.mapCodePrefix}</span>
                   </div>
                   <span className="terrain-chrono-age mono">{c.ageRange}</span>
                 </div>
