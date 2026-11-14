@@ -10,37 +10,37 @@
 
 :root {
   /* Minimal Dark Palette: Deep Matte & Flat Graphite (WCAG AA Compliant) */
-  --bg-space: #0d0d0d;
-  --bg-primary: #121316;
-  --bg-secondary: #18191e;
-  --bg-panel: #1c2027;
-  --bg-panel-elevated: #22252e;
-  --bg-panel-active: #282c37;
-  --bg-input: #101216;
+  --bg-space: #0c0c0c;
+  --bg-primary: #0c0c0c;
+  --bg-secondary: #121212;
+  --bg-panel: #171717;
+  --bg-panel-elevated: #1e1e1e;
+  --bg-panel-active: #242424;
+  --bg-input: #0e0e0e;
 
   /* Backwards-compatible aliases */
   --bg-card: var(--bg-panel);
   --bg-card-hover: var(--bg-panel-elevated);
   --bg-sidebar: var(--bg-secondary);
 
-  /* Typography: Crisp Off-White & Neutral Muted Gray */
-  --text-primary: #f5f5f0;
-  --text-primary-bright: #ededed;
+  /* Typography: Off-white (#f0f0f0), muted gray (#888888) */
+  --text-primary: #f0f0f0;
+  --text-primary-bright: #ffffff;
   --text-secondary: #d6d4cb;
-  --text-secondary-alt: #e8e8ed;
-  --text-muted: #999999;
-  --text-dim: #737373;
+  --text-secondary-alt: #b0b0b0;
+  --text-muted: #888888;
+  --text-dim: #666666;
 
-  /* Technical Amber Accents (Used strictly for active states / key telemetry, never glowing fills) */
-  --accent-amber: #d99b26;
+  /* Technical Amber (#d4912b) strictly for active items, zero glowing background fills */
+  --accent-amber: #d4912b;
   --accent-amber-tech: #d4912b;
-  --accent-amber-alt: #d97706;
-  --accent-amber-hover: #e5a93c;
+  --accent-amber-alt: #d4912b;
+  --accent-amber-hover: #e09d35;
   --accent-amber-dim: #b87a14;
   --accent-amber-subtle: transparent;
   --accent-amber-border: #d4912b;
 
-  /* Legacy yellow alias mapped to muted amber */
+  /* Legacy yellow alias mapped to technical amber */
   --accent-yellow: var(--accent-amber);
   --accent-yellow-hover: var(--accent-amber-hover);
   --accent-yellow-subtle: transparent;
@@ -68,17 +68,18 @@
   --status-online: var(--status-nominal);
   --status-processed: #38bdf8;
   --status-processed-subtle: transparent;
-  --status-illustrative: #d97706;
+  --status-illustrative: #d4912b;
   --status-illustrative-subtle: transparent;
-  --status-warning: #d97706;
+  --status-warning: #d4912b;
   --status-critical: #c53030;
   --status-telemetry: #38bdf8;
   --status-info: var(--status-telemetry);
 
-  /* Precision Console Hairlines (1px solid, ultra-thin quiet borders) */
-  --border-subtle: #242731;
-  --border-medium: #2a2e3a;
-  --border-strong: #373c4b;
+  /* Hairline Borders: Hairline #222222, active state #333333 */
+  --border-subtle: #222222;
+  --border-medium: #2a2a2a;
+  --border-strong: #333333;
+  --border-active: #333333;
 
   /* Legacy border aliases */
   --border-color: var(--border-subtle);
@@ -103,10 +104,10 @@
   --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Roboto Mono', 'Consolas', monospace;
 
-  /* Crisp Scientific Instrument Corners (max 4px radius, strictly no rounded pills) */
+  /* Strict 2px to 3px corner radius (no large pill shapes) */
   --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 4px;
+  --radius-md: 3px;
+  --radius-lg: 3px;
 
   /* Flat Matte Surfaces: ZERO box-shadows, ZERO glowing borders */
   --shadow-sm: none;
@@ -115,6 +116,14 @@
 
   --transition-fast: 100ms ease;
   --transition-normal: 150ms ease;
+}
+
+/* Global Reset: Force box-shadow: none !important and backdrop-filter: none !important */
+*, *::before, *::after,
+.card, .panel, .sidebar, .header, .modal, [class*="card"], [class*="panel"], [class*="drawer"], [class*="hud"], [class*="overlay"], [class*="badge"] {
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* --- Reset & Base --- */
