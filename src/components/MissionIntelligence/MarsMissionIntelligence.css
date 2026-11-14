@@ -138,8 +138,8 @@
 
 .mmi-mission-card--active {
   border-color: var(--accent-yellow);
-  background: rgba(245, 197, 66, 0.04);
-  box-shadow: inset 0 0 0 1px var(--accent-yellow);
+  border-left: 3px solid var(--accent-yellow);
+  background: rgba(217, 155, 38, 0.05);
 }
 
 .mmi-card-top {
@@ -191,9 +191,9 @@
 }
 
 .mmi-status-pill--completed {
-  background: rgba(245, 197, 66, 0.12);
+  background: rgba(217, 155, 38, 0.1);
   color: var(--accent-yellow);
-  border: 1px solid rgba(245, 197, 66, 0.3);
+  border: 1px solid rgba(217, 155, 38, 0.3);
 }
 
 .mmi-status-dot {
@@ -204,7 +204,6 @@
 
 .mmi-status-pill--active .mmi-status-dot {
   background: #10b981;
-  box-shadow: 0 0 6px #10b981;
 }
 
 .mmi-status-pill--completed .mmi-status-dot {
@@ -328,8 +327,8 @@
 
 /* Status Banner */
 .mmi-status-banner {
-  background: rgba(245, 197, 66, 0.05);
-  border: 1px solid rgba(245, 197, 66, 0.3);
+  background: rgba(217, 155, 38, 0.06);
+  border: 1px solid rgba(217, 155, 38, 0.25);
   padding: 14px 18px;
   display: flex;
   align-items: flex-start;
@@ -877,8 +876,7 @@
 .mmi-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(3px);
+  background: rgba(8, 10, 12, 0.85);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -893,7 +891,7 @@
   width: 100%;
   max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;
 }

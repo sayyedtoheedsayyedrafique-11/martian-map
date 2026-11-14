@@ -1,4 +1,4 @@
-/* Sidebar.css — Compact Black Sidebar with Warm Yellow Active State */
+/* Sidebar.css — Authentic Planetary GIS Sidebar */
 
 .sidebar {
   position: fixed;
@@ -6,8 +6,8 @@
   left: 0;
   width: var(--sidebar-width);
   height: 100vh;
-  background: var(--bg-sidebar);
-  border-right: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   z-index: 100;
@@ -16,12 +16,13 @@
 }
 
 .sidebar__header {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: var(--header-height);
+  background: var(--bg-secondary);
   box-sizing: border-box;
 }
 
@@ -34,16 +35,13 @@
 .sidebar__brand-mark {
   width: 26px;
   height: 26px;
-  background: #080909;
-  border: 1px solid var(--border-color);
-  color: var(--accent-yellow);
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
-  font-weight: 800;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-medium);
+  color: var(--accent-amber);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  letter-spacing: -0.5px;
   flex-shrink: 0;
 }
 
@@ -53,42 +51,43 @@
 }
 
 .sidebar__title {
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.15;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.1px;
 }
 
 .sidebar__subtitle {
-  font-size: 0.62rem;
-  color: var(--text-muted);
+  font-size: 0.6rem;
+  color: var(--text-dim);
   line-height: 1.1;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.06em;
+  font-weight: 500;
 }
 
 .sidebar__close {
   display: none;
-  background: none;
-  border: 1px solid var(--border-color);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   cursor: pointer;
   padding: 4px;
-  border-radius: 0;
+  border-radius: var(--radius-sm);
 }
 
 .sidebar__close:hover {
-  color: var(--accent-yellow);
-  border-color: var(--accent-yellow);
+  color: var(--text-primary);
+  border-color: var(--accent-amber);
 }
 
 .sidebar__nav {
   flex: 1;
-  padding: 10px 8px;
+  padding: 12px 10px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .sidebar__section {
@@ -98,24 +97,23 @@
 }
 
 .sidebar__nav-label {
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.09em;
-  padding: 4px 8px 3px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  margin-bottom: 3px;
+  letter-spacing: 0.08em;
+  padding: 3px 6px;
+  margin-bottom: 2px;
 }
 
 .sidebar__link {
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 7px 10px;
-  border-radius: var(--radius-md);
+  padding: 6px 9px;
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  font-size: 0.81rem;
+  font-size: 0.8rem;
   font-weight: 500;
   text-decoration: none;
   border-left: 2px solid transparent;
@@ -132,13 +130,14 @@
 }
 
 .sidebar__link-badge {
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   padding: 1px 5px;
-  background: rgba(245, 197, 66, 0.12);
-  color: var(--accent-yellow);
-  border: 1px solid rgba(245, 197, 66, 0.3);
+  background: var(--accent-amber-subtle);
+  color: var(--accent-amber);
+  border: 1px solid var(--accent-amber-border);
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  border-radius: var(--radius-sm);
 }
 
 .sidebar__link-icon {
@@ -149,37 +148,37 @@
 
 .sidebar__link:hover {
   color: var(--text-primary);
-  background: var(--bg-card-hover);
+  background: var(--bg-panel);
   text-decoration: none;
 }
 
 .sidebar__link:hover .sidebar__link-icon {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
-/* Active Navigation: Warm Yellow Accent Only */
+/* Active State: Clean Muted Amber Bar & Solid Contrast */
 .sidebar__link--active {
-  color: var(--accent-yellow);
-  background: rgba(245, 197, 66, 0.09);
-  border-left-color: var(--accent-yellow);
+  color: var(--text-primary);
+  background: var(--bg-panel-elevated);
+  border-left-color: var(--accent-amber);
   font-weight: 600;
 }
 
 .sidebar__link--active .sidebar__link-icon {
-  color: var(--accent-yellow);
+  color: var(--accent-amber);
 }
 
 .sidebar__footer {
   padding: 10px 14px;
-  border-top: 1px solid var(--border-color);
-  background: #0d0f0f;
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-primary);
 }
 
 .sidebar__footer-meta {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  font-size: 0.65rem;
+  font-size: 0.64rem;
 }
 
 .sidebar__meta-row {
@@ -189,16 +188,16 @@
 }
 
 .sidebar__meta-key {
-  color: var(--text-muted);
-  letter-spacing: 0.4px;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
 }
 
 .sidebar__meta-val {
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-weight: 600;
 }
 
-/* Mobile responsive */
+/* Mobile responsive drawer */
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
@@ -206,7 +205,7 @@
 
   .sidebar--open {
     transform: translateX(0);
-    box-shadow: 0 0 24px rgba(0, 0, 0, 0.95);
+    box-shadow: var(--shadow-lg);
   }
 
   .sidebar__close {

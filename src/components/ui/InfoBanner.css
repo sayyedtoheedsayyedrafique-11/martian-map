@@ -24,7 +24,7 @@
 }
 
 .info-banner--warning {
-  background: #141616;
+  background: var(--bg-panel);
   border: 1px solid var(--border-color);
   border-left: 3px solid var(--accent-yellow);
   color: var(--text-secondary);

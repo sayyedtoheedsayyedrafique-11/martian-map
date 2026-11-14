@@ -271,8 +271,8 @@
 
 .sources-sys-tag--accent {
   color: var(--accent-yellow);
-  border-color: rgba(245, 197, 66, 0.4);
-  background: rgba(245, 197, 66, 0.06);
+  border-color: rgba(217, 155, 38, 0.4);
+  background: rgba(217, 155, 38, 0.08);
 }
 
 .sources-delivery-bar {
@@ -333,9 +333,9 @@
 }
 
 .source-status-pill--cached {
-  border-color: rgba(245, 197, 66, 0.4);
+  border-color: rgba(217, 155, 38, 0.4);
   color: var(--accent-yellow);
-  background: rgba(245, 197, 66, 0.06);
+  background: rgba(217, 155, 38, 0.08);
 }
 
 .source-card__proof {

@@ -353,6 +353,14 @@ function JezeroTerrain3D({
     verticalScaleRef.current = verticalScale;
   }, [verticalScale]);
 
+  const solarPresetRef = useRef(solarPreset);
+  useEffect(() => {
+    solarPresetRef.current = solarPreset;
+  }, [solarPreset]);
+
+  const lastCompassHeadingRef = useRef(-1);
+  const lastBadgeTimeRef = useRef(0);
+
   // Enhanced features list with Perseverance landing site
   const allFeatures = useMemo(() => {
     if (!metadata) return [];
@@ -379,9 +387,12 @@ function JezeroTerrain3D({
   useEffect(() => {
     if (selectedFeatureId && allFeatures.length > 0) {
       const match = allFeatures.find((f) => f.id === selectedFeatureId);
-      if (match) setSelectedFeature(match);
+      if (match && match.id !== selectedFeature?.id) {
+        const timer = setTimeout(() => setSelectedFeature(match), 0);
+        return () => clearTimeout(timer);
+      }
     }
-  }, [selectedFeatureId, allFeatures]);
+  }, [selectedFeatureId, allFeatures, selectedFeature?.id]);
 
   // Load Authentic USGS DEM Metadata
   useEffect(() => {
@@ -467,7 +478,7 @@ function JezeroTerrain3D({
     const ambientLight = new THREE.AmbientLight(0xffecd6, 0.65);
     scene.add(ambientLight);
 
-    const initialPreset = SOLAR_PRESETS[solarPreset] || SOLAR_PRESETS.morning;
+    const initialPreset = SOLAR_PRESETS[solarPresetRef.current] || SOLAR_PRESETS.morning;
     const sunLight = new THREE.DirectionalLight(initialPreset.color, initialPreset.intensity);
     sunLight.position.set(initialPreset.position[0], initialPreset.position[1], initialPreset.position[2]);
     sunLight.castShadow = true;
@@ -664,17 +675,22 @@ function JezeroTerrain3D({
 
       controls.update();
 
-      // Camera Azimuth heading for live compass rose
+      // Camera Azimuth heading for live compass rose (throttled to avoid redundant React renders)
       const forward = new THREE.Vector3();
       camera.getWorldDirection(forward);
       const angleRad = Math.atan2(forward.x, -forward.z);
       const angleDeg = (angleRad * (180 / Math.PI) + 360) % 360;
-      setCompassHeading(Math.round(angleDeg));
+      const roundedHeading = Math.round(angleDeg);
+      if (Math.abs(roundedHeading - lastCompassHeadingRef.current) >= 1) {
+        lastCompassHeadingRef.current = roundedHeading;
+        setCompassHeading(roundedHeading);
+      }
 
       renderer.render(scene, camera);
 
-      // Project 3D markers to 2D screen positions for crisp interactive HTML badges
-      if (markersGroupRef.current && container) {
+      // Project 3D markers to 2D screen positions (throttled to ~22 FPS to preserve silky rendering without React churn)
+      if (markersGroupRef.current && container && (currentTime - lastBadgeTimeRef.current >= 45)) {
+        lastBadgeTimeRef.current = currentTime;
         const rect = container.getBoundingClientRect();
         const positions = {};
         markersGroupRef.current.children.forEach((marker) => {

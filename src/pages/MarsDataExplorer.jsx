@@ -48,7 +48,7 @@ function createObservationIcon(isGroundTruth = false, isSelected = false) {
       iconAnchor: [13, 34],
       popupAnchor: [0, -34],
     });
-  } catch (_err) {
+  } catch {
     return undefined;
   }
 }
@@ -71,7 +71,7 @@ function createReticleIcon() {
       iconSize: [32, 32],
       iconAnchor: [16, 16],
     });
-  } catch (_err) {
+  } catch {
     return undefined;
   }
 }
@@ -258,17 +258,21 @@ export default function MarsDataExplorer() {
   // Query elevation when selected target changes
   useEffect(() => {
     let isCancelled = false;
-    setIsElevationLoading(true);
+    const loadTimer = setTimeout(() => {
+      if (!isCancelled) setIsElevationLoading(true);
+    }, 0);
 
     getElevationAtCoordinate(selectedTarget.lat, selectedTarget.lng)
       .then((res) => {
         if (!isCancelled) {
+          clearTimeout(loadTimer);
           setElevationResult(res);
           setIsElevationLoading(false);
         }
       })
       .catch((err) => {
         if (!isCancelled) {
+          clearTimeout(loadTimer);
           console.warn('Elevation query failed:', err);
           setIsElevationLoading(false);
         }
@@ -276,6 +280,7 @@ export default function MarsDataExplorer() {
 
     return () => {
       isCancelled = true;
+      clearTimeout(loadTimer);
     };
   }, [selectedTarget.lat, selectedTarget.lng]);
 
@@ -290,7 +295,16 @@ export default function MarsDataExplorer() {
   }, []);
 
   useEffect(() => {
-    queryPdsOde(selectedTarget.lat, selectedTarget.lng);
+    let isCancelled = false;
+    const odeTimer = setTimeout(() => {
+      if (!isCancelled) {
+        queryPdsOde(selectedTarget.lat, selectedTarget.lng);
+      }
+    }, 0);
+    return () => {
+      isCancelled = true;
+      clearTimeout(odeTimer);
+    };
   }, [selectedTarget.lat, selectedTarget.lng, queryPdsOde]);
 
   // Handle map click

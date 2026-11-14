@@ -127,7 +127,7 @@ export const JEZERO_LANDMARKS = [
 ];
 
 // Curated landmarks across NASA MSL Curiosity rover's actual 32+ km traverse in Gale Crater
-// Sourced from official NASA JPL MSL Traverse Waypoints and PDS Geosciences Node
+// Sourced from official NASA JPL MSL Traverse Waypoints, Route-Map and PDS Geosciences Node
 export const CURIOSITY_GALE_LANDMARKS = [
   {
     id: 'bradbury-landing',
@@ -137,6 +137,8 @@ export const CURIOSITY_GALE_LANDMARKS = [
     lng: 137.4417,
     elevationMeters: -4501,
     sol: 0,
+    cumulativeKm: 0.0,
+    drillTarget: 'None (Landing Ellipse)',
     type: 'rover',
     status: 'Landing: Sol 0',
     desc: 'NASA Mars Science Laboratory landing site in northern Gale Crater near the Peace Vallis alluvial fan.',
@@ -151,6 +153,8 @@ export const CURIOSITY_GALE_LANDMARKS = [
     lng: 137.4485,
     elevationMeters: -4520,
     sol: 125,
+    cumulativeKm: 0.5,
+    drillTarget: 'John Klein & Cumberland (First Extraterrestrial Mudstone Drills)',
     type: 'landmark',
     status: 'Explored: Sols 125–300',
     desc: 'Topographic depression where drilled mudstones proved ancient Mars had fresh, life-supporting lake water.',
@@ -165,6 +169,8 @@ export const CURIOSITY_GALE_LANDMARKS = [
     lng: 137.4005,
     elevationMeters: -4475,
     sol: 620,
+    cumulativeKm: 6.8,
+    drillTarget: 'Windjana Drill Core (High Potassium Sandstone)',
     type: 'landmark',
     status: 'Explored: Sol 620',
     desc: 'Intersection of three distinct geological formations with striking cross-bedded sandstones.',
@@ -179,6 +185,8 @@ export const CURIOSITY_GALE_LANDMARKS = [
     lng: 137.3850,
     elevationMeters: -4450,
     sol: 1190,
+    cumulativeKm: 11.9,
+    drillTarget: 'Scoop Sample Only (Active Aeolian Basaltic Sand)',
     type: 'landmark',
     status: 'Explored: Sol 1190',
     desc: 'First active extraterrestrial sand dune investigated in-situ; severe wheel-slip and mobility hazard.',
@@ -193,6 +201,8 @@ export const CURIOSITY_GALE_LANDMARKS = [
     lng: 137.3702,
     elevationMeters: -4380,
     sol: 1450,
+    cumulativeKm: 14.2,
+    drillTarget: 'Quela & Sebina Drill Holes (Murray Lacustrine Mudstone)',
     type: 'landmark',
     status: 'Explored: Sol 1450',
     desc: 'Scenic mesa remnants of ancient wind-sculpted sandstone at the entry to Aeolis Mons lower slopes.',
@@ -207,6 +217,8 @@ export const CURIOSITY_GALE_LANDMARKS = [
     lng: 137.3600,
     elevationMeters: -4200,
     sol: 1809,
+    cumulativeKm: 18.1,
+    drillTarget: 'Duluth & Stoer (Hard Resistant Hematite Bedrock)',
     type: 'landmark',
     status: 'Explored: Sols 1800–2300',
     desc: 'Topographic ridge standing 65m above surrounding plains, enriched in gray crystalline hematite.',
@@ -221,6 +233,8 @@ export const CURIOSITY_GALE_LANDMARKS = [
     lng: 137.3750,
     elevationMeters: -4260,
     sol: 2350,
+    cumulativeKm: 24.3,
+    drillTarget: 'Kilmarie & Mary Anning (Smectite Clay Unit)',
     type: 'landmark',
     status: 'Explored: Sols 2350–3100',
     desc: 'Broad depression rich in phyllosilicates formed in neutral water, nestled south of Vera Rubin Ridge.',
@@ -235,6 +249,8 @@ export const CURIOSITY_GALE_LANDMARKS = [
     lng: 137.3501,
     elevationMeters: -4150,
     sol: 2700,
+    cumulativeKm: 27.8,
+    drillTarget: 'Edinburgh & Zechstein (Steep Incline Sandstone Cap)',
     type: 'landmark',
     status: 'Explored: Sols 2700 / 3400',
     desc: 'Capping sandstone pediment accessed via a 31° slope scarp — the steepest grade climbed by MSL.',
@@ -249,6 +265,8 @@ export const CURIOSITY_GALE_LANDMARKS = [
     lng: 137.3550,
     elevationMeters: -3980,
     sol: 4100,
+    cumulativeKm: 32.4,
+    drillTarget: 'Mammoth Lakes (Discovery of Pure Elemental Yellow Sulfur Crystals)',
     type: 'landmark',
     status: 'Explored: Sol 4100+',
     desc: 'Carved canyon and debris ridge preserving boulders washed down from high on Mount Sharp.',
@@ -256,6 +274,56 @@ export const CURIOSITY_GALE_LANDMARKS = [
     verified: true,
   },
 ];
+
+/**
+ * NASA-STD-3001 Planetary Survival Consumables Estimator
+ * Calculates life support consumption and environmental radiation exposure for a given traverse.
+ * 
+ * @param {number} distanceKm - Traverse distance in km
+ * @param {number} solKmRate - Travel rate in km per Sol
+ * @param {number} [crewSize=2] - Number of astronauts (default 2 for buddy system)
+ * @returns {Object} Consumables breakdown with scientific citations
+ */
+export function calculateTraverseSurvivalConsumables(distanceKm, solKmRate, crewSize = 2) {
+  const estSols = Math.max(0.1, distanceKm / (solKmRate || 1));
+  
+  // NASA-STD-3001 metabolic standards
+  const o2KgPerSol = 0.84 * crewSize;
+  const totalO2Kg = Math.round(o2KgPerSol * estSols * 10) / 10;
+  
+  const waterKgPerSol = 2.5 * crewSize; // Drinking + rehydration
+  const totalWaterKg = Math.round(waterKgPerSol * estSols * 10) / 10;
+  
+  const kcalPerSol = 3000 * crewSize;
+  const totalKcal = Math.round(kcalPerSol * estSols);
+  
+  const co2ScrubKgPerSol = 1.0 * crewSize;
+  const totalCo2ScrubKg = Math.round(co2ScrubKgPerSol * estSols * 10) / 10;
+  
+  // MSL RAD ground-truth galactic cosmic ray (GCR) + solar baseline on Mars surface (~0.65 mSv / Sol)
+  const radiationMsvPerSol = 0.65;
+  const totalRadiationMsv = Math.round(radiationMsvPerSol * estSols * 10) / 10;
+
+  // Rover robotic equivalent energy (thermal heating + mobility actuators ~0.9 kWh/sol)
+  const roverKwhPerSol = 0.9;
+  const totalRoverKwh = Math.round(roverKwhPerSol * estSols * 10) / 10;
+
+  return {
+    estSols: Math.round(estSols * 10) / 10,
+    crewSize,
+    totalO2Kg,
+    totalWaterKg,
+    totalKcal,
+    totalCo2ScrubKg,
+    totalRadiationMsv,
+    totalRoverKwh,
+    citations: {
+      lifeSupport: 'NASA-STD-3001 Vol 2 (Human Factors, Habitability, and Environmental Health)',
+      radiation: 'NASA MSL RAD (Radiation Assessment Detector) Science Team ground-truth published rate',
+      metabolic: 'NASA Bioastronautics Roadmap (Metabolic Energy Expenditure in 0.38g)',
+    },
+  };
+}
 
 /**
  * Great-circle spherical distance (Haversine formula, R = 3,389.5 km)

@@ -70,6 +70,7 @@ export const USGS_GEOLOGIC_UNITS = [
     occurrence: 'Southern highlands, rims of Jezero and Gale Craters',
     description: 'Densely cratered terrain cut by branched valley networks. Composed of impact breccias and smectite clay-rich sedimentary interbeds.',
     hazardGrade: 'Moderate to High (Steep rim scarps & boulder fields)',
+    survivalRelevance: 'Primary target for ISRU water extraction from smectite clays (4–7% structural H₂O). High radiation shelter potential in natural crater overhangs.',
     sourceUrl: 'https://pubs.usgs.gov/sim/3292/',
   },
   {
@@ -81,6 +82,7 @@ export const USGS_GEOLOGIC_UNITS = [
     occurrence: 'Hesperia Planum, Syrtis Major, floor of Jezero Crater',
     description: 'Extensive sheet lavas displaying prominent compressional wrinkle ridges. Predominantly basaltic with high olivine cumulate content.',
     hazardGrade: 'Low to Moderate (Smooth surface interrupted by ridge scarps)',
+    survivalRelevance: 'Optimum structural base for surface habitat module foundations and long-range pressurized rover traversal.',
     sourceUrl: 'https://pubs.usgs.gov/sim/3292/',
   },
   {
@@ -92,6 +94,7 @@ export const USGS_GEOLOGIC_UNITS = [
     occurrence: 'Ares Vallis, Tiu Vallis, Neretva Vallis',
     description: 'Scoured channel floors, streamlined teardrop islands, and coarse boulder conglomerates deposited by high-velocity liquid outburst events.',
     hazardGrade: 'High (Channel scarps, dry gorges, and imbricated boulders)',
+    survivalRelevance: 'Canyon walls offer natural wind and solar particle radiation shielding; exposed stratigraphy reveals buried ice-cemented paleoflood gravels.',
     sourceUrl: 'https://pubs.usgs.gov/sim/3292/',
   },
   {
@@ -103,6 +106,7 @@ export const USGS_GEOLOGIC_UNITS = [
     occurrence: 'Olympus Mons, Ascraeus Mons, Pavonis Mons, Arsia Mons',
     description: 'Massive basaltic shield volcanic flows with low flank slopes (4°–8°) surrounded by steep basal scarps rising up to 8 km above the plains.',
     hazardGrade: 'Critical (Basal cliffs and collapsed caldera chasms)',
+    survivalRelevance: 'Lava tube skylights (pit craters) provide natural subterranean pressurized habitat sites with 100% cosmic radiation and micrometeorite shielding.',
     sourceUrl: 'https://pubs.usgs.gov/sim/3292/',
   },
   {
@@ -114,6 +118,7 @@ export const USGS_GEOLOGIC_UNITS = [
     occurrence: 'Bagnold Dunes (Gale), Séítah (Jezero), Olympia Undae',
     description: 'Unconsolidated, wind-blown basaltic sand dunes with active slip faces. Dunes migrate up to 1 meter per Earth year under prevailing winds.',
     hazardGrade: 'Critical Mobility Hazard (Severe wheel slip and sinkage)',
+    survivalRelevance: 'Extreme mobility hazard for surface rovers; electrostatic fine grains abrade space suit bearings and degrade photovoltaic generation.',
     sourceUrl: 'https://pubs.usgs.gov/sim/3292/',
   },
   {
@@ -125,6 +130,7 @@ export const USGS_GEOLOGIC_UNITS = [
     occurrence: 'Planum Boreum (North Pole), Planum Australe (South Pole)',
     description: 'Finely layered strata of water ice, seasonal CO₂ dry ice frost, and trapped atmospheric dust recording Mars\' orbital obliquity cycles.',
     hazardGrade: 'Extreme Environmental Hazard (Sub-freezing temperatures to -153°C)',
+    survivalRelevance: 'Abundant accessible glacial water ice for propellant manufacture (CH₄/O₂ ISRU) and drinking water, offset by cryogenic thermal management demands.',
     sourceUrl: 'https://pubs.usgs.gov/sim/3292/',
   },
 ];

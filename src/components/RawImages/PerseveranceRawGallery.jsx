@@ -43,7 +43,7 @@ export default function PerseveranceRawGallery() {
   }, []);
 
   // Fetch live NASA images when live feed mode or filters change
-  const loadLiveFeed = useCallback(async () => {
+  const refreshLiveFeed = useCallback(async () => {
     if (feedMode !== 'live') return;
     setIsLiveLoading(true);
     setLiveError(null);
@@ -62,10 +62,41 @@ export default function PerseveranceRawGallery() {
   }, [feedMode, selectedSol, selectedCamera]);
 
   useEffect(() => {
+    let isCancelled = false;
     if (feedMode === 'live') {
-      loadLiveFeed();
+      const initTimer = setTimeout(() => {
+        if (!isCancelled) {
+          setIsLiveLoading(true);
+          setLiveError(null);
+        }
+      }, 0);
+
+      fetchLivePerseveranceRawImages({
+        sol: selectedSol !== 'all' ? selectedSol : undefined,
+        camera: selectedCamera !== 'all' ? selectedCamera : undefined,
+        num: 24,
+      })
+        .then((res) => {
+          if (!isCancelled) {
+            clearTimeout(initTimer);
+            setLiveImages(res.images);
+            setIsLiveLoading(false);
+          }
+        })
+        .catch((err) => {
+          if (!isCancelled) {
+            clearTimeout(initTimer);
+            setLiveError(err.message || 'Failed to connect to NASA raw feed');
+            setIsLiveLoading(false);
+          }
+        });
+
+      return () => {
+        isCancelled = true;
+        clearTimeout(initTimer);
+      };
     }
-  }, [feedMode, loadLiveFeed]);
+  }, [feedMode, selectedSol, selectedCamera]);
 
   // Active list of images depending on mode
   const currentPool = feedMode === 'live' ? liveImages : MARS_RAW_IMAGES;
@@ -241,7 +272,7 @@ export default function PerseveranceRawGallery() {
           <button
             type="button"
             className="raw-error-retry-btn"
-            onClick={loadLiveFeed}
+            onClick={refreshLiveFeed}
           >
             Retry Feed
           </button>

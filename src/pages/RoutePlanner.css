@@ -693,6 +693,182 @@
   text-decoration: underline;
 }
 
+/* Interplanetary Survival Consumables Section */
+.route-survival-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.route-survival-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.route-survival-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.route-survival-crew-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.route-survival-crew-label {
+  font-size: 8px;
+  color: var(--text-secondary, #94a3b8);
+  margin-right: 4px;
+}
+
+.route-crew-btn {
+  background: #0d1117;
+  border: 1px solid var(--border-color, #242a30);
+  color: #94a3b8;
+  font-size: 8px;
+  padding: 2px 7px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.route-crew-btn:hover {
+  border-color: #475569;
+  color: #ffffff;
+}
+
+.route-crew-btn--active {
+  background: rgba(245, 197, 66, 0.15);
+  border-color: var(--accent-yellow, #f5c542);
+  color: var(--accent-yellow, #f5c542);
+  font-weight: 700;
+}
+
+.route-survival-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.route-survival-stat {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 8px;
+  border-radius: 2px;
+}
+
+.route-survival-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 7.5px;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: 3px;
+}
+
+.route-survival-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.route-survival-sub {
+  font-size: 7.5px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.route-survival-citations {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-left: 3px solid #ef4444;
+  padding: 8px 10px;
+  font-size: 8px;
+  color: #cbd5e1;
+}
+
+.route-survival-citations strong {
+  display: block;
+  color: #fca5a5;
+  margin-bottom: 2px;
+}
+
+.route-survival-citations p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Gale Rover Drill Targets Grid */
+.route-gale-drill-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.route-drill-item {
+  display: flex;
+  flex-direction: column;
+  background: rgba(16, 185, 129, 0.04);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-left: 3px solid #10b981;
+  padding: 8px 10px;
+}
+
+.route-drill-label {
+  font-size: 7.5px;
+  color: #10b981;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.route-drill-val {
+  font-size: 11px;
+  color: #f8fafc;
+  margin-bottom: 3px;
+}
+
+.route-drill-desc {
+  font-size: 8px;
+  color: #cbd5e1;
+  line-height: 1.35;
+}
+
+.route-drill-odo {
+  font-size: 7.5px;
+  color: #38bdf8;
+  margin-top: 4px;
+}
+
+.route-gale-ext-link-row {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 640px) {
+  .route-survival-grid {
+    grid-template-columns: 1fr;
+  }
+  .route-gale-drill-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .route-gale-metrics-grid {

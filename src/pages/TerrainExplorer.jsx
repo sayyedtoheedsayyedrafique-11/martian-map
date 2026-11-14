@@ -490,6 +490,7 @@ function TerrainExplorer() {
                   <th>OCCURRENCE & SITES</th>
                   <th>LITHOLOGY</th>
                   <th>HAZARD GRADE</th>
+                  <th>SURVIVAL & ISRU UTILITY</th>
                 </tr>
               </thead>
               <tbody>
@@ -505,6 +506,7 @@ function TerrainExplorer() {
                     <td>{u.occurrence}</td>
                     <td>{u.description}</td>
                     <td className="terrain-unit-hazard">{u.hazardGrade}</td>
+                    <td style={{ color: '#38bdf8', fontSize: '8px' }}>{u.survivalRelevance}</td>
                   </tr>
                 ))}
               </tbody>

@@ -60,8 +60,8 @@
 
 /* Mandatory Ethics & Empirical Integrity Banner */
 .mss-ethics-banner {
-  background: rgba(245, 197, 66, 0.06);
-  border: 1px solid var(--accent-yellow);
+  background: rgba(217, 155, 38, 0.08);
+  border: 1px solid rgba(217, 155, 38, 0.4);
   padding: 14px 18px;
   display: flex;
   align-items: flex-start;
@@ -120,7 +120,7 @@
 .mss-reset-btn:hover {
   border-color: var(--accent-yellow);
   color: var(--accent-yellow);
-  background: rgba(245, 197, 66, 0.08);
+  background: rgba(217, 155, 38, 0.08);
 }
 
 .mss-quick-locations {
@@ -208,9 +208,9 @@
 }
 
 .mss-sensor-badge--modeled {
-  background: rgba(245, 197, 66, 0.12);
+  background: rgba(217, 155, 38, 0.12);
   color: var(--accent-yellow);
-  border: 1px solid rgba(245, 197, 66, 0.4);
+  border: 1px solid rgba(217, 155, 38, 0.35);
 }
 
 .mss-location-meta-strip {
@@ -337,9 +337,9 @@
 }
 
 .mss-measurement-pill--modeled {
-  background: rgba(245, 197, 66, 0.1);
+  background: rgba(217, 155, 38, 0.1);
   color: var(--accent-yellow);
-  border: 1px solid rgba(245, 197, 66, 0.3);
+  border: 1px solid rgba(217, 155, 38, 0.3);
 }
 
 .mss-condition-value-box {
@@ -556,8 +556,7 @@
 .mss-glossary-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(4px);
+  background: rgba(8, 10, 12, 0.85);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -572,7 +571,7 @@
   width: 100%;
   max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;
 }

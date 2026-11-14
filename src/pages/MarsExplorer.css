@@ -1,45 +1,110 @@
-/* MarsExplorer.css — Minimalist Black + Warm Yellow Field GIS */
+/* MarsExplorer.css — Authentic Planetary GIS Workstation */
 
 .mars-page {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
-/* Header & Search */
+/* Header & Controls */
 .mars-page__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .mars-page__title-area {
   flex: 1;
-  min-width: 260px;
+  min-width: 280px;
 }
 
 .mars-page__title {
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 2px;
-  letter-spacing: -0.2px;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
   font-family: var(--font-mono);
   text-transform: uppercase;
 }
 
 .mars-page__desc {
   font-size: 0.8rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  max-width: 720px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  max-width: 760px;
 }
 
-.mars-page__search-area {
+.mars-tag-row {
   display: flex;
   align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.mars-sys-tag {
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.mars-sys-tag--accent {
+  color: var(--accent-amber);
+  border-color: var(--accent-amber-border);
+  background: var(--accent-amber-subtle);
+}
+
+/* Workstation View Switcher */
+.mars-view-switcher {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.mars-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.73rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  padding: 5px 11px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mars-view-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-panel);
+}
+
+.mars-view-btn--active {
+  background: var(--accent-amber);
+  color: #0f1115;
+  font-weight: 700;
+}
+
+.mars-view-btn--active:hover {
+  background: var(--accent-amber-hover);
+  color: #0f1115;
 }
 
 /* Category Filter Bar */
@@ -50,49 +115,87 @@
 }
 
 .mars-cat-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 500;
   padding: 4px 10px;
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
   font-family: var(--font-mono);
 }
 
 .mars-cat-btn:hover {
-  background: var(--bg-card-hover);
+  background: var(--bg-panel-elevated);
   color: var(--text-primary);
-  border-color: var(--border-light);
+  border-color: var(--border-medium);
 }
 
-/* Active Category Button in Warm Yellow */
 .mars-cat-btn--active {
-  background: var(--accent-yellow);
-  border-color: var(--accent-yellow);
-  color: #080909;
+  background: var(--bg-panel-elevated);
+  border-color: var(--accent-amber);
+  color: var(--accent-amber);
   font-weight: 700;
 }
 
-.mars-cat-btn--active:hover {
-  background: var(--accent-yellow-hover);
-  color: #080909;
+/* Main Visualizer Section */
+.mars-globe-section,
+.mars-surface-map-section,
+.mars-terrain-section,
+.mars-dossier-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-margin-top: 60px;
 }
 
-/* Main Map Section */
-.mars-map-section {
-  width: 100%;
+.mars-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-/* Selected Location Scientific Dossier Panel */
+.mars-section-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mars-subtag {
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  color: var(--accent-amber);
+  font-weight: 700;
+}
+
+.mars-section-heading {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.mars-section-hint {
+  font-size: 0.66rem;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+/* Scientific Location Detail Dossier (Compact & High Information Density) */
 .mars-location-detail-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-left: 3px solid var(--accent-yellow);
-  border-radius: 0;
-  padding: 16px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-medium);
+  border-left: 3px solid var(--accent-amber);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -114,83 +217,83 @@
 }
 
 .mars-detail-tag {
-  font-size: 0.66rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  color: var(--text-primary);
-  background: #080909;
-  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
   padding: 2px 6px;
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   text-transform: uppercase;
   font-family: var(--font-mono);
 }
 
 .mars-detail-status {
-  font-size: 0.7rem;
-  color: var(--status-online);
+  font-size: 0.68rem;
+  color: var(--status-nominal);
   font-weight: 600;
   font-family: var(--font-mono);
 }
 
 .mars-detail-catalog {
-  font-size: 0.66rem;
+  font-size: 0.65rem;
   color: var(--text-muted);
-  background: #080909;
+  background: var(--bg-secondary);
   padding: 2px 6px;
-  border-radius: 0;
-  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
 }
 
 .mars-detail-title {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: -0.2px;
+  letter-spacing: -0.01em;
 }
 
 .mars-detail-mission {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   margin-top: 2px;
   display: block;
 }
 
 .mars-detail-close {
-  background: #080909;
-  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   cursor: pointer;
   padding: 4px;
-  border-radius: 0;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
 }
 
 .mars-detail-close:hover {
-  color: var(--accent-yellow);
-  border-color: var(--accent-yellow);
+  color: var(--text-primary);
+  border-color: var(--accent-amber);
 }
 
 .mars-detail-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .mars-detail-text {
   font-size: 0.82rem;
   color: var(--text-secondary);
-  line-height: 1.45;
+  line-height: 1.48;
 }
 
 .mars-discovery-note {
-  background: #080909;
-  border-left: 2px solid var(--accent-yellow);
-  padding: 8px 10px;
-  border-radius: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--accent-amber);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
   font-size: 0.76rem;
   color: var(--text-secondary);
-  border: 1px solid var(--border-color);
-  border-left-width: 3px;
-  border-left-color: var(--accent-yellow);
+  line-height: 1.45;
 }
 
 .mars-discovery-note strong {
@@ -200,12 +303,12 @@
 /* Scientific Metadata Grid */
 .mars-metadata-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 8px;
-  background: #080909;
-  padding: 10px;
-  border-radius: 0;
-  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
 }
 
 .mars-meta-item {
@@ -215,11 +318,11 @@
 }
 
 .mars-meta-label {
-  font-size: 0.66rem;
-  color: var(--text-muted);
+  font-size: 0.64rem;
+  color: var(--text-dim);
   text-transform: uppercase;
   font-family: var(--font-mono);
-  letter-spacing: 0.3px;
+  letter-spacing: 0.04em;
 }
 
 .mars-meta-value {
@@ -229,12 +332,12 @@
 }
 
 .mars-copy-btn {
-  background: #141616;
-  border: 1px solid var(--border-color);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   font-size: 0.68rem;
-  padding: 2px 6px;
-  border-radius: 0;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -244,11 +347,11 @@
 }
 
 .mars-copy-btn:hover {
-  color: var(--accent-yellow);
-  border-color: var(--accent-yellow);
+  color: var(--accent-amber);
+  border-color: var(--accent-amber);
 }
 
-/* Actions: Primary in Warm Yellow */
+/* Action Buttons */
 .mars-detail-actions {
   display: flex;
   gap: 8px;
@@ -260,13 +363,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--accent-yellow);
-  color: #080909;
-  font-size: 0.78rem;
+  background: var(--accent-amber);
+  color: #0f1115;
+  font-size: 0.76rem;
   font-weight: 700;
   padding: 6px 12px;
-  border-radius: 0;
-  border: 1px solid var(--accent-yellow);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-amber);
   cursor: pointer;
   text-decoration: none;
   transition: background var(--transition-fast);
@@ -274,8 +377,8 @@
 }
 
 .mars-btn-primary:hover {
-  background: var(--accent-yellow-hover);
-  color: #080909;
+  background: var(--accent-amber-hover);
+  color: #0f1115;
   text-decoration: none;
 }
 
@@ -283,34 +386,144 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #080909;
+  background: var(--bg-secondary);
   color: var(--text-primary);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 500;
   padding: 6px 12px;
-  border-radius: 0;
-  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
   text-decoration: none;
   transition: all var(--transition-fast);
   font-family: var(--font-mono);
 }
 
 .mars-btn-secondary:hover {
-  background: var(--bg-card-hover);
-  border-color: var(--border-light);
+  background: var(--bg-panel-elevated);
+  border-color: var(--border-medium);
   color: var(--text-primary);
-  text-decoration: none;
 }
 
-/* Directory Section */
+/* Quick List Directory Section */
 .mars-quick-list-section {
-  margin-top: 8px;
+  margin-top: 6px;
+}
+
+.mars-section-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.mars-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+
+.mars-site-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mars-site-card:hover {
+  background: var(--bg-panel-elevated);
+  border-color: var(--border-medium);
+}
+
+.mars-site-card--selected {
+  border-color: var(--accent-amber);
+  background: var(--bg-panel-active);
+  border-left: 3px solid var(--accent-amber);
+}
+
+.mars-site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mars-site-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mars-site-type {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.mars-site-coords {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+}
+
+.mars-site-desc {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mars-site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.mars-site-status {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.mars-site-select-btn {
+  background: none;
+  border: none;
+  color: var(--accent-amber);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.mars-site-select-btn:hover {
+  color: var(--text-primary);
 }
 
 .mars-empty-search {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 0;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   padding: 24px 16px;
   text-align: center;
   color: var(--text-secondary);
@@ -322,248 +535,23 @@
 }
 
 .mars-reset-search-btn {
-  background: #080909;
-  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
   color: var(--text-primary);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 600;
   padding: 5px 12px;
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
   font-family: var(--font-mono);
 }
 
 .mars-reset-search-btn:hover {
-  border-color: var(--accent-yellow);
-  color: var(--accent-yellow);
-}
-
-.mars-section-subtitle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 10px;
-  text-transform: uppercase;
-  font-family: var(--font-mono);
-  letter-spacing: 0.5px;
-}
-
-.mars-quick-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-  gap: 10px;
-}
-
-.mars-site-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 0;
-  padding: 10px 12px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.mars-site-card:hover {
-  background: var(--bg-card-hover);
-  border-color: var(--border-light);
-}
-
-/* Selected state: highlighted in Warm Yellow */
-.mars-site-card--selected {
-  border-color: var(--accent-yellow);
-  background: #181a1a;
-  border-left: 2px solid var(--accent-yellow);
-}
-
-.mars-site-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.mars-site-name {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.mars-site-type {
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  background: #080909;
-  padding: 1px 5px;
-  border-radius: 0;
-  border: 1px solid var(--border-color);
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-}
-
-.mars-site-coords {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
-
-.mars-site-desc {
-  font-size: 0.76rem;
-  color: var(--text-secondary);
-  line-height: 1.35;
-}
-
-.mars-site-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 4px;
-  padding-top: 5px;
-  border-top: 1px solid var(--border-color);
-}
-
-.mars-site-status {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-
-.mars-site-select-btn {
-  background: none;
-  border: none;
-  color: var(--accent-yellow);
-  font-size: 0.72rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-}
-
-.mars-site-select-btn:hover {
-  text-decoration: underline;
-  color: #ffffff;
-}
-
-/* --- New 3D Globe & View Switcher Mission-Control Styles --- */
-
-.mars-tag-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  flex-wrap: wrap;
-}
-
-.mars-sys-tag {
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  padding: 2px 7px;
-  text-transform: uppercase;
-}
-
-.mars-sys-tag--accent {
-  color: var(--accent-yellow);
-  border-color: rgba(245, 197, 66, 0.4);
-  background: rgba(245, 197, 66, 0.06);
-}
-
-.mars-view-switcher {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  padding: 3px;
-}
-
-.mars-view-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 0.74rem;
-  font-family: var(--font-mono);
-  font-weight: 500;
-  padding: 6px 12px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.mars-view-btn:hover {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.mars-view-btn--active {
-  background: var(--accent-yellow);
-  color: #080909;
-  font-weight: 700;
-}
-
-.mars-view-btn--active:hover {
-  background: var(--accent-yellow-hover);
-  color: #080909;
-}
-
-/* Sections */
-.mars-globe-section,
-.mars-surface-map-section,
-.mars-dossier-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  scroll-margin-top: 60px;
-}
-
-.mars-section-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 14px;
-  flex-wrap: wrap;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.mars-section-title-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.mars-subtag {
-  font-size: 0.66rem;
-  letter-spacing: 0.12em;
-  color: var(--accent-yellow);
-  font-weight: 700;
-}
-
-.mars-section-heading {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-  margin: 0;
-}
-
-.mars-section-hint {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  letter-spacing: 0.06em;
+  border-color: var(--accent-amber);
+  color: var(--accent-amber);
 }
 
 .mars-search-compact {
-  min-width: 260px;
+  min-width: 240px;
 }
-

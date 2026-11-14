@@ -1,11 +1,12 @@
-/* MarsGlobe.css — Minimal Scientific Mission-Control 3D GIS Interface */
+/* MarsGlobe.css — Planetary Science 3D Globe Interface */
 
 .mars-globe-container {
   position: relative;
   width: 100%;
-  background: #080909;
+  background: var(--bg-space);
   overflow: hidden;
-  border-bottom: 1px solid var(--border-color);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
   user-select: none;
 }
 
@@ -22,58 +23,59 @@
   outline: none;
 }
 
-/* Loading Splash Overlay */
+/* Loading Overlay */
 .mars-globe-loader {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #080909;
+  background: var(--bg-primary);
   z-index: 30;
 }
 
 .mars-loader-content {
-  width: min(90%, 420px);
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  padding: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85);
+  width: min(90%, 400px);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  box-shadow: var(--shadow-lg);
 }
 
 .mars-loader-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   font-size: 11px;
-  color: var(--accent-yellow);
+  color: var(--accent-amber);
 }
 
 .mars-loader-tag {
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   font-weight: 700;
 }
 
 .mars-loader-bar {
   width: 100%;
-  height: 3px;
-  background: #1f2222;
+  height: 2px;
+  background: var(--border-subtle);
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .mars-loader-fill {
   height: 100%;
-  background: var(--accent-yellow);
-  transition: width 180ms ease-out;
+  background: var(--accent-amber);
+  transition: width 150ms ease-out;
 }
 
 .mars-loader-subtext {
   display: block;
-  font-size: 10px;
-  color: var(--text-secondary);
-  letter-spacing: 0.05em;
+  font-size: 9.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
   line-height: 1.4;
 }
 
@@ -84,71 +86,72 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #080909;
+  background: var(--bg-primary);
   padding: 20px;
   z-index: 25;
 }
 
 .mars-fallback-card {
-  max-width: 480px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  padding: 28px;
+  max-width: 460px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 24px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .mars-fallback-title {
-  font-size: 16px;
+  font-size: 15px;
   color: var(--text-primary);
   font-weight: 600;
-  letter-spacing: 0.04em;
 }
 
 .mars-fallback-text {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--text-secondary);
   line-height: 1.5;
 }
 
 .mars-fallback-btn {
-  margin-top: 8px;
-  background: var(--accent-yellow);
-  color: #080909;
+  margin-top: 6px;
+  background: var(--accent-amber);
+  color: #0f1115;
   border: none;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 10px 18px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  letter-spacing: 0.06em;
-  transition: opacity var(--transition-fast);
+  letter-spacing: 0.04em;
+  transition: background var(--transition-fast);
 }
 
 .mars-fallback-btn:hover {
-  opacity: 0.9;
+  background: var(--accent-amber-hover);
 }
 
 /* Top Telemetry HUD */
 .mars-globe-top-hud {
   position: absolute;
-  top: 14px;
-  left: 16px;
-  right: 16px;
+  top: 12px;
+  left: 14px;
+  right: 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   pointer-events: none;
   z-index: 10;
-  gap: 12px;
+  gap: 10px;
 }
 
 .mars-hud-telemetry {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
@@ -157,33 +160,32 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  background: rgba(14, 16, 16, 0.88);
-  border: 1px solid var(--border-color);
-  font-size: 11px;
+  padding: 3px 8px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 10.5px;
   color: var(--text-secondary);
-  backdrop-filter: blur(8px);
 }
 
 .mars-hud-chip--active {
-  border-color: var(--accent-yellow);
-  color: var(--accent-yellow);
-  background: rgba(245, 197, 66, 0.08);
+  border-color: var(--accent-amber);
+  color: var(--accent-amber);
+  background: var(--accent-amber-subtle);
 }
 
 .mars-status-dot {
   width: 6px;
   height: 6px;
-  background: var(--status-online);
+  background: var(--status-nominal);
   border-radius: 50%;
   display: inline-block;
-  box-shadow: 0 0 8px var(--status-online);
 }
 
 .mars-hud-label {
   font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
 }
 
 .mars-hud-meta {
@@ -193,36 +195,38 @@
   gap: 8px;
   font-size: 10px;
   color: var(--text-muted);
-  background: rgba(14, 16, 16, 0.85);
-  border: 1px solid var(--border-color);
-  padding: 4px 10px;
-  backdrop-filter: blur(8px);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
 }
 
 .mars-meta-engine-tag {
-  color: var(--accent-yellow);
+  color: var(--accent-amber);
   font-weight: 700;
   font-size: 9px;
-  border-left: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-subtle);
   padding-left: 8px;
 }
 
-/* Globe Basemap Layer Toggle */
+/* Basemap Layer Toggle */
 .mars-globe-layer-toggle {
   pointer-events: auto;
   display: inline-flex;
-  background: rgba(8, 10, 12, 0.92);
-  border: 1px solid var(--border-color);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
 }
 
 .mars-globe-toggle-btn {
   background: transparent;
   border: none;
-  border-right: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   font-size: 10px;
   font-weight: 600;
-  padding: 4px 9px;
+  padding: 3px 8px;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
@@ -232,78 +236,77 @@
 }
 
 .mars-globe-toggle-btn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  background: var(--bg-panel-elevated);
 }
 
 .mars-globe-toggle-btn--active {
-  background: rgba(245, 197, 66, 0.16);
-  color: var(--accent-yellow);
+  background: var(--accent-amber);
+  color: #0f1115;
   font-weight: 700;
 }
 
-/* Right Side Controls Toolbar */
+/* Controls Toolbar */
 .mars-globe-controls {
   position: absolute;
-  top: 60px;
-  right: 16px;
+  top: 52px;
+  right: 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   z-index: 15;
 }
 
 .mars-ctrl-btn {
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(20, 22, 22, 0.88);
-  border: 1px solid var(--border-color);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
   cursor: pointer;
   transition: all var(--transition-fast);
-  backdrop-filter: blur(8px);
 }
 
 .mars-ctrl-btn:hover {
-  background: #1c1e1e;
+  background: var(--bg-panel-elevated);
   color: var(--text-primary);
-  border-color: var(--border-light);
+  border-color: var(--border-medium);
 }
 
 .mars-ctrl-btn--active {
-  color: #080909;
-  background: var(--accent-yellow);
-  border-color: var(--accent-yellow);
+  color: #0f1115;
+  background: var(--accent-amber);
+  border-color: var(--accent-amber);
 }
 
 .mars-ctrl-btn--active:hover {
-  background: var(--accent-yellow-hover);
-  color: #080909;
+  background: var(--accent-amber-hover);
 }
 
-/* Featured Sites Quick-Jump Strip */
+/* Featured Sites Strip */
 .mars-globe-quick-strip {
   position: absolute;
-  top: 56px;
-  left: 16px;
+  top: 50px;
+  left: 14px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   z-index: 15;
   flex-wrap: wrap;
-  max-width: calc(100% - 70px);
+  max-width: calc(100% - 65px);
 }
 
 .mars-strip-label {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 10px;
-  color: var(--text-muted);
-  letter-spacing: 0.08em;
+  font-size: 9.5px;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
 }
 
 .mars-strip-chips {
@@ -315,63 +318,51 @@
 .mars-strip-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 8px;
-  background: rgba(14, 16, 16, 0.85);
-  border: 1px solid var(--border-color);
+  gap: 4px;
+  padding: 2px 7px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: 10px;
   font-family: var(--font-mono);
   cursor: pointer;
   transition: all var(--transition-fast);
-  backdrop-filter: blur(8px);
 }
 
 .mars-strip-chip:hover {
-  background: #1a1d1d;
+  background: var(--bg-panel-elevated);
   color: var(--text-primary);
-  border-color: var(--border-light);
+  border-color: var(--border-medium);
 }
 
 .mars-strip-chip--selected {
-  background: rgba(245, 197, 66, 0.15);
-  color: var(--accent-yellow);
-  border-color: var(--accent-yellow);
+  background: var(--bg-panel-active);
+  color: var(--accent-amber);
+  border-color: var(--accent-amber);
   font-weight: 600;
 }
 
 .mars-strip-chip-dot {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  background: var(--accent-yellow);
+  background: var(--accent-amber);
 }
 
-/* Floating Selected Site Summary Dossier */
+/* Floating Selected Site Dossier */
 .mars-globe-selected-dossier {
   position: absolute;
-  bottom: 46px;
-  left: 16px;
-  width: min(92%, 360px);
-  background: rgba(20, 22, 22, 0.94);
-  border: 1px solid var(--border-color);
-  border-left: 3px solid var(--accent-yellow);
-  padding: 14px 16px;
+  bottom: 40px;
+  left: 14px;
+  width: min(92%, 350px);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-medium);
+  border-left: 3px solid var(--accent-amber);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
   z-index: 15;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(12px);
-  animation: dossierFadeIn 180ms ease-out;
-}
-
-@keyframes dossierFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  box-shadow: var(--shadow-lg);
 }
 
 .mars-dossier-header {
@@ -382,19 +373,20 @@
 }
 
 .mars-dossier-tag {
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  color: var(--accent-yellow);
+  font-size: 8.5px;
+  letter-spacing: 0.06em;
+  color: var(--accent-amber);
   font-weight: 700;
 }
 
 .mars-dossier-status {
-  font-size: 10px;
-  color: var(--status-online);
+  font-size: 9.5px;
+  color: var(--status-nominal);
+  font-weight: 600;
 }
 
 .mars-dossier-name {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text-primary);
   font-weight: 600;
   margin: 0 0 2px 0;
@@ -402,8 +394,8 @@
 }
 
 .mars-dossier-mission {
-  font-size: 11px;
-  color: var(--text-secondary);
+  font-size: 10.5px;
+  color: var(--text-muted);
   margin-bottom: 8px;
 }
 
@@ -411,38 +403,34 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  padding: 8px 0;
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
+  padding: 6px 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
   margin-bottom: 8px;
 }
 
 .mars-dossier-stat {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .mars-stat-label {
-  font-size: 9px;
-  color: var(--text-muted);
-  letter-spacing: 0.08em;
+  font-size: 8.5px;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
 }
 
 .mars-stat-val {
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--text-primary);
 }
 
 .mars-dossier-desc {
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--text-secondary);
   line-height: 1.4;
   margin-bottom: 10px;
-}
-
-.mars-dossier-desc strong {
-  color: var(--text-primary);
 }
 
 .mars-dossier-action-btn {
@@ -450,23 +438,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 7px 12px;
-  background: var(--accent-yellow);
-  color: #080909;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--accent-amber);
+  color: #0f1115;
   border: none;
-  font-size: 11px;
+  border-radius: var(--radius-sm);
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   cursor: pointer;
-  transition: opacity var(--transition-fast);
+  transition: background var(--transition-fast);
 }
 
 .mars-dossier-action-btn:hover {
-  opacity: 0.9;
+  background: var(--accent-amber-hover);
 }
 
-/* Floating Marker Labels (projected on screen) */
+/* Floating Marker Labels */
 .mars-globe-marker-labels {
   position: absolute;
   inset: 0;
@@ -485,13 +474,12 @@
   flex-direction: column;
   align-items: center;
   transform-origin: bottom center;
-  transition: transform 120ms ease-out;
 }
 
 .mars-screen-tag__stem {
   width: 1px;
-  height: 16px;
-  background: rgba(245, 197, 66, 0.4);
+  height: 14px;
+  background: var(--border-medium);
 }
 
 .mars-screen-tag__pill {
@@ -499,80 +487,79 @@
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  background: rgba(14, 16, 16, 0.92);
-  border: 1px solid var(--border-color);
-  padding: 2px 7px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  box-shadow: var(--shadow-sm);
   white-space: nowrap;
 }
 
 .mars-screen-tag--selected .mars-screen-tag__pill {
-  border-color: var(--accent-yellow);
-  background: rgba(20, 22, 22, 0.98);
+  border-color: var(--accent-amber);
+  background: var(--bg-panel-elevated);
 }
 
 .mars-screen-tag--selected .mars-screen-tag__stem {
-  background: var(--accent-yellow);
-  height: 22px;
+  background: var(--accent-amber);
+  height: 18px;
 }
 
 .mars-tag-name {
-  font-size: 10px;
+  font-size: 9.5px;
   color: var(--text-primary);
   font-weight: 600;
-  letter-spacing: 0.02em;
 }
 
 .mars-screen-tag--selected .mars-tag-name {
-  color: var(--accent-yellow);
+  color: var(--accent-amber);
 }
 
 .mars-tag-coords {
-  font-size: 8.5px;
-  color: var(--text-muted);
+  font-size: 8px;
+  color: var(--text-dim);
 }
 
-/* Bottom Hint & Transition Banner */
+/* Bottom Hint */
 .mars-globe-bottom-hint {
   position: absolute;
-  bottom: 10px;
-  left: 16px;
-  right: 16px;
+  bottom: 8px;
+  left: 14px;
+  right: 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   pointer-events: none;
   z-index: 10;
-  font-size: 10px;
-  color: var(--text-muted);
-  letter-spacing: 0.08em;
+  font-size: 9.5px;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
 }
 
 .mars-scroll-prompt-btn {
   pointer-events: auto;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(20, 22, 22, 0.88);
-  border: 1px solid var(--border-color);
-  color: var(--accent-yellow);
-  font-size: 10px;
+  gap: 5px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--accent-amber);
+  font-size: 9.5px;
   font-family: var(--font-mono);
   font-weight: 700;
-  padding: 5px 10px;
+  padding: 4px 8px;
   cursor: pointer;
-  letter-spacing: 0.08em;
-  backdrop-filter: blur(8px);
+  letter-spacing: 0.04em;
   transition: all var(--transition-fast);
 }
 
 .mars-scroll-prompt-btn:hover {
-  background: var(--accent-yellow);
-  color: #080909;
-  border-color: var(--accent-yellow);
+  background: var(--accent-amber);
+  color: #0f1115;
+  border-color: var(--accent-amber);
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .mars-globe-top-hud {
     flex-direction: column;
@@ -581,29 +568,20 @@
   }
 
   .mars-globe-quick-strip {
-    top: 86px;
-    max-width: calc(100% - 60px);
+    top: 78px;
+    max-width: calc(100% - 50px);
   }
 
   .mars-globe-selected-dossier {
-    left: 12px;
-    right: 12px;
+    left: 10px;
+    right: 10px;
     width: auto;
-    bottom: 42px;
+    bottom: 38px;
   }
 
   .mars-globe-bottom-hint {
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mars-loader-fill,
-  .mars-screen-tag,
-  .mars-globe-selected-dossier {
-    transition: none !important;
-    animation: none !important;
   }
 }

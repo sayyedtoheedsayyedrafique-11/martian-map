@@ -16,7 +16,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #080909;
+  background: var(--bg-panel);
   border: 1px solid var(--border-color);
   color: var(--accent-yellow);
   padding: 3px 8px;
@@ -82,7 +82,7 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  background: #080909;
+  background: var(--bg-panel);
   border: 1px solid var(--border-color);
   border-left: 3px solid var(--accent-yellow);
   border-radius: 0;
@@ -128,7 +128,7 @@
 }
 
 .matrix-table th {
-  background: #080909;
+  background: var(--bg-panel);
   color: var(--text-muted);
   font-size: 0.68rem;
   text-transform: uppercase;

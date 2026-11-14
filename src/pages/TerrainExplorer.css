@@ -35,8 +35,8 @@
 
 .terrain-sys-tag--accent {
   color: var(--accent-yellow);
-  border-color: rgba(245, 197, 66, 0.4);
-  background: rgba(245, 197, 66, 0.06);
+  border-color: rgba(217, 155, 38, 0.4);
+  background: rgba(217, 155, 38, 0.08);
 }
 
 .terrain-header__title {
@@ -202,7 +202,7 @@
 .terrain-feat-card--selected {
   border-color: var(--accent-yellow);
   border-left: 3px solid var(--accent-yellow);
-  background: rgba(245, 197, 66, 0.04);
+  background: rgba(217, 155, 38, 0.05);
 }
 
 .terrain-feat-card__header {
@@ -333,7 +333,7 @@
 }
 
 .terrain-dossier-block--callout {
-  background: rgba(245, 197, 66, 0.04);
+  background: rgba(217, 155, 38, 0.05);
   border-left: 2px solid var(--accent-yellow);
   padding: 10px 12px;
 }
@@ -428,8 +428,8 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  background: rgba(245, 197, 66, 0.06);
-  border: 1px solid rgba(245, 197, 66, 0.3);
+  background: rgba(217, 155, 38, 0.08);
+  border: 1px solid rgba(217, 155, 38, 0.25);
   padding: 14px 16px;
   font-size: 0.8rem;
   color: var(--text-secondary);
@@ -466,7 +466,7 @@
 .terrain-hazard-card--selected {
   border-color: var(--accent-yellow);
   border-left: 3px solid var(--accent-yellow);
-  background: rgba(245, 197, 66, 0.03);
+  background: rgba(217, 155, 38, 0.05);
 }
 
 .terrain-hazard-card__header {
@@ -764,7 +764,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--accent-yellow, #f5c542);
+  color: var(--accent-yellow);
   text-decoration: none;
   font-size: 9px;
   font-weight: 600;
@@ -782,24 +782,24 @@
 }
 
 .terrain-chrono-card {
-  background: #0d1117;
-  border: 1px solid #21262d;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: border-color 0.2s ease;
+  transition: border-color var(--transition-fast);
 }
 
 .terrain-chrono-card:hover {
-  border-color: #38bdf8;
+  border-color: var(--border-light);
 }
 
 .terrain-chrono-head {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-bottom: 1px solid #21262d;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 8px;
 }
 
@@ -807,31 +807,33 @@
   margin: 0 0 2px 0;
   font-size: 13px;
   font-weight: 700;
+  color: var(--text-primary);
 }
 
 .terrain-chrono-sub {
   font-size: 8px;
-  color: #8b949e;
+  color: var(--text-muted);
 }
 
 .terrain-chrono-age {
   font-size: 8px;
   font-weight: 700;
   padding: 2px 6px;
-  border: 1px solid #30363d;
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  background: var(--bg-panel);
+  color: var(--accent-yellow);
 }
 
 .terrain-chrono-summary {
   margin: 0;
   font-size: 10px;
-  color: #c9d1d9;
+  color: var(--text-secondary);
   line-height: 1.45;
 }
 
 .terrain-chrono-box {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
   padding: 6px 8px;
   font-size: 8.5px;
   display: flex;
@@ -840,20 +842,21 @@
 }
 
 .terrain-chrono-lbl {
-  color: #8b949e;
+  color: var(--text-muted);
   font-weight: 700;
+  text-transform: uppercase;
 }
 
 .terrain-chrono-val {
-  color: #e6edf3;
+  color: var(--text-primary);
   line-height: 1.4;
 }
 
 .terrain-units-table-wrap {
   overflow-x: auto;
   margin-bottom: 20px;
-  border: 1px solid #21262d;
-  background: #0d1117;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
 }
 
 .terrain-units-table {
@@ -864,18 +867,18 @@
 }
 
 .terrain-units-table th {
-  background: #161b22;
-  color: var(--accent-yellow, #f5c542);
+  background: var(--bg-panel);
+  color: var(--accent-yellow);
   padding: 8px 10px;
-  border-bottom: 1px solid #21262d;
+  border-bottom: 1px solid var(--border-color);
   font-weight: 700;
   letter-spacing: 0.04em;
 }
 
 .terrain-units-table td {
   padding: 8px 10px;
-  border-bottom: 1px solid #1c2128;
-  color: #c9d1d9;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
 }
 
 .terrain-units-table tr:hover td {

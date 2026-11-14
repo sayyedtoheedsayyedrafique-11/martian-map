@@ -8,6 +8,7 @@ import {
   CURIOSITY_GALE_LANDMARKS,
   MOBILITY_MODELS,
   calculateRouteComparison,
+  calculateTraverseSurvivalConsumables,
 } from '../services/marsRouteService';
 import {
   Navigation,
@@ -21,6 +22,13 @@ import {
   ExternalLink,
   Compass,
   Layers,
+  Clock,
+  Wind,
+  Droplets,
+  Flame,
+  Zap,
+  BatteryCharging,
+  HeartPulse,
 } from 'lucide-react';
 import './RoutePlanner.css';
 
@@ -326,6 +334,86 @@ function RouteElevationProfile({ routeData, activeRouteKey = 'routeA' }) {
   );
 }
 
+// Interplanetary Survival Consumables Component (NASA-STD-3001)
+function RouteSurvivalAssessment({ distanceKm, mobilityModel }) {
+  const [crewCount, setCrewCount] = useState(2);
+  const consumables = calculateTraverseSurvivalConsumables(distanceKm, mobilityModel?.solKm || 1, crewCount);
+
+  return (
+    <div className="route-survival-card mono">
+      <div className="route-survival-header">
+        <div className="route-survival-title">
+          <HeartPulse size={14} color="#ef4444" />
+          <span>TRAVERSE SURVIVAL & LIFE SUPPORT (NASA-STD-3001)</span>
+        </div>
+        <div className="route-survival-crew-toggle">
+          <span className="route-survival-crew-label">CREW:</span>
+          {[1, 2, 4].map((n) => (
+            <button
+              key={n}
+              type="button"
+              className={`route-crew-btn ${crewCount === n ? 'route-crew-btn--active' : ''}`}
+              onClick={() => setCrewCount(n)}
+            >
+              {n} Astronaut{n > 1 ? 's' : ''}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="route-survival-grid">
+        <div className="route-survival-stat">
+          <div className="route-survival-label"><Clock size={11} /> SOL DURATION</div>
+          <div className="route-survival-val">{consumables.estSols} Sols</div>
+          <div className="route-survival-sub">At {mobilityModel?.label?.split('(')[0] || 'Selected Pace'}</div>
+        </div>
+
+        <div className="route-survival-stat">
+          <div className="route-survival-label"><Wind size={11} /> O₂ CONSUMPTION</div>
+          <div className="route-survival-val">{consumables.totalO2Kg} kg</div>
+          <div className="route-survival-sub">0.84 kg/crew/sol (NASA-STD-3001)</div>
+        </div>
+
+        <div className="route-survival-stat">
+          <div className="route-survival-label"><Droplets size={11} /> H₂O HYDRATION</div>
+          <div className="route-survival-val">{consumables.totalWaterKg} kg</div>
+          <div className="route-survival-sub">2.5 kg/crew/sol consumables</div>
+        </div>
+
+        <div className="route-survival-stat">
+          <div className="route-survival-label"><Flame size={11} /> METABOLIC CALORIES</div>
+          <div className="route-survival-val">{consumables.totalKcal.toLocaleString()} kcal</div>
+          <div className="route-survival-sub">3,000 kcal/crew/sol in 0.38g</div>
+        </div>
+
+        <div className="route-survival-stat">
+          <div className="route-survival-label"><Zap size={11} /> IONIZING RADIATION</div>
+          <div className="route-survival-val" style={{ color: consumables.totalRadiationMsv > 25 ? '#ef4444' : '#f5c542' }}>
+            {consumables.totalRadiationMsv} mSv
+          </div>
+          <div className="route-survival-sub">MSL RAD Surface: 0.65 mSv/Sol</div>
+        </div>
+
+        <div className="route-survival-stat">
+          <div className="route-survival-label"><BatteryCharging size={11} /> ROBOTIC ACTUATION & HEAT</div>
+          <div className="route-survival-val">{consumables.totalRoverKwh} kWh</div>
+          <div className="route-survival-sub">0.9 kWh/sol equivalent electrical</div>
+        </div>
+      </div>
+
+      <div className="route-survival-citations">
+        <ShieldAlert size={13} color="var(--accent-yellow)" style={{ flexShrink: 0, marginTop: '2px' }} />
+        <div>
+          <strong>PHYSIOLOGICAL ENVIRONMENTAL BOUNDARIES:</strong>
+          <p>
+            Ambient surface pressure is ~610–850 Pa (far below the 6.3 kPa Armstrong Limit). Unpressurized exposure causes instantaneous bodily fluid boiling and loss of consciousness within 15 seconds. Pressurized suit or sealed rover cabin with active thermal control is mandatory for every meter of this traverse.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function RoutePlanner() {
   const [searchParams] = useSearchParams();
   const urlStart = searchParams.get('start');
@@ -382,17 +470,21 @@ export default function RoutePlanner() {
   // Re-run terrain-aware route comparison whenever endpoints change
   useEffect(() => {
     let isCancelled = false;
-    setIsCalculating(true);
+    const calcTimer = setTimeout(() => {
+      if (!isCancelled) setIsCalculating(true);
+    }, 0);
 
     calculateRouteComparison(startPoint, destPoint)
       .then((comp) => {
         if (!isCancelled) {
+          clearTimeout(calcTimer);
           setRouteComparison(comp);
           setIsCalculating(false);
         }
       })
       .catch((err) => {
         if (!isCancelled) {
+          clearTimeout(calcTimer);
           console.warn('Route comparison failed:', err);
           setIsCalculating(false);
         }
@@ -400,6 +492,7 @@ export default function RoutePlanner() {
 
     return () => {
       isCancelled = true;
+      clearTimeout(calcTimer);
     };
   }, [startPoint, destPoint]);
 
@@ -1032,6 +1125,62 @@ export default function RoutePlanner() {
                     No route across the Martian surface is completely safe. Even low-slope options may encounter unresolved sub-pixel boulder clusters (&lt;20m), loose wheel-trapping drift sand, or steep bedrock fissures below the Context Camera DEM resolution threshold. Autonomous driving requires continuous visual odometry hazard avoidance.
                   </p>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Planetary Survival & Consumables Assessment Card */}
+          {isValidRoute && routeComparison && (
+            <div className="route-card">
+              <RouteSurvivalAssessment
+                distanceKm={
+                  activeRouteKey === 'routeB' && routeComparison.isFullJezeroDemCoverage
+                    ? routeComparison.routeB.totalDistKm
+                    : (routeComparison.routeA?.totalDistKm || routeComparison.straightDistKm || 1)
+                }
+                mobilityModel={selectedSpeed}
+              />
+            </div>
+          )}
+
+          {/* Curiosity MSL Traverse Science Target Log (Gale Scope) */}
+          {scopeMode === 'gale' && isValidRoute && (startPoint?.drillTarget || destPoint?.drillTarget) && (
+            <div className="route-card mono">
+              <h3 className="route-card-title">
+                <Compass size={13} color="var(--accent-yellow)" /> CURIOSITY ROVER TRAVERSE LOG & DRILL SAMPLES
+                <span style={{ marginLeft: 'auto', fontSize: '8px', color: '#10b981' }}>● REAL DATA: NASA MSL</span>
+              </h3>
+              <div className="route-gale-drill-grid">
+                {startPoint?.drillTarget && (
+                  <div className="route-drill-item">
+                    <span className="route-drill-label">ORIGIN SCIENCE TARGET:</span>
+                    <strong className="route-drill-val">{startPoint.name} (Sol {startPoint.sol})</strong>
+                    <span className="route-drill-desc">{startPoint.drillTarget}</span>
+                    {startPoint.cumulativeKm !== undefined && (
+                      <span className="route-drill-odo">Odometer: {startPoint.cumulativeKm} km from Bradbury Landing</span>
+                    )}
+                  </div>
+                )}
+                {destPoint?.drillTarget && (
+                  <div className="route-drill-item">
+                    <span className="route-drill-label">DESTINATION SCIENCE TARGET:</span>
+                    <strong className="route-drill-val">{destPoint.name} (Sol {destPoint.sol})</strong>
+                    <span className="route-drill-desc">{destPoint.drillTarget}</span>
+                    {destPoint.cumulativeKm !== undefined && (
+                      <span className="route-drill-odo">Odometer: {destPoint.cumulativeKm} km from Bradbury Landing</span>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="route-gale-ext-link-row">
+                <a
+                  href="https://mars.nasa.gov/msl/mission/where-is-the-rover/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="route-gale-link"
+                >
+                  Verify on Official NASA MSL Route Map ("Where is the Rover?") <ExternalLink size={11} />
+                </a>
               </div>
             </div>
           )}
