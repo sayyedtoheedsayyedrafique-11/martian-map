@@ -427,14 +427,20 @@ function SurfaceConditions() {
               <p className="dust-analogue-desc">
                 In planetary meteorology, Earth's atmospheric aerosol transport observed on NASA Worldview serves as a key comparative analogue for understanding Mars' planet-encircling dust storms (PEDEs). While NASA Worldview monitors Earth satellite layers, NASA monitors Martian dust dynamics via MRO MARCI, Odyssey THEMIS, and rover REMS/MEDA sensors.
               </p>
+              <span className="mono" style={{ color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.4)', padding: '2px 6px', fontSize: '8.5px', marginTop: '6px', display: 'inline-block', borderRadius: '2px' }}>
+                ◈ EARTH SCIENTIFIC ANALOGY ONLY — NASA WORLDVIEW MONITORS TERRESTRIAL SATELLITE LAYERS (DOES NOT OBSERVE MARS DIRECTLY)
+              </span>
             </div>
           </div>
 
           <div className="dust-comparison-grid">
             <div className="dust-col">
-              <h4 className="dust-col-title" style={{ color: '#f59e0b' }}>
-                <Wind size={13} /> Martian Global Dust Storms (PEDEs)
-              </h4>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <h4 className="dust-col-title" style={{ color: '#f59e0b', margin: 0 }}>
+                  <Wind size={13} /> Martian Global Dust Storms (PEDEs)
+                </h4>
+                <span style={{ color: '#10b981', fontSize: '8px', fontWeight: 700 }} className="mono">● REAL DATA</span>
+              </div>
               <p className="dust-col-body">
                 During perihelion (southern summer), intense solar heating triggers local dust devils that can merge into planet-encircling events. In 2018, a global storm reached atmospheric optical depth &tau; &gt; 8.0, blocking &gt;99% of sunlight and concluding the solar-powered Opportunity rover mission after 15 years on Sol 5111.
               </p>
@@ -455,9 +461,12 @@ function SurfaceConditions() {
             </div>
 
             <div className="dust-col">
-              <h4 className="dust-col-title" style={{ color: '#38bdf8' }}>
-                <Globe2 size={13} /> Earth Aerosol Systems on NASA Worldview
-              </h4>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <h4 className="dust-col-title" style={{ color: '#38bdf8', margin: 0 }}>
+                  <Globe2 size={13} /> Earth Aerosol Systems on NASA Worldview
+                </h4>
+                <span style={{ color: '#38bdf8', fontSize: '8px', fontWeight: 700 }} className="mono">◈ EARTH ANALOGUE</span>
+              </div>
               <p className="dust-col-body">
                 NASA Worldview interactively visualizes daily global satellite imagery (MODIS on Terra/Aqua and VIIRS on Suomi NPP/NOAA-20), tracking trans-Atlantic Saharan dust plumes and volcanic aerosol plumes. These Earth observations provide the mathematical hydrodynamic baseline for modeling Mars atmospheric suspension.
               </p>
