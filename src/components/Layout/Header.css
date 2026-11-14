@@ -1,13 +1,13 @@
-/* Header.css — Flat Minimalist Single-Line Mission Telemetry Bar */
+/* Header.css — Anodized-Metal Telemetry Status Bar (36px Height) */
 
 .header {
-  height: var(--header-height, 40px);
-  background: var(--bg-secondary, #121212);
-  border-bottom: 1px solid var(--border-subtle, #222222);
+  height: var(--header-height, 36px);
+  background: var(--bg-secondary, #12151a);
+  border-bottom: 1px solid var(--border-subtle, #242933);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 14px;
+  padding: 0 12px;
   position: sticky;
   top: 0;
   z-index: 50;
@@ -17,50 +17,50 @@
 .header__left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .header__menu-btn {
   display: none;
   background: transparent;
-  border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
+  border: 1px solid var(--border-subtle, #242933);
+  color: var(--text-muted, #8c93a0);
   cursor: pointer;
-  padding: 4px 6px;
-  border-radius: var(--radius-sm);
+  padding: 3px 5px;
+  border-radius: var(--radius-sm, 2px);
   transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .header__menu-btn:hover {
-  border-color: var(--accent-amber);
-  color: var(--text-primary);
+  border-color: var(--accent-amber, #d99b26);
+  color: var(--text-primary, #f2f0e6);
 }
 
 .header__brand-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .header__brand-tag {
-  font-size: 0.74rem;
+  font-size: 0.70rem;
   font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: 0.05em;
+  color: var(--text-primary, #f2f0e6);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .header__divider {
-  color: var(--border-strong);
+  color: var(--border-strong, #3d4657);
   font-weight: 300;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 .header__section-title {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 500;
   color: var(--accent-amber);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   margin: 0;
 }
@@ -68,25 +68,26 @@
 .header__right {
   display: flex;
   align-items: center;
-  gap: 14px;
-  font-size: 0.68rem;
+  gap: 12px;
+  font-size: 0.65rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .header__telemetry-item {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  color: var(--text-muted);
-  letter-spacing: 0.03em;
+  gap: 4px;
+  color: var(--text-muted, #8c93a0);
+  letter-spacing: 0.02em;
 }
 
 .header__telemetry-label {
-  color: var(--text-dim);
+  color: var(--text-dim, #5c6370);
   font-weight: 600;
 }
 
 .header__telemetry-value {
-  color: var(--text-primary);
+  color: var(--text-primary, #f2f0e6);
   font-weight: 500;
 }
 
@@ -101,9 +102,9 @@
 .header__quick-tools {
   display: flex;
   align-items: center;
-  gap: 6px;
-  border-left: 1px solid var(--border-subtle);
-  padding-left: 10px;
+  gap: 5px;
+  border-left: 1px solid var(--border-subtle, #242933);
+  padding-left: 8px;
 }
 
 .header__quick-link {
@@ -111,23 +112,30 @@
   align-items: center;
   gap: 4px;
   background: transparent;
-  border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
-  font-size: 0.64rem;
-  font-weight: 500;
-  padding: 3px 7px;
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
+  border: 1px solid var(--border-subtle, #242933);
+  color: var(--text-muted, #8c93a0);
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm, 2px);
+  transition: all var(--transition-fast, 80ms ease);
 }
 
 .header__quick-link:hover {
-  background: var(--bg-panel);
-  border-color: var(--border-medium);
-  color: var(--text-primary);
+  background: var(--bg-panel, #181c23);
+  border-color: var(--accent-amber, #d99b26);
+  color: var(--text-primary, #f2f0e6);
 }
 
-@media (max-width: 960px) {
-  .header__telemetry-item--hide-sm {
+@media (max-width: 1024px) {
+  .header__telemetry-item--hide-md {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .header__telemetry-item--hide-sm,
+  .header__telemetry-item--hide-xs {
     display: none;
   }
 }

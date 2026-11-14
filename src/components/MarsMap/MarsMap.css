@@ -1,43 +1,43 @@
 /* MarsMap.css — Planetary GIS Map Workspace */
 
 .mars-map-card {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  background: var(--bg-panel, #181c23);
+  border: 1px solid var(--border-subtle, #242933);
+  border-radius: var(--radius-sm, 2px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   box-shadow: none;
 }
 
-/* Map Controls Bar */
+/* Map Controls Bar: Physical Avionics Control Strip */
 .mars-map-controls-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 6px 10px;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-subtle);
+  gap: 8px;
+  padding: 5px 8px;
+  background: var(--bg-secondary, #12151a);
+  border-bottom: 1px solid var(--border-subtle, #242933);
   flex-wrap: wrap;
 }
 
 .mars-map-control-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .mars-map-status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: 1px solid var(--border-subtle);
+  gap: 5px;
+  background: var(--bg-panel, #181c23);
+  border: 1px solid var(--border-subtle, #242933);
   padding: 2px 6px;
-  font-size: 0.66rem;
-  color: var(--text-muted);
-  border-radius: var(--radius-sm);
+  font-size: 0.62rem;
+  color: var(--text-muted, #8c93a0);
+  border-radius: var(--radius-sm, 2px);
 }
 
 .mars-map-status-dot {
@@ -48,39 +48,41 @@
 }
 
 .mars-map-status-text {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
 }
 
 .mars-control-label {
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: var(--text-dim);
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--text-dim, #5c6370);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  font-family: var(--font-mono, monospace);
 }
 
 .mars-button-group {
   display: inline-flex;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle, #242933);
+  border-radius: var(--radius-sm, 2px);
   overflow: hidden;
 }
 
+/* Physical Avionics Switch: Crisp borders, subtle hover, no bouncy animation */
 .mars-control-btn {
-  background: transparent;
+  background: var(--bg-panel, #181c23);
   border: none;
-  border-right: 1px solid var(--border-subtle);
-  color: var(--text-muted);
-  font-size: 0.68rem;
+  border-right: 1px solid var(--border-subtle, #242933);
+  color: var(--text-muted, #8c93a0);
+  font-size: 0.66rem;
   font-weight: 500;
-  padding: 3px 8px;
+  padding: 3px 7px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-fast, 80ms ease);
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: var(--font-mono);
+  font-family: var(--font-mono, monospace);
 }
 
 .mars-control-btn:last-child {
@@ -88,43 +90,43 @@
 }
 
 .mars-control-btn:hover {
-  background: var(--bg-panel);
-  color: var(--text-primary);
+  background: var(--bg-panel-elevated, #1e232c);
+  color: var(--text-primary, #f2f0e6);
 }
 
-/* Active State: Technical Amber Text, Quiet Minimal */
+/* Active State: Amber highlight, dark well fill */
 .mars-control-btn--active {
-  background: var(--bg-panel);
-  color: var(--accent-amber);
-  font-weight: 600;
-  border-bottom: 2px solid var(--accent-amber);
+  background: var(--bg-panel-active, #252b36);
+  color: var(--accent-amber, #d99b26);
+  font-weight: 700;
+  border-bottom: 2px solid var(--accent-amber, #d99b26);
 }
 
 .mars-control-btn--active:hover {
-  background: var(--bg-panel-elevated);
-  color: var(--accent-amber);
+  background: var(--bg-panel-active, #252b36);
+  color: var(--accent-amber, #d99b26);
 }
 
 .mars-reset-btn {
-  background: transparent;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 3px 8px;
-  color: var(--text-muted);
-  font-size: 0.68rem;
-  font-family: var(--font-mono);
+  background: var(--bg-panel, #181c23);
+  border: 1px solid var(--border-subtle, #242933);
+  border-radius: var(--radius-sm, 2px);
+  padding: 2px 7px;
+  color: var(--text-muted, #8c93a0);
+  font-size: 0.64rem;
+  font-family: var(--font-mono, monospace);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   margin-left: auto;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-fast, 80ms ease);
 }
 
 .mars-reset-btn:hover {
-  background: var(--bg-panel);
-  border-color: var(--border-medium);
-  color: var(--text-primary);
+  background: var(--bg-panel-elevated, #1e232c);
+  border-color: var(--accent-amber, #d99b26);
+  color: var(--text-primary, #f2f0e6);
 }
 
 /* Map Canvas */
@@ -336,36 +338,41 @@
 }
 
 .mars-coords-tag {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  background: var(--bg-secondary, #12151a);
+  border: 1px solid var(--border-subtle, #242933);
+  border-radius: var(--radius-sm, 2px);
   padding: 3px 8px;
-  font-size: 0.68rem;
-  color: var(--text-primary);
+  font-size: 0.66rem;
+  color: var(--text-primary, #f2f0e6);
   display: flex;
   align-items: center;
   gap: 8px;
   box-shadow: none;
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
 }
 
 .mars-coords-elev {
   color: var(--status-processed, #38bdf8);
-  font-size: 0.65rem;
-  border-left: 1px solid var(--border-subtle);
+  font-size: 0.64rem;
+  border-left: 1px solid var(--border-subtle, #242933);
   padding-left: 8px;
+  font-variant-numeric: tabular-nums;
 }
 
 .mars-scale-tag {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  background: var(--bg-secondary, #12151a);
+  border: 1px solid var(--border-subtle, #242933);
+  border-radius: var(--radius-sm, 2px);
   padding: 3px 8px;
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.66rem;
-  color: var(--text-secondary);
+  font-size: 0.64rem;
+  color: var(--text-secondary, #8c93a0);
   box-shadow: none;
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
 }
 
 .mars-scale-line {

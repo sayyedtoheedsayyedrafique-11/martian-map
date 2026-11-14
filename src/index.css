@@ -9,83 +9,81 @@
    ========================================================================== */
 
 :root {
-  /* Minimal Dark Palette: Deep Matte & Flat Graphite (WCAG AA Compliant) */
-  --bg-space: #0c0c0c;
-  --bg-primary: #0c0c0c;
-  --bg-secondary: #121212;
-  --bg-panel: #171717;
-  --bg-panel-elevated: #1e1e1e;
-  --bg-panel-active: #242424;
-  --bg-input: #0e0e0e;
+  /* Anodized-Metal Aerospace Mission Control Palette (Zero AI Slop) */
+  --bg-space: #0b0d10;
+  --bg-primary: #0b0d10;      /* Base canvas */
+  --bg-secondary: #12151a;    /* Instrument panels */
+  --bg-panel: #181c23;        /* Recessed data wells */
+  --bg-panel-elevated: #1e232c;
+  --bg-panel-active: #252b36;
+  --bg-input: #0e1014;
 
-  /* Backwards-compatible aliases */
+  /* Aliases for cards, panels, and sidebars */
   --bg-card: var(--bg-panel);
   --bg-card-hover: var(--bg-panel-elevated);
   --bg-sidebar: var(--bg-secondary);
 
-  /* Typography: Off-white (#f0f0f0), muted gray (#888888) */
-  --text-primary: #f0f0f0;
+  /* Tactile Instrument Typography */
+  --text-primary: #f2f0e6;    /* Warm, high-legibility off-white */
   --text-primary-bright: #ffffff;
-  --text-secondary: #d6d4cb;
-  --text-secondary-alt: #b0b0b0;
-  --text-muted: #888888;
-  --text-dim: #666666;
+  --text-secondary: #8c93a0;  /* Muted slate-gray labels */
+  --text-secondary-alt: #d6d4cb;
+  --text-muted: #8c93a0;
+  --text-dim: #5c6370;
 
-  /* Technical Amber (#d4912b) strictly for active items, zero glowing background fills */
-  --accent-amber: #d4912b;
-  --accent-amber-tech: #d4912b;
-  --accent-amber-alt: #d4912b;
-  --accent-amber-hover: #e09d35;
+  /* Muted Instrument Amber (Strictly active selection states & live telemetry) */
+  --accent-amber: #d99b26;
+  --accent-amber-tech: #d99b26;
+  --accent-amber-alt: #d99b26;
+  --accent-amber-hover: #e5a93c;
   --accent-amber-dim: #b87a14;
   --accent-amber-subtle: transparent;
-  --accent-amber-border: #d4912b;
+  --accent-amber-border: #d99b26;
 
-  /* Legacy yellow alias mapped to technical amber */
   --accent-yellow: var(--accent-amber);
   --accent-yellow-hover: var(--accent-amber-hover);
   --accent-yellow-subtle: transparent;
 
-  /* Natural Martian Rust-Red & Geological Accents */
-  --mars-rust: #a84a32;
-  --mars-rust-hover: #b8543b;
-  --mars-rust-dark: #82381f;
+  /* Authentic Martian Iron-Oxide Rust (Geological & terrain highlights) */
+  --mars-rust: #b04a33;
+  --mars-rust-hover: #c4543b;
+  --mars-rust-dark: #8a3724;
   --mars-rust-subtle: transparent;
-  --mars-rust-border: #a84a32;
+  --mars-rust-border: #b04a33;
 
-  --mars-red: #c1440e;
-  --mars-red-hover: #b23a10;
-  --mars-red-dark: #8c2a05;
+  --mars-red: #b04a33;
+  --mars-red-hover: #c4543b;
+  --mars-red-dark: #8a3724;
   --mars-red-subtle: transparent;
-  --mars-red-border: #c1440e;
+  --mars-red-border: #b04a33;
   --mars-rust-border: var(--mars-red-border);
-  --mars-brown: #5a3d2e;
+  --mars-brown: #543b2f;
   --mars-ochre: #b57a4a;
   --mars-sand: #c48a58;
 
-  /* Functional Telemetry & Classification Status */
+  /* Functional Status Telemetry */
   --status-nominal: #22c55e;
   --status-nominal-subtle: transparent;
   --status-online: var(--status-nominal);
   --status-processed: #38bdf8;
   --status-processed-subtle: transparent;
-  --status-illustrative: #d4912b;
+  --status-illustrative: #d99b26;
   --status-illustrative-subtle: transparent;
-  --status-warning: #d4912b;
-  --status-critical: #c53030;
+  --status-warning: #d99b26;
+  --status-critical: #ef4444;
   --status-telemetry: #38bdf8;
   --status-info: var(--status-telemetry);
 
-  /* Hairline Borders: Hairline #222222, active state #333333 */
-  --border-subtle: #222222;
-  --border-medium: #2a2a2a;
-  --border-strong: #333333;
-  --border-active: #333333;
+  /* Hairline Dividers: Crisp 1px solid #242933 */
+  --border-subtle: #242933;
+  --border-medium: #2e3543;
+  --border-strong: #3d4657;
+  --border-active: #d99b26;
 
-  /* Legacy border aliases */
   --border-color: var(--border-subtle);
   --border-light: var(--border-medium);
   --border-accent: var(--accent-amber);
-  --border-mars: var(--mars-red);
+  --border-mars: var(--mars-rust);
 
   /* Layout Spacing Grid (8-point spatial scales) */
   --space-xxs: 4px;
@@ -96,34 +94,66 @@
   --space-xl: 32px;
   --space-2xl: 48px;
 
-  --sidebar-width: 230px;
-  --header-height: 40px;
-  --content-padding: 14px;
+  --sidebar-width: 200px;
+  --header-height: 36px;
+  --content-padding: 12px;
 
-  /* Scientific Typography */
-  --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+  /* Scientific Typography: Geometric Headings + Tabular Monospace */
+  --font-main: -apple-system, BlinkMacSystemFont, 'Inter', 'Space Grotesk', 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Roboto Mono', 'Consolas', monospace;
 
-  /* Strict 2px to 3px corner radius (no large pill shapes) */
+  /* Strict 2px technical corners */
   --radius-sm: 2px;
-  --radius-md: 3px;
-  --radius-lg: 3px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
 
   /* Flat Matte Surfaces: ZERO box-shadows, ZERO glowing borders */
   --shadow-sm: none;
   --shadow-md: none;
   --shadow-lg: none;
 
-  --transition-fast: 100ms ease;
-  --transition-normal: 150ms ease;
+  --transition-fast: 80ms ease;
+  --transition-normal: 140ms ease;
 }
 
-/* Global Reset: Force box-shadow: none !important and backdrop-filter: none !important */
+/* Global Reset: Force box-shadow: none !important and backdrop-filter: none !important across cards, panels, and sidebars */
 *, *::before, *::after,
 .card, .panel, .sidebar, .header, .modal, [class*="card"], [class*="panel"], [class*="drawer"], [class*="hud"], [class*="overlay"], [class*="badge"] {
   box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+}
+
+/* Authentic Scientific Tables (Clean row dividers, compact padding, scannable tabular alignment) */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.74rem;
+  text-align: left;
+}
+
+th {
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  vertical-align: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+tr:hover td {
+  background: var(--bg-panel-elevated);
 }
 
 /* --- Reset & Base --- */

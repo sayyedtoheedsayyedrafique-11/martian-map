@@ -23,7 +23,7 @@ function Header({ onMenuToggle }) {
   const sectionTitle = pageTitles[location.pathname] || 'FIELD GIS';
   const isJezero = location.pathname === '/jezero' || (location.pathname === '/terrain' && location.search.includes('jezero'));
 
-  // Precision single-line mission clock (UTC)
+  // Live mission clock (UTC)
   const [utcTime, setUtcTime] = useState(() => {
     const d = new Date();
     return d.toISOString().substring(11, 19) + ' UTC';
@@ -38,14 +38,14 @@ function Header({ onMenuToggle }) {
   }, []);
 
   return (
-    <header className="header" aria-label="Mission Telemetry Bar">
+    <header className="header" aria-label="Mission Telemetry Status Bar">
       <div className="header__left">
         <button
           className="header__menu-btn"
           onClick={onMenuToggle}
           aria-label="Toggle navigation menu"
         >
-          <Menu size={14} />
+          <Menu size={13} />
         </button>
 
         <div className="header__brand-group">
@@ -56,39 +56,46 @@ function Header({ onMenuToggle }) {
       </div>
 
       <div className="header__right mono">
-        {/* Real-time mission telemetry readouts */}
-        <div className="header__telemetry-item" title="Mission Clock (UTC)">
-          <span className="header__telemetry-label">CLK:</span>
+        {/* Active Landing Site Coordinates & MOLA Elevation Datum */}
+        <div className="header__telemetry-item header__telemetry-item--hide-sm" title="Active Target Site Coordinates">
+          <span className="header__telemetry-label">SITE:</span>
+          <span className="header__telemetry-value">18.4447°N, 77.4508°E</span>
+        </div>
+
+        <div className="header__telemetry-item header__telemetry-item--hide-md" title="MOLA Elevation Reference Datum (Water Triple Point 610.5 Pa)">
+          <span className="header__telemetry-label">MOLA:</span>
+          <span className="header__telemetry-value">-2,568m AREOID</span>
+        </div>
+
+        {/* Real-time Martian Mission Sol & Clock */}
+        <div className="header__telemetry-item" title="Perseverance Mars 2020 Mission Sol">
+          <span className="header__telemetry-label">SOL:</span>
+          <span className="header__telemetry-value">1420</span>
+        </div>
+
+        <div className="header__telemetry-item header__telemetry-item--hide-xs" title="UTC Mission Clock">
+          <span className="header__telemetry-label">UTC:</span>
           <span className="header__telemetry-value">{utcTime}</span>
         </div>
 
-        <div className="header__telemetry-item" title="Perseverance Mission Sol">
-          <span className="header__telemetry-label">SOL:</span>
-          <span className="header__telemetry-value">1420 (M20)</span>
-        </div>
-
-        <div className="header__telemetry-item" title="System Telemetry Status">
+        {/* Data Provenance & Operational Status */}
+        <div className="header__telemetry-item" title="Data Provenance: NASA Planetary Data System & USGS Geologic Map">
           <span className="header__status-dot" />
-          <span className="header__telemetry-value">NOMINAL</span>
+          <span className="header__telemetry-value">PDS/USGS NOMINAL</span>
         </div>
 
-        <div className="header__telemetry-item header__telemetry-item--hide-sm" title="Planetary Coordinate Reference">
-          <span className="header__telemetry-label">REF:</span>
-          <span className="header__telemetry-value">IAU AREOID (610.5 Pa)</span>
-        </div>
-
-        {/* Quiet Quick-Switch Links */}
+        {/* Avionics-Style Quick-Switch Links */}
         <div className="header__quick-tools">
           {!isJezero && (
             <Link to="/jezero" className="header__quick-link" title="Open 3D Jezero Crater DEM">
-              <Box size={11} />
+              <Box size={10} />
               <span>3D DEM</span>
             </Link>
           )}
 
           {location.pathname !== '/' && (
             <Link to="/" className="header__quick-link" title="Open Primary 2D GIS Map & 3D Globe">
-              <Globe size={11} />
+              <Globe size={10} />
               <span>MAP</span>
             </Link>
           )}

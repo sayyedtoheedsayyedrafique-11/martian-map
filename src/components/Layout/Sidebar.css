@@ -1,13 +1,13 @@
-/* Sidebar.css — Minimal Flat Planetary GIS Navigation */
+/* Sidebar.css — Slim Left-Hand Instrument Rail (200px Compact Navigation) */
 
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
-  width: var(--sidebar-width, 230px);
+  width: var(--sidebar-width, 200px);
   height: 100vh;
-  background: var(--bg-secondary, #121212);
-  border-right: 1px solid var(--border-subtle, #222222);
+  background: var(--bg-secondary, #12151a);
+  border-right: 1px solid var(--border-subtle, #242933);
   display: flex;
   flex-direction: column;
   z-index: 100;
@@ -16,29 +16,29 @@
 }
 
 .sidebar__header {
-  padding: 0 14px;
-  border-bottom: 1px solid var(--border-subtle, #222222);
+  padding: 0 10px;
+  border-bottom: 1px solid var(--border-subtle, #242933);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: var(--header-height, 40px);
-  background: var(--bg-secondary, #121212);
+  height: var(--header-height, 36px);
+  background: var(--bg-secondary, #12151a);
   box-sizing: border-box;
 }
 
 .sidebar__brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
 }
 
 .sidebar__brand-mark {
-  width: 20px;
-  height: 20px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-subtle);
-  color: var(--accent-amber);
-  border-radius: var(--radius-sm);
+  width: 18px;
+  height: 18px;
+  background: var(--bg-panel, #181c23);
+  border: 1px solid var(--border-subtle, #242933);
+  color: var(--accent-amber, #d99b26);
+  border-radius: var(--radius-sm, 2px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -51,44 +51,44 @@
 }
 
 .sidebar__title {
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-primary, #f2f0e6);
   line-height: 1.1;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
 .sidebar__subtitle {
-  font-size: 0.58rem;
-  color: var(--text-dim);
+  font-size: 0.54rem;
+  color: var(--text-dim, #5c6370);
   line-height: 1.1;
-  letter-spacing: 0.05em;
-  font-weight: 500;
+  letter-spacing: 0.04em;
+  font-weight: 600;
 }
 
 .sidebar__close {
   display: none;
   background: transparent;
-  border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
+  border: 1px solid var(--border-subtle, #242933);
+  color: var(--text-muted, #8c93a0);
   cursor: pointer;
-  padding: 4px;
-  border-radius: var(--radius-sm);
+  padding: 3px;
+  border-radius: var(--radius-sm, 2px);
 }
 
 .sidebar__close:hover {
-  color: var(--text-primary);
-  border-color: var(--accent-amber);
+  color: var(--text-primary, #f2f0e6);
+  border-color: var(--accent-amber, #d99b26);
 }
 
 .sidebar__nav {
   flex: 1;
-  padding: 10px 8px;
+  padding: 8px 6px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .sidebar__section {
@@ -98,33 +98,33 @@
 }
 
 .sidebar__nav-label {
-  font-size: 0.56rem;
+  font-size: 0.54rem;
   font-weight: 700;
-  color: var(--text-dim);
+  color: var(--text-dim, #5c6370);
   text-transform: uppercase;
-  letter-spacing: 0.07em;
-  padding: 2px 8px;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
   margin-bottom: 2px;
 }
 
 .sidebar__link {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 8px;
-  border-radius: 0;
-  color: var(--text-muted);
-  font-size: 0.78rem;
+  gap: 7px;
+  padding: 5px 7px;
+  border-radius: var(--radius-sm, 2px);
+  color: var(--text-muted, #8c93a0);
+  font-size: 0.74rem;
   font-weight: 500;
   text-decoration: none;
-  border-left: 2px solid transparent;
+  border-left: 3px solid transparent;
   background: transparent;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-fast, 80ms ease);
 }
 
 .sidebar__link-icon {
-  color: var(--text-dim);
-  transition: color var(--transition-fast);
+  color: var(--text-dim, #5c6370);
+  transition: color var(--transition-fast, 80ms ease);
   flex-shrink: 0;
 }
 
@@ -136,54 +136,55 @@
 }
 
 .sidebar__link-badge {
-  font-size: 0.54rem;
+  font-size: 0.52rem;
   padding: 1px 4px;
   background: transparent;
-  color: var(--text-dim);
-  border: 1px solid var(--border-subtle);
-  letter-spacing: 0.04em;
+  color: var(--text-dim, #5c6370);
+  border: 1px solid var(--border-subtle, #242933);
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-sm, 2px);
 }
 
 .sidebar__link:hover {
-  color: var(--text-primary);
-  background: var(--bg-panel);
+  color: var(--text-primary, #f2f0e6);
+  background: var(--bg-panel, #181c23);
+  border-left-color: var(--border-medium, #2e3543);
   text-decoration: none;
 }
 
 .sidebar__link:hover .sidebar__link-icon {
-  color: var(--text-secondary);
+  color: var(--text-primary, #f2f0e6);
 }
 
-/* Active State: Quiet 2px solid amber left border, NO bright background highlights */
+/* Active State: 3px Solid Amber Left Indicator Bar, Zero Glow */
 .sidebar__link--active {
-  color: var(--text-primary);
+  color: var(--text-primary, #f2f0e6);
   background: transparent;
-  border-left: 2px solid var(--accent-amber);
+  border-left: 3px solid var(--accent-amber, #d99b26);
   font-weight: 600;
 }
 
 .sidebar__link--active .sidebar__link-icon {
-  color: var(--accent-amber);
+  color: var(--accent-amber, #d99b26);
 }
 
 .sidebar__link--active .sidebar__link-badge {
-  color: var(--accent-amber);
-  border-color: var(--accent-amber);
+  color: var(--accent-amber, #d99b26);
+  border-color: var(--accent-amber, #d99b26);
 }
 
 .sidebar__footer {
-  padding: 8px 12px;
-  border-top: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
+  padding: 6px 10px;
+  border-top: 1px solid var(--border-subtle, #242933);
+  background: var(--bg-secondary, #12151a);
 }
 
 .sidebar__footer-meta {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  font-size: 0.62rem;
+  gap: 2px;
+  font-size: 0.58rem;
 }
 
 .sidebar__meta-row {
@@ -193,11 +194,11 @@
 }
 
 .sidebar__meta-key {
-  color: var(--text-dim);
+  color: var(--text-dim, #5c6370);
 }
 
 .sidebar__meta-val {
-  color: var(--text-muted);
+  color: var(--text-muted, #8c93a0);
 }
 
 @media (max-width: 768px) {
