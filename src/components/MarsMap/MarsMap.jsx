@@ -340,7 +340,12 @@ function MarsMap({
   hideToolbar = false,
 }) {
   const navigate = useNavigate();
-  const [cursorCoords, setCursorCoords] = useState({ lat: 0, lng: 0 });
+  const [cursorCoords, setCursorCoords] = useState(() => {
+    if (selectedLocation && typeof selectedLocation.lat === 'number' && typeof selectedLocation.lng === 'number') {
+      return { lat: selectedLocation.lat, lng: selectedLocation.lng };
+    }
+    return { lat: 18.4447, lng: 77.4508 };
+  });
   const [activeLayerKey, setActiveLayerKey] = useState('viking');
   const [resetTrigger, setResetTrigger] = useState(0);
   const [isTilesLoading, setIsTilesLoading] = useState(true);
@@ -355,6 +360,15 @@ function MarsMap({
 
   const effectiveLayerKey = activeLayer || activeLayerKey;
   const currentLayer = TILE_LAYERS[effectiveLayerKey] || TILE_LAYERS.viking;
+
+  // Sync cursor coordinates when active location changes during render
+  const [prevSelectedLocId, setPrevSelectedLocId] = useState(selectedLocation?.id);
+  if (selectedLocation && selectedLocation.id !== prevSelectedLocId) {
+    setPrevSelectedLocId(selectedLocation.id);
+    if (typeof selectedLocation.lat === 'number' && typeof selectedLocation.lng === 'number') {
+      setCursorCoords({ lat: selectedLocation.lat, lng: selectedLocation.lng });
+    }
+  }
 
   const handleSelectLayer = (id) => {
     if (onLayerChange) onLayerChange(id);
@@ -522,8 +536,8 @@ function MarsMap({
         )}
         <MapContainer
           key={`mars-map-${effectiveLayerKey}`}
-          center={[0, 0]}
-          zoom={2}
+          center={selectedLocation ? [selectedLocation.lat, selectedLocation.lng] : [18.4447, 77.4508]}
+          zoom={selectedLocation ? 4 : 2}
           minZoom={1}
           maxZoom={8}
           className="mars-leaflet-container"
@@ -587,7 +601,10 @@ function MarsMap({
                   position={[loc.lat, loc.lng]}
                   icon={icon}
                   eventHandlers={{
-                    click: () => onLocationSelect && onLocationSelect(loc),
+                    click: () => {
+                      setCursorCoords({ lat: loc.lat, lng: loc.lng });
+                      if (onLocationSelect) onLocationSelect(loc);
+                    },
                   }}
                 >
                   <Popup>
@@ -797,7 +814,7 @@ function MarsMap({
           <div className="mars-coords-tag mono">
             <span className="mars-coords-text">{formatCoordinates(cursorCoords.lat, cursorCoords.lng)}</span>
             <span className="mars-coords-elev">
-              {cursorElev.elevationMeters !== null
+              {cursorElev && cursorElev.elevationMeters !== null && cursorElev.elevationMeters !== undefined
                 ? `${cursorElev.elevationFormatted} (DEM)`
                 : 'MOLA Datum (610.5 Pa)'}
             </span>
