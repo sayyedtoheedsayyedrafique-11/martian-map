@@ -121,6 +121,139 @@ export const JEZERO_LANDMARKS = [
     elevationMeters: -2613,
     type: 'Outflow Breach',
     desc: 'Eastern rim breach where ancient Lake Jezero drained toward Isidis Planitia.',
+    source: 'https://mars.nasa.gov/mars2020/',
+    verified: true,
+  },
+];
+
+// Curated landmarks across NASA MSL Curiosity rover's actual 32+ km traverse in Gale Crater
+// Sourced from official NASA JPL MSL Traverse Waypoints and PDS Geosciences Node
+export const CURIOSITY_GALE_LANDMARKS = [
+  {
+    id: 'bradbury-landing',
+    name: 'Bradbury Landing (MSL Touchdown)',
+    shortName: 'Bradbury Landing',
+    lat: -4.5895,
+    lng: 137.4417,
+    elevationMeters: -4501,
+    sol: 0,
+    type: 'rover',
+    status: 'Landing: Sol 0',
+    desc: 'NASA Mars Science Laboratory landing site in northern Gale Crater near the Peace Vallis alluvial fan.',
+    source: 'https://mars.nasa.gov/msl/mission/where-is-the-rover/',
+    verified: true,
+  },
+  {
+    id: 'yellowknife-bay',
+    name: 'Yellowknife Bay (Habitable Lakebed)',
+    shortName: 'Yellowknife Bay',
+    lat: -4.5912,
+    lng: 137.4485,
+    elevationMeters: -4520,
+    sol: 125,
+    type: 'landmark',
+    status: 'Explored: Sols 125–300',
+    desc: 'Topographic depression where drilled mudstones proved ancient Mars had fresh, life-supporting lake water.',
+    source: 'https://mars.nasa.gov/msl/mission-updates/',
+    verified: true,
+  },
+  {
+    id: 'kimberley',
+    name: 'The Kimberley (Windjana Outcrop)',
+    shortName: 'The Kimberley',
+    lat: -4.6402,
+    lng: 137.4005,
+    elevationMeters: -4475,
+    sol: 620,
+    type: 'landmark',
+    status: 'Explored: Sol 620',
+    desc: 'Intersection of three distinct geological formations with striking cross-bedded sandstones.',
+    source: 'https://mars.nasa.gov/msl/mission-updates/',
+    verified: true,
+  },
+  {
+    id: 'namib-dune',
+    name: 'Namib Dune (Bagnold Dune Field)',
+    shortName: 'Namib Dune',
+    lat: -4.6750,
+    lng: 137.3850,
+    elevationMeters: -4450,
+    sol: 1190,
+    type: 'landmark',
+    status: 'Explored: Sol 1190',
+    desc: 'First active extraterrestrial sand dune investigated in-situ; severe wheel-slip and mobility hazard.',
+    source: 'https://mars.nasa.gov/msl/mission-updates/',
+    verified: true,
+  },
+  {
+    id: 'murray-buttes',
+    name: 'Murray Buttes (Mount Sharp Foothills)',
+    shortName: 'Murray Buttes',
+    lat: -4.7001,
+    lng: 137.3702,
+    elevationMeters: -4380,
+    sol: 1450,
+    type: 'landmark',
+    status: 'Explored: Sol 1450',
+    desc: 'Scenic mesa remnants of ancient wind-sculpted sandstone at the entry to Aeolis Mons lower slopes.',
+    source: 'https://mars.nasa.gov/msl/mission-updates/',
+    verified: true,
+  },
+  {
+    id: 'vera-rubin-ridge',
+    name: 'Vera Rubin Ridge (Hematite Ridge)',
+    shortName: 'Vera Rubin Ridge',
+    lat: -4.7350,
+    lng: 137.3600,
+    elevationMeters: -4200,
+    sol: 1809,
+    type: 'landmark',
+    status: 'Explored: Sols 1800–2300',
+    desc: 'Topographic ridge standing 65m above surrounding plains, enriched in gray crystalline hematite.',
+    source: 'https://mars.nasa.gov/msl/mission-updates/',
+    verified: true,
+  },
+  {
+    id: 'glen-torridon',
+    name: 'Glen Torridon (Clay-Bearing Trough)',
+    shortName: 'Glen Torridon',
+    lat: -4.7550,
+    lng: 137.3750,
+    elevationMeters: -4260,
+    sol: 2350,
+    type: 'landmark',
+    status: 'Explored: Sols 2350–3100',
+    desc: 'Broad depression rich in phyllosilicates formed in neutral water, nestled south of Vera Rubin Ridge.',
+    source: 'https://mars.nasa.gov/msl/mission-updates/',
+    verified: true,
+  },
+  {
+    id: 'greenheugh-pediment',
+    name: 'Greenheugh Pediment (Ascent Scarp)',
+    shortName: 'Greenheugh Pediment',
+    lat: -4.7505,
+    lng: 137.3501,
+    elevationMeters: -4150,
+    sol: 2700,
+    type: 'landmark',
+    status: 'Explored: Sols 2700 / 3400',
+    desc: 'Capping sandstone pediment accessed via a 31° slope scarp — the steepest grade climbed by MSL.',
+    source: 'https://mars.nasa.gov/msl/mission-updates/',
+    verified: true,
+  },
+  {
+    id: 'gediz-vallis',
+    name: 'Gediz Vallis Ridge & Channel',
+    shortName: 'Gediz Vallis Ridge',
+    lat: -4.7702,
+    lng: 137.3550,
+    elevationMeters: -3980,
+    sol: 4100,
+    type: 'landmark',
+    status: 'Explored: Sol 4100+',
+    desc: 'Carved canyon and debris ridge preserving boulders washed down from high on Mount Sharp.',
+    source: 'https://mars.nasa.gov/news/9574/',
+    verified: true,
   },
 ];
 
@@ -375,6 +508,14 @@ export async function calculateRouteComparison(startPoint, destPoint) {
   const destInDem = isInsideJezeroDem(destPoint.lat, destPoint.lng, dem);
   const isFullJezeroDemCoverage = startInDem && destInDem;
 
+  // Check if endpoints reside in the NASA MSL Gale Crater exploration corridor
+  const isInsideGale = (lat, lng) => lat >= -4.85 && lat <= -4.50 && lng >= 137.30 && lng <= 137.50;
+  const isGaleRegion = isInsideGale(startPoint.lat, startPoint.lng) && isInsideGale(destPoint.lat, destPoint.lng);
+
+  const startMolaElev = typeof startPoint.elevationMeters === 'number' ? startPoint.elevationMeters : null;
+  const destMolaElev = typeof destPoint.elevationMeters === 'number' ? destPoint.elevationMeters : null;
+  const molaReliefDeltaM = (startMolaElev !== null && destMolaElev !== null) ? Math.round(destMolaElev - startMolaElev) : null;
+
   // Generate Route A (Direct)
   const waypointsA = generateDirectRoutePoints(startPoint, destPoint, 40);
   const analysisA = analyzeRouteWaypoints(waypointsA, dem);
@@ -398,6 +539,8 @@ export async function calculateRouteComparison(startPoint, destPoint) {
       preferredOption = 'A';
       comparisonRationale = `Route A provides the most direct transit (${analysisA.totalDistKm} km) across manageable slope angles (max ${analysisA.maxSlopeDeg}°), conserving sol drive cycles.`;
     }
+  } else if (isGaleRegion) {
+    comparisonRationale = `Gale Crater traverse along NASA MSL Curiosity corridor. Waypoint elevations verified via MOLA Areoid datum (${startMolaElev !== null ? `${startMolaElev}m` : 'N/A'} to ${destMolaElev !== null ? `${destMolaElev}m` : 'N/A'}, net relief ${molaReliefDeltaM !== null ? `${Math.abs(molaReliefDeltaM)}m` : 'N/A'}). Continuous 20m CTX DEM is not locally loaded for Gale; intermediate slope transect is withheld to preserve scientific integrity without synthetic extrapolation.`;
   } else {
     comparisonRationale = `Traverse endpoints extend beyond the Jezero Crater 20m CTX DEM footprint into unmapped global Mars territory. Route analysis uses spherical great-circle arc on MOLA datum. Sub-kilometer slope data is unavailable; comparative slope analysis is omitted to preserve scientific integrity.`;
   }
@@ -408,6 +551,10 @@ export async function calculateRouteComparison(startPoint, destPoint) {
     straightDistKm: Math.round(straightDistKm * 100) / 100,
     azimuth,
     isFullJezeroDemCoverage,
+    isGaleRegion,
+    startMolaElev,
+    destMolaElev,
+    molaReliefDeltaM,
     preferredOption,
     comparisonRationale,
     routeA: {

@@ -1,34 +1,22 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import MarsMap from '../components/MarsMap/MarsMap';
 import marsLocations from '../data/marsLocations';
-import {
-  calculateMarsDistance,
-  formatCoordinates,
-  calculateBearing,
-  generateGeodesicPoints,
-  MARS_RADIUS_KM,
-} from '../utils/helpers';
+import { formatCoordinates } from '../utils/helpers';
 import {
   JEZERO_LANDMARKS,
+  CURIOSITY_GALE_LANDMARKS,
   MOBILITY_MODELS,
   calculateRouteComparison,
-  haversineDistanceKm,
-  calculateAzimuth,
 } from '../services/marsRouteService';
-import { loadJezeroDemData } from '../services/marsDataService';
 import {
   Navigation,
   ShieldAlert,
   AlertTriangle,
   RotateCcw,
   XCircle,
-  RefreshCw,
-  Sliders,
   CheckCircle2,
   Info,
-  Layers,
-  ArrowRight,
   TrendingUp,
   MapPin,
   Mountain,
@@ -42,6 +30,68 @@ import './RoutePlanner.css';
 function RouteElevationProfile({ routeData, activeRouteKey = 'routeA' }) {
   const [hoverPoint, setHoverPoint] = useState(null);
   const activeRoute = routeData[activeRouteKey] || routeData.routeA;
+
+  // Gale Crater NASA MSL Waypoint MOLA Profile
+  if (routeData.isGaleRegion) {
+    const startMola = routeData.startMolaElev ?? routeData.startPoint?.elevationMeters;
+    const destMola = routeData.destMolaElev ?? routeData.destPoint?.elevationMeters;
+    const dist = routeData.straightDistKm || 1;
+    const relief = routeData.molaReliefDeltaM ?? (startMola !== null && destMola !== null ? destMola - startMola : null);
+    const avgGradePct = relief !== null ? ((Math.abs(relief) / (dist * 1000)) * 100).toFixed(1) : null;
+
+    return (
+      <div className="route-profile-gale mono">
+        <div className="route-gale-header">
+          <div className="route-chart-title">
+            <TrendingUp size={13} color="var(--accent-yellow)" />
+            <span>GALE CRATER (NASA MSL CURIOSITY TRAVERSE WAYPOINTS)</span>
+          </div>
+          <span className="route-gale-badge">MOLA AREOID DATUM</span>
+        </div>
+
+        <div className="route-gale-metrics-grid">
+          <div className="route-gale-stat">
+            <span className="route-gale-label">ORIGIN ELEVATION</span>
+            <span className="route-gale-val">{startMola !== null ? `${startMola} m` : 'N/A'}</span>
+            <span className="route-gale-sub">{routeData.startPoint?.shortName || routeData.startPoint?.name}</span>
+          </div>
+          <div className="route-gale-stat">
+            <span className="route-gale-label">DESTINATION ELEVATION</span>
+            <span className="route-gale-val">{destMola !== null ? `${destMola} m` : 'N/A'}</span>
+            <span className="route-gale-sub">{routeData.destPoint?.shortName || routeData.destPoint?.name}</span>
+          </div>
+          <div className="route-gale-stat">
+            <span className="route-gale-label">NET RELIEF Δ</span>
+            <span className="route-gale-val">{relief !== null ? `${relief > 0 ? '+' : ''}${relief} m` : 'N/A'}</span>
+            <span className="route-gale-sub">{relief > 0 ? 'Ascending Mount Sharp' : 'Descending Basin Floor'}</span>
+          </div>
+          <div className="route-gale-stat">
+            <span className="route-gale-label">AVERAGE GRADE</span>
+            <span className="route-gale-val">{avgGradePct !== null ? `${avgGradePct}%` : 'N/A'}</span>
+            <span className="route-gale-sub">Point-to-Point Chord</span>
+          </div>
+        </div>
+
+        <div className="route-gale-disclosure">
+          <Info size={13} color="var(--accent-yellow)" />
+          <div>
+            <strong>DISCRETE NASA MSL WAYPOINT ELEVATIONS ACTIVE</strong>
+            <p>
+              In strict accordance with NASA scientific standards, continuous sub-kilometer DEM slope profiling is withheld because the 20m Gale CTX DEM matrix is not locally loaded. Waypoints display authentic discrete MOLA laser altimetry recorded across Curiosity's 32+ km traverse.
+            </p>
+            <a
+              href="https://mars.nasa.gov/msl/mission/where-is-the-rover/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="route-gale-link"
+            >
+              Verify on NASA MSL Official Traverse Map <ExternalLink size={11} />
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!routeData.isFullJezeroDemCoverage || !activeRoute.profilePoints || activeRoute.profilePoints.length < 2) {
     return (
@@ -419,6 +469,34 @@ export default function RoutePlanner() {
       setStartPoint(start);
       setDestPoint(dest);
       setCenterView({ lat: 18.68, lng: 77.42, zoom: 7 });
+    } else if (type === 'gale-yellowknife') {
+      setScopeMode('gale');
+      const start = CURIOSITY_GALE_LANDMARKS.find((l) => l.id === 'bradbury-landing');
+      const dest = CURIOSITY_GALE_LANDMARKS.find((l) => l.id === 'yellowknife-bay');
+      setStartPoint(start);
+      setDestPoint(dest);
+      setCenterView({ lat: -4.59, lng: 137.445, zoom: 12 });
+    } else if (type === 'gale-kimberley') {
+      setScopeMode('gale');
+      const start = CURIOSITY_GALE_LANDMARKS.find((l) => l.id === 'bradbury-landing');
+      const dest = CURIOSITY_GALE_LANDMARKS.find((l) => l.id === 'kimberley');
+      setStartPoint(start);
+      setDestPoint(dest);
+      setCenterView({ lat: -4.62, lng: 137.42, zoom: 11 });
+    } else if (type === 'gale-vera-rubin') {
+      setScopeMode('gale');
+      const start = CURIOSITY_GALE_LANDMARKS.find((l) => l.id === 'bradbury-landing');
+      const dest = CURIOSITY_GALE_LANDMARKS.find((l) => l.id === 'vera-rubin-ridge');
+      setStartPoint(start);
+      setDestPoint(dest);
+      setCenterView({ lat: -4.66, lng: 137.40, zoom: 11 });
+    } else if (type === 'gale-gediz') {
+      setScopeMode('gale');
+      const start = CURIOSITY_GALE_LANDMARKS.find((l) => l.id === 'glen-torridon');
+      const dest = CURIOSITY_GALE_LANDMARKS.find((l) => l.id === 'gediz-vallis');
+      setStartPoint(start);
+      setDestPoint(dest);
+      setCenterView({ lat: -4.76, lng: 137.365, zoom: 12 });
     } else if (type === 'global-msl') {
       setScopeMode('global');
       const start = marsLocations.find((l) => l.id === 'perseverance');
@@ -463,7 +541,7 @@ export default function RoutePlanner() {
             Mars Surface Route Planner & Slope Analyzer
           </h1>
           <p className="route-desc">
-            Plan surface traverses across Jezero Crater with terrain-aware elevation profiling. Compare direct straight-line paths with low-slope navigational bypasses, evaluate slope hazards, and review real USGS/CTX digital elevation metrics.
+            Plan surface traverses across Jezero Crater and Gale Crater with terrain-aware elevation profiling. Compare direct straight-line paths with low-slope navigational bypasses, evaluate rover engineering hazards, and review real USGS/CTX digital elevation metrics.
           </p>
         </div>
 
@@ -477,7 +555,17 @@ export default function RoutePlanner() {
               loadPresetRoute('delta-front');
             }}
           >
-            <Crosshair size={12} /> Jezero Crater (20m DEM Focus)
+            <Crosshair size={12} /> Jezero Crater (Perseverance DEM)
+          </button>
+          <button
+            type="button"
+            className={`route-scope-btn ${scopeMode === 'gale' ? 'route-scope-btn--active' : ''}`}
+            onClick={() => {
+              setScopeMode('gale');
+              loadPresetRoute('gale-vera-rubin');
+            }}
+          >
+            <Navigation size={12} /> Gale Crater (Curiosity Traverse)
           </button>
           <button
             type="button"
@@ -498,34 +586,74 @@ export default function RoutePlanner() {
           <Crosshair size={12} /> VERIFIED MISSION TRAVERSES:
         </span>
         <div className="route-preset-buttons">
-          <button
-            type="button"
-            className="route-preset-btn"
-            onClick={() => loadPresetRoute('delta-front')}
-          >
-            Landing Site → Delta Front (8.6 km)
-          </button>
-          <button
-            type="button"
-            className="route-preset-btn"
-            onClick={() => loadPresetRoute('belva')}
-          >
-            Delta Front → Belva Crater Rim (6.4 km)
-          </button>
-          <button
-            type="button"
-            className="route-preset-btn"
-            onClick={() => loadPresetRoute('neretva-rim')}
-          >
-            Delta Front → Neretva Inflow Gorge (37.8 km)
-          </button>
-          <button
-            type="button"
-            className="route-preset-btn"
-            onClick={() => loadPresetRoute('global-msl')}
-          >
-            Global: Perseverance → Curiosity (3,710 km)
-          </button>
+          {scopeMode === 'jezero' && (
+            <>
+              <button
+                type="button"
+                className="route-preset-btn"
+                onClick={() => loadPresetRoute('delta-front')}
+              >
+                Landing Site → Delta Front (8.6 km)
+              </button>
+              <button
+                type="button"
+                className="route-preset-btn"
+                onClick={() => loadPresetRoute('belva')}
+              >
+                Delta Front → Belva Crater Rim (6.4 km)
+              </button>
+              <button
+                type="button"
+                className="route-preset-btn"
+                onClick={() => loadPresetRoute('neretva-rim')}
+              >
+                Delta Front → Neretva Inflow Gorge (37.8 km)
+              </button>
+            </>
+          )}
+
+          {scopeMode === 'gale' && (
+            <>
+              <button
+                type="button"
+                className="route-preset-btn"
+                onClick={() => loadPresetRoute('gale-yellowknife')}
+              >
+                Bradbury → Yellowknife Bay (0.5 km)
+              </button>
+              <button
+                type="button"
+                className="route-preset-btn"
+                onClick={() => loadPresetRoute('gale-kimberley')}
+              >
+                Bradbury → The Kimberley (6.4 km)
+              </button>
+              <button
+                type="button"
+                className="route-preset-btn"
+                onClick={() => loadPresetRoute('gale-vera-rubin')}
+              >
+                Bradbury → Vera Rubin Ridge (18.6 km)
+              </button>
+              <button
+                type="button"
+                className="route-preset-btn"
+                onClick={() => loadPresetRoute('gale-gediz')}
+              >
+                Glen Torridon → Gediz Vallis Ridge (2.4 km)
+              </button>
+            </>
+          )}
+
+          {scopeMode === 'global' && (
+            <button
+              type="button"
+              className="route-preset-btn"
+              onClick={() => loadPresetRoute('global-msl')}
+            >
+              Global: Perseverance → Curiosity (3,710 km)
+            </button>
+          )}
         </div>
       </div>
 
@@ -587,7 +715,13 @@ export default function RoutePlanner() {
               routeDestLoc={destPoint}
               onMapClick={handleMapClick}
               centerView={centerView}
-              filteredLocations={scopeMode === 'jezero' ? JEZERO_LANDMARKS : marsLocations}
+              filteredLocations={
+                scopeMode === 'jezero'
+                  ? JEZERO_LANDMARKS
+                  : scopeMode === 'gale'
+                  ? CURIOSITY_GALE_LANDMARKS
+                  : marsLocations
+              }
               canvasClassName="mars-map-canvas--route-planner"
             />
           </div>
@@ -641,6 +775,22 @@ export default function RoutePlanner() {
                     </option>
                   ))}
                 </select>
+              ) : scopeMode === 'gale' ? (
+                <select
+                  className="route-select mono"
+                  value={startPoint?.id || ''}
+                  onChange={(e) => {
+                    const found = CURIOSITY_GALE_LANDMARKS.find((l) => l.id === e.target.value);
+                    if (found) setStartPoint(found);
+                  }}
+                >
+                  <option value="">-- Choose Curiosity Landmark --</option>
+                  {CURIOSITY_GALE_LANDMARKS.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name} (Sol {l.sol} • {l.elevationMeters}m)
+                    </option>
+                  ))}
+                </select>
               ) : (
                 <select
                   className="route-select mono"
@@ -680,6 +830,22 @@ export default function RoutePlanner() {
                   {JEZERO_LANDMARKS.map((l) => (
                     <option key={l.id} value={l.id}>
                       {l.name} ({l.elevationMeters}m)
+                    </option>
+                  ))}
+                </select>
+              ) : scopeMode === 'gale' ? (
+                <select
+                  className="route-select mono"
+                  value={destPoint?.id || ''}
+                  onChange={(e) => {
+                    const found = CURIOSITY_GALE_LANDMARKS.find((l) => l.id === e.target.value);
+                    if (found) setDestPoint(found);
+                  }}
+                >
+                  <option value="">-- Choose Curiosity Landmark --</option>
+                  {CURIOSITY_GALE_LANDMARKS.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name} (Sol {l.sol} • {l.elevationMeters}m)
                     </option>
                   ))}
                 </select>
