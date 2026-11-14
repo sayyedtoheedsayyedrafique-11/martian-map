@@ -44,27 +44,32 @@ function RouteElevationProfile({ routeData, activeRouteKey = 'routeA' }) {
             <TrendingUp size={13} color="var(--accent-yellow)" />
             <span>GALE CRATER (NASA MSL CURIOSITY TRAVERSE WAYPOINTS)</span>
           </div>
-          <span className="route-gale-badge">MOLA AREOID DATUM</span>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <span className="route-gale-badge" style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' }}>
+              ● REAL DATA: NASA MSL WAYPOINTS
+            </span>
+            <span className="route-gale-badge">MOLA AREOID DATUM</span>
+          </div>
         </div>
 
         <div className="route-gale-metrics-grid">
           <div className="route-gale-stat">
-            <span className="route-gale-label">ORIGIN ELEVATION</span>
+            <span className="route-gale-label">ORIGIN ELEVATION <span style={{ color: '#10b981', fontSize: '8px' }}>[REAL DATA]</span></span>
             <span className="route-gale-val">{startMola !== null ? `${startMola} m` : 'N/A'}</span>
             <span className="route-gale-sub">{routeData.startPoint?.shortName || routeData.startPoint?.name}</span>
           </div>
           <div className="route-gale-stat">
-            <span className="route-gale-label">DESTINATION ELEVATION</span>
+            <span className="route-gale-label">DESTINATION ELEVATION <span style={{ color: '#10b981', fontSize: '8px' }}>[REAL DATA]</span></span>
             <span className="route-gale-val">{destMola !== null ? `${destMola} m` : 'N/A'}</span>
             <span className="route-gale-sub">{routeData.destPoint?.shortName || routeData.destPoint?.name}</span>
           </div>
           <div className="route-gale-stat">
-            <span className="route-gale-label">NET RELIEF Δ</span>
+            <span className="route-gale-label">NET RELIEF Δ <span style={{ color: '#38bdf8', fontSize: '8px' }}>[CALCULATED]</span></span>
             <span className="route-gale-val">{relief !== null ? `${relief > 0 ? '+' : ''}${relief} m` : 'N/A'}</span>
             <span className="route-gale-sub">{relief > 0 ? 'Ascending Mount Sharp' : 'Descending Basin Floor'}</span>
           </div>
           <div className="route-gale-stat">
-            <span className="route-gale-label">AVERAGE GRADE</span>
+            <span className="route-gale-label">AVERAGE GRADE <span style={{ color: '#38bdf8', fontSize: '8px' }}>[CALCULATED]</span></span>
             <span className="route-gale-val">{avgGradePct !== null ? `${avgGradePct}%` : 'N/A'}</span>
             <span className="route-gale-sub">Point-to-Point Chord</span>
           </div>
@@ -539,7 +544,12 @@ export default function RoutePlanner() {
         <div className="route-header__left">
           <div className="route-tag-strip mono">
             <span className="route-tag route-tag--accent">USGS ASTROGEOLOGY CTX 20m DEM</span>
-            <span className="route-tag">MOLA 610.5 Pa DATUM</span>
+            <span className="route-tag" style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' }}>
+              ● REAL DATA: NASA PDS & MOLA
+            </span>
+            <span className="route-tag" style={{ color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.4)' }}>
+              ◈ CALCULATED: GEODESIC & SLOPES
+            </span>
             <span className="route-tag">AUTONAV SLOPE LIMIT: 15°</span>
           </div>
           <h1 className="route-heading">
@@ -944,6 +954,7 @@ export default function RoutePlanner() {
             <div className="route-card">
               <h3 className="route-card-title mono">
                 <Layers size={13} color="var(--accent-yellow)" /> COMPARATIVE TRAVERSE MATRIX
+                <span style={{ marginLeft: 'auto', fontSize: '8px', color: '#38bdf8' }}>[CALCULATED]</span>
               </h3>
 
               <div className="route-comparison-table-wrapper mono">
