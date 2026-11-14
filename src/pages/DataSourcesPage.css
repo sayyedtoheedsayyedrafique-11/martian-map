@@ -56,6 +56,190 @@
   line-height: 1.4;
 }
 
+/* 5 Core NASA Challenge Resources Hub */
+.sources-challenge-hub {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sources-challenge-hub__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.sources-challenge-hub__title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sources-challenge-hub__tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent-yellow);
+  letter-spacing: 0.5px;
+}
+
+.sources-challenge-hub__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.sources-challenge-hub__status {
+  font-size: 0.7rem;
+  color: var(--status-nominal, #10b981);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 3px 8px;
+  letter-spacing: 0.3px;
+}
+
+.sources-challenge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.sources-challenge-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color var(--transition-fast);
+}
+
+.sources-challenge-card:hover {
+  border-color: var(--border-light);
+}
+
+.sources-challenge-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.sources-challenge-card__icon-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sources-challenge-icon {
+  color: var(--accent-yellow);
+}
+
+.sources-challenge-card__agency {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+}
+
+.sources-challenge-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border: 1px solid currentColor;
+}
+
+.sources-challenge-pill--actual {
+  color: var(--status-nominal, #10b981);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.sources-challenge-pill--illustrative {
+  color: var(--accent-yellow, #d99b26);
+  background: rgba(217, 155, 38, 0.08);
+}
+
+.sources-challenge-card__name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.sources-challenge-card__desc {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.sources-challenge-card__usage {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  padding: 6px 8px;
+  font-size: 0.68rem;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sources-challenge-usage-lbl {
+  color: var(--accent-yellow);
+  font-size: 0.64rem;
+  letter-spacing: 0.3px;
+}
+
+.sources-challenge-card__actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.sources-challenge-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  text-decoration: none;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-fast);
+}
+
+.sources-challenge-btn--app {
+  background: rgba(217, 155, 38, 0.1);
+  border-color: rgba(217, 155, 38, 0.4);
+  color: var(--accent-yellow);
+  font-weight: 600;
+  flex: 1;
+}
+
+.sources-challenge-btn--app:hover {
+  background: var(--accent-yellow);
+  color: #0b0d10;
+}
+
+.sources-challenge-btn--ext {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+.sources-challenge-btn--ext:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
 /* Controls */
 .sources-controls {
   display: flex;
