@@ -40,7 +40,9 @@ async function run() {
   const expectedGaleLandmarkIds = [
     'bradbury-landing',
     'yellowknife-bay',
+    'glenelg',
     'kimberley',
+    'pahrump-hills',
     'namib-dune',
     'murray-buttes',
     'vera-rubin-ridge',
@@ -85,7 +87,7 @@ async function run() {
 
   console.log('\n5. Verifying Gale Crater Trajectory Analysis (Curiosity MSL Traverse)...');
   const galeStart = CURIOSITY_GALE_LANDMARKS[0]; // Bradbury Landing
-  const galeDest = CURIOSITY_GALE_LANDMARKS[5];  // Vera Rubin Ridge
+  const galeDest = CURIOSITY_GALE_LANDMARKS.find((l) => l.id === 'vera-rubin-ridge') || CURIOSITY_GALE_LANDMARKS[7];  // Vera Rubin Ridge
   console.log(`  Analyzing Gale traverse: [${galeStart.name}] -> [${galeDest.name}]`);
   const galeComparison = await calculateRouteComparison(galeStart, galeDest);
   console.log('  Gale Straight-line distance:', galeComparison.straightDistKm, 'km');

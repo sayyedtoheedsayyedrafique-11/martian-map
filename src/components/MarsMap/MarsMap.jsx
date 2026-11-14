@@ -542,6 +542,17 @@ function MarsMap({
                         <a href={loc.sourceUrl} target="_blank" rel="noopener noreferrer">
                           {loc.source} <ExternalLink size={11} style={{ verticalAlign: 'middle' }} />
                         </a>
+                        <span style={{ margin: '0 4px', color: 'var(--text-muted)' }}>•</span>
+                        <a
+                          href={`https://trek.nasa.gov/mars/#v=0.1&x=${loc.lng.toFixed(4)}&y=${loc.lat.toFixed(4)}&z=6&p=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A104905`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mono"
+                          title="View coordinates in official NASA JPL Mars Trek GIS portal"
+                          style={{ color: 'var(--accent-yellow)' }}
+                        >
+                          NASA Mars Trek <ExternalLink size={10} style={{ verticalAlign: 'middle' }} />
+                        </a>
                       </div>
                     </div>
                   </Popup>
@@ -625,9 +636,18 @@ function MarsMap({
       <div className="mars-map-footer">
         <span>Layer: {currentLayer.provider}</span>
         <span>•</span>
-        <span>Datum: MOLA Areoid (0 m = 610.5 Pa)</span>
+        <span>Datum: IAU 2000 Mars Spheroid / MOLA Areoid (0 m = 610.5 Pa)</span>
         <span>•</span>
-        <span>Mars Mean Radius: 3,389.5 km</span>
+        <span>Mars Radius: 3,389.5 km</span>
+        <span>•</span>
+        <a
+          href="https://trek.nasa.gov/mars/"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'var(--accent-yellow)', textDecoration: 'none' }}
+        >
+          NASA JPL Mars Trek <ExternalLink size={10} style={{ verticalAlign: 'middle' }} />
+        </a>
       </div>
     </div>
   );

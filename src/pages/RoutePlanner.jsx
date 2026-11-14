@@ -90,14 +90,24 @@ function RouteElevationProfile({ routeData, activeRouteKey = 'routeA' }) {
             <p>
               In strict accordance with NASA scientific standards, continuous sub-kilometer DEM slope profiling is withheld because the 20m Gale CTX DEM matrix is not locally loaded. Waypoints display authentic discrete MOLA laser altimetry recorded across Curiosity's 32+ km traverse.
             </p>
-            <a
-              href="https://mars.nasa.gov/msl/mission/where-is-the-rover/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="route-gale-link"
-            >
-              Verify on NASA MSL Official Traverse Map <ExternalLink size={11} />
-            </a>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '6px' }}>
+              <a
+                href="https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="route-gale-link"
+              >
+                NASA Curiosity Mount Sharp Proposed Path Reference <ExternalLink size={11} />
+              </a>
+              <a
+                href="https://mars.nasa.gov/msl/mission/where-is-the-rover/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="route-gale-link"
+              >
+                NASA MSL Official Traverse Portal <ExternalLink size={11} />
+              </a>
+            </div>
           </div>
         </div>
       </div>

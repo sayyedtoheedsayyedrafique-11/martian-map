@@ -423,14 +423,24 @@ function TerrainExplorer() {
               <p>
                 Mars chronostratigraphic architecture and rock-stratigraphic units based on the official USGS global geological map (Tanaka, Skinner, Dohm, et al., 2014) sponsored by NASA. Defines the 3 major planetary eras and lithologic map units governing rover mobility.
               </p>
-              <a
-                href="https://pubs.usgs.gov/sim/3292/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="terrain-usgs-link mono"
-              >
-                Access USGS SIM 3292 Official Map Repository <ExternalLink size={10} />
-              </a>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '6px' }}>
+                <a
+                  href="https://pubs.usgs.gov/sim/3292/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="terrain-usgs-link mono"
+                >
+                  USGS SIM 3292 Map Repository <ExternalLink size={10} />
+                </a>
+                <a
+                  href="https://www.usgs.gov/special-topics/planetary-geologic-mapping"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="terrain-usgs-link mono"
+                >
+                  USGS–NASA Planetary Geologic Mapping Program <ExternalLink size={10} />
+                </a>
+              </div>
             </div>
           </div>
 
