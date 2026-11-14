@@ -38,7 +38,10 @@ export default function PerseveranceRawGallery() {
         <div className="raw-gallery__title-area">
           <div className="raw-gallery__tag-row">
             <span className="raw-sys-tag mono">NASA MARS 2020 // PERSEVERANCE ARCHIVE</span>
-            <span className="raw-sys-tag raw-sys-tag--accent mono">AUTHENTIC RAW RECONNAISSANCE</span>
+            <span className="raw-sys-tag mono" style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' }}>
+              ● REAL DATA: NASA PDS & MARS 2020 RAW DOWNLINK
+            </span>
+            <span className="raw-sys-tag raw-sys-tag--accent mono">AUTHENTIC IN-SITU RECONNAISSANCE</span>
             <a
               href="https://mars.nasa.gov/mars2020/multimedia/raw-images/"
               target="_blank"
@@ -135,6 +138,7 @@ export default function PerseveranceRawGallery() {
                 <div className="raw-card__body">
                   <div className="raw-card__meta-top mono">
                     <span className="raw-card__camera-badge">{img.camera}</span>
+                    <span style={{ color: '#10b981', fontSize: '8px', fontWeight: 700 }}>● REAL DATA</span>
                     <span className="raw-card__date">{img.dateEarthFormatted}</span>
                   </div>
                   <h3 className="raw-card__heading">{img.title}</h3>
@@ -203,6 +207,12 @@ export default function PerseveranceRawGallery() {
                 <span className="raw-modal__val">
                   <Clock size={11} style={{ marginRight: '4px', display: 'inline' }} />
                   {activeModalImage.ltst}
+                </span>
+              </div>
+              <div className="raw-modal__detail-item">
+                <span className="raw-modal__label">DATA PROVENANCE:</span>
+                <span className="raw-modal__val" style={{ color: '#10b981', fontWeight: 700 }}>
+                  ● REAL DATA (In-Situ Mars Transmission)
                 </span>
               </div>
               <div className="raw-modal__detail-item">
