@@ -12,6 +12,7 @@ import {
   Thermometer,
   Layers,
   Compass,
+  Camera,
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -29,6 +30,7 @@ const navSections = [
     title: 'Mission Flight Ops',
     items: [
       { to: '/missions', icon: Rocket, label: 'Mission Intelligence' },
+      { to: '/raw-images', icon: Camera, label: 'Perseverance Raw Images', badge: 'NASA' },
       { to: '/route-planner', icon: Route, label: 'Smart Route Planner' },
       { to: '/conditions', icon: Thermometer, label: 'Surface Conditions' },
     ],

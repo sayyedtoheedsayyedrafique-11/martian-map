@@ -18,9 +18,6 @@ import {
   Radio,
   Layers,
   ArrowDownCircle,
-  Activity,
-  Sun,
-  Globe as GlobeIcon,
 } from 'lucide-react';
 import './MarsGlobe.css';
 

@@ -732,3 +732,171 @@
 .terrain-ex-vals {
   color: var(--text-secondary);
 }
+
+/* USGS SIM 3292 Chronostratigraphy & Map Units */
+.terrain-usgs-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-left: 3px solid #38bdf8;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+
+.terrain-usgs-banner strong {
+  display: block;
+  font-size: 11px;
+  color: #38bdf8;
+  margin-bottom: 3px;
+  letter-spacing: 0.04em;
+}
+
+.terrain-usgs-banner p {
+  margin: 0 0 6px 0;
+  font-size: 11px;
+  color: #8b949e;
+  line-height: 1.45;
+}
+
+.terrain-usgs-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent-yellow, #f5c542);
+  text-decoration: none;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.terrain-usgs-link:hover {
+  text-decoration: underline;
+}
+
+.terrain-chrono-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.terrain-chrono-card {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.terrain-chrono-card:hover {
+  border-color: #38bdf8;
+}
+
+.terrain-chrono-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid #21262d;
+  padding-bottom: 8px;
+}
+
+.terrain-chrono-name {
+  margin: 0 0 2px 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.terrain-chrono-sub {
+  font-size: 8px;
+  color: #8b949e;
+}
+
+.terrain-chrono-age {
+  font-size: 8px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border: 1px solid #30363d;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.terrain-chrono-summary {
+  margin: 0;
+  font-size: 10px;
+  color: #c9d1d9;
+  line-height: 1.45;
+}
+
+.terrain-chrono-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 6px 8px;
+  font-size: 8.5px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.terrain-chrono-lbl {
+  color: #8b949e;
+  font-weight: 700;
+}
+
+.terrain-chrono-val {
+  color: #e6edf3;
+  line-height: 1.4;
+}
+
+.terrain-units-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 20px;
+  border: 1px solid #21262d;
+  background: #0d1117;
+}
+
+.terrain-units-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9.5px;
+  text-align: left;
+}
+
+.terrain-units-table th {
+  background: #161b22;
+  color: var(--accent-yellow, #f5c542);
+  padding: 8px 10px;
+  border-bottom: 1px solid #21262d;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.terrain-units-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #1c2128;
+  color: #c9d1d9;
+}
+
+.terrain-units-table tr:hover td {
+  background: rgba(56, 189, 248, 0.03);
+}
+
+.terrain-unit-code-badge {
+  display: inline-block;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 2px;
+  color: #ffffff;
+  font-size: 9px;
+}
+
+.terrain-unit-hazard {
+  color: #f59e0b;
+}
+
+@media (max-width: 1024px) {
+  .terrain-chrono-grid {
+    grid-template-columns: 1fr;
+  }
+}

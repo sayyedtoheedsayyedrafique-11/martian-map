@@ -1,5 +1,6 @@
 import marsMissions from './src/data/marsMissions.js';
 import marsLocations from './src/data/marsLocations.js';
+import { MARS_RAW_IMAGES, PERSEVERANCE_CAMERAS } from './src/data/marsRawImages.js';
 
 console.log('--- MARS MISSION INTELLIGENCE VERIFICATION TEST ---');
 
@@ -109,6 +110,18 @@ pairs.forEach(([idA, idB]) => {
   console.log(`    - Locations: "${mA.landingSiteName}" vs "${mB.landingSiteName}"`);
   console.log(`    - Instruments: ${mA.scientificInstruments.length} vs ${mB.scientificInstruments.length}`);
   console.log(`    - Achievements: ${mA.explorationAchievements.length} vs ${mB.explorationAchievements.length}`);
+});
+
+console.log('\n5. Verifying NASA Mars 2020 Perseverance Raw Images Catalog...');
+console.log(`  Found ${MARS_RAW_IMAGES.length} curated raw images across ${PERSEVERANCE_CAMERAS.length - 1} camera instruments.`);
+MARS_RAW_IMAGES.forEach((img) => {
+  if (!img.id || typeof img.sol !== 'number' || !img.camera || !img.imageUrl) {
+    throw new Error(`Invalid raw image record: ${img.id}`);
+  }
+  if (!img.sourceUrl || !img.sourceUrl.startsWith('https://')) {
+    throw new Error(`Raw image missing verified NASA HTTPS URL: ${img.id}`);
+  }
+  console.log(`  ✓ Sol ${img.sol} [${img.camera}]: "${img.title}" — ${img.credit}`);
 });
 
 console.log('\n>>> ALL MARS MISSION INTELLIGENCE VERIFICATION TESTS PASSED SUCCESSFULLY! <<<');

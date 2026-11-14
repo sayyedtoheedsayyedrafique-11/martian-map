@@ -7,7 +7,7 @@ import {
   MARS_TERRAIN_FEATURES,
   MARS_SURFACE_HAZARDS,
 } from '../data/marsTerrainFeatures';
-import terrainTypes from '../data/terrainTypes';
+import terrainTypes, { USGS_CHRONOSTRATIGRAPHY, USGS_GEOLOGIC_UNITS } from '../data/terrainTypes';
 import { formatCoordinates } from '../utils/helpers';
 import {
   Mountain,
@@ -91,7 +91,7 @@ function TerrainExplorer() {
             onClick={() => setActiveTab('classifications')}
           >
             <Layers size={13} />
-            <span>USGS Units ({terrainTypes.length})</span>
+            <span>USGS Geologic Mapping (SIM 3292)</span>
           </button>
         </div>
       </div>
@@ -404,9 +404,106 @@ function TerrainExplorer() {
         </div>
       )}
 
-      {/* TAB 3: USGS TERRAIN CLASSIFICATIONS */}
+      {/* TAB 3: USGS PLANETARY GEOLOGIC MAPPING (SIM 3292) */}
       {activeTab === 'classifications' && (
         <div className="terrain-class-section">
+          {/* USGS SIM 3292 Header Banner */}
+          <div className="terrain-usgs-banner">
+            <Layers size={20} color="#38bdf8" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <strong>USGS SCIENTIFIC INVESTIGATIONS MAP 3292 // PLANETARY GEOLOGIC MAPPING PROGRAM</strong>
+              <p>
+                Mars chronostratigraphic architecture and rock-stratigraphic units based on the official USGS global geological map (Tanaka, Skinner, Dohm, et al., 2014) sponsored by NASA. Defines the 3 major planetary eras and lithologic map units governing rover mobility.
+              </p>
+              <a
+                href="https://pubs.usgs.gov/sim/3292/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="terrain-usgs-link mono"
+              >
+                Access USGS SIM 3292 Official Map Repository <ExternalLink size={10} />
+              </a>
+            </div>
+          </div>
+
+          {/* Chronostratigraphic Eras Grid */}
+          <h3 className="terrain-chrono-sec-title mono" style={{ fontSize: '11px', color: '#f0f6fc', marginBottom: '8px' }}>
+            MARTIAN CHRONOSTRATIGRAPHIC TIME SCALE (USGS ASTRONOMICAL DATUM)
+          </h3>
+          <div className="terrain-chrono-grid">
+            {USGS_CHRONOSTRATIGRAPHY.map((c) => (
+              <div
+                key={c.id}
+                className="terrain-chrono-card"
+                style={{ borderTop: `3px solid ${c.colorHex}` }}
+              >
+                <div className="terrain-chrono-head">
+                  <div>
+                    <h4 className="terrain-chrono-name" style={{ color: c.colorHex }}>{c.period}</h4>
+                    <span className="terrain-chrono-sub mono">{c.epochSpan}</span>
+                  </div>
+                  <span className="terrain-chrono-age mono">{c.ageRange}</span>
+                </div>
+
+                <p className="terrain-chrono-summary">{c.summary}</p>
+
+                <div className="terrain-chrono-box mono">
+                  <span className="terrain-chrono-lbl">CLIMATE DYNAMICS:</span>
+                  <span className="terrain-chrono-val">{c.climaticConditions}</span>
+                </div>
+
+                <div className="terrain-chrono-box mono">
+                  <span className="terrain-chrono-lbl">NOTABLE SITES:</span>
+                  <span className="terrain-chrono-val">{c.notableFormations.join(' • ')}</span>
+                </div>
+
+                <div className="terrain-chrono-box mono">
+                  <span className="terrain-chrono-lbl">ROVER MOBILITY PROFILE:</span>
+                  <span className="terrain-chrono-val">{c.traversabilityProfile}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Verified USGS Geologic Map Units Table */}
+          <h3 className="terrain-chrono-sec-title mono" style={{ fontSize: '11px', color: '#f0f6fc', marginBottom: '8px' }}>
+            VERIFIED USGS MAP UNITS AT EXPLORATION SITES
+          </h3>
+          <div className="terrain-units-table-wrap">
+            <table className="terrain-units-table mono">
+              <thead>
+                <tr>
+                  <th>UNIT CODE</th>
+                  <th>FORMATION / UNIT NAME</th>
+                  <th>PERIOD</th>
+                  <th>OCCURRENCE & SITES</th>
+                  <th>LITHOLOGY</th>
+                  <th>HAZARD GRADE</th>
+                </tr>
+              </thead>
+              <tbody>
+                {USGS_GEOLOGIC_UNITS.map((u) => (
+                  <tr key={u.code}>
+                    <td>
+                      <span className="terrain-unit-code-badge" style={{ background: u.colorHex }}>
+                        {u.code}
+                      </span>
+                    </td>
+                    <td><strong style={{ color: '#f0f6fc' }}>{u.name}</strong></td>
+                    <td>{u.period}</td>
+                    <td>{u.occurrence}</td>
+                    <td>{u.description}</td>
+                    <td className="terrain-unit-hazard">{u.hazardGrade}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Morphological Terrain Classes */}
+          <h3 className="terrain-chrono-sec-title mono" style={{ fontSize: '11px', color: '#f0f6fc', marginBottom: '8px' }}>
+            SURFACE MORPHOLOGY & TERRAIN CLASSES
+          </h3>
           <div className="terrain-class-grid">
             {terrainTypes.map((t) => (
               <div key={t.id} className="terrain-class-card">
@@ -414,7 +511,7 @@ function TerrainExplorer() {
                 <div className="terrain-class-card__body">
                   <div className="terrain-class-header">
                     <h3 className="terrain-class-title">{t.name}</h3>
-                    <span className="terrain-class-badge mono">Hazard: {t.hazardLevel}</span>
+                    <span className="terrain-class-badge mono">Hazard: {t.hazardLevel} {t.usgsCode && `• ${t.usgsCode}`}</span>
                   </div>
                   <p className="terrain-class-desc">{t.description}</p>
                   <div className="terrain-class-tags">

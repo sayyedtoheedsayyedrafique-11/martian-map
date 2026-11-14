@@ -12,14 +12,11 @@ import {
 import {
   Navigation,
   ShieldAlert,
-  AlertTriangle,
   RotateCcw,
   XCircle,
   CheckCircle2,
   Info,
   TrendingUp,
-  MapPin,
-  Mountain,
   Crosshair,
   ExternalLink,
   Compass,
@@ -328,29 +325,37 @@ export default function RoutePlanner() {
   const urlStart = searchParams.get('start');
   const urlDest = searchParams.get('dest');
 
-  // Planning scope: 'jezero' (Tactical 20m DEM) vs 'global' (Interplanetary Mars)
-  const [scopeMode, setScopeMode] = useState('jezero');
+  // Planning scope: 'jezero' (Tactical 20m DEM), 'gale' (Curiosity MSL Traverse), or 'global' (Interplanetary Mars)
+  const [scopeMode, setScopeMode] = useState(() => {
+    if (urlStart || urlDest) {
+      const isGale = CURIOSITY_GALE_LANDMARKS.some((l) => l.id === urlStart || l.id === urlDest);
+      if (isGale) return 'gale';
+      const isGlobal = marsLocations.some((l) => l.id === urlStart || l.id === urlDest);
+      if (isGlobal) return 'global';
+    }
+    return 'jezero';
+  });
   const [activeRouteKey, setActiveRouteKey] = useState('routeA'); // 'routeA' | 'routeB' | 'both'
 
   // Endpoint selections
-  const [startPoint, setStartPoint] = useState({
-    id: 'octavia-butler',
-    name: 'Octavia E. Butler Landing (Perseverance)',
-    lat: 18.4447,
-    lng: 77.4508,
-    elevation: '-2,568 m',
-    elevationMeters: -2568,
-    isCustomClick: false,
+  const [startPoint, setStartPoint] = useState(() => {
+    if (urlStart) {
+      const match = JEZERO_LANDMARKS.find((l) => l.id === urlStart) ||
+                    CURIOSITY_GALE_LANDMARKS.find((l) => l.id === urlStart) ||
+                    marsLocations.find((l) => l.id === urlStart);
+      if (match) return match;
+    }
+    return JEZERO_LANDMARKS[0];
   });
 
-  const [destPoint, setDestPoint] = useState({
-    id: 'delta-front',
-    name: 'Jezero Western Delta Front (Scarp Base)',
-    lat: 18.5200,
-    lng: 77.3200,
-    elevation: '-2,329 m',
-    elevationMeters: -2329,
-    isCustomClick: false,
+  const [destPoint, setDestPoint] = useState(() => {
+    if (urlDest) {
+      const match = JEZERO_LANDMARKS.find((l) => l.id === urlDest) ||
+                    CURIOSITY_GALE_LANDMARKS.find((l) => l.id === urlDest) ||
+                    marsLocations.find((l) => l.id === urlDest);
+      if (match) return match;
+    }
+    return JEZERO_LANDMARKS[1];
   });
 
   // Click-to-set waypoint mode: 'none' | 'start' | 'dest'
@@ -755,6 +760,7 @@ export default function RoutePlanner() {
           <div className="route-card">
             <h3 className="route-card-title mono">
               <Crosshair size={13} color="var(--accent-yellow)" /> SURFACE WAYPOINT CONFIGURATION
+              {isCalculating && <span style={{ marginLeft: 'auto', fontSize: '8px', color: '#38bdf8' }}>COMPUTING TRAVERSE...</span>}
             </h3>
 
             <div className="route-field">

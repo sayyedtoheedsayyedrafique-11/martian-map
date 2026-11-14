@@ -11,6 +11,8 @@ import {
   Activity,
   Layers,
   Globe2,
+  Wind,
+  Eye,
 } from 'lucide-react';
 import './SurfaceConditions.css';
 
@@ -407,6 +409,99 @@ function SurfaceConditions() {
             </tbody>
           </table>
         </Card>
+      </div>
+
+      {/* Planetary Atmosphere Dynamics & Dust Storm Analogue (NASA Worldview) */}
+      <div className="conditions-section" style={{ marginTop: '30px' }}>
+        <h2 className="conditions-section-title">
+          <Wind size={20} />
+          Planetary Atmosphere Dynamics & Global Dust Storm Analogue
+        </h2>
+        <div className="dust-analogue-card">
+          <div className="dust-analogue-header">
+            <Eye size={22} color="#38bdf8" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <h3 className="dust-analogue-title">
+                NASA Worldview Remote Sensing Analogy & Atmospheric Optical Depth (Tau)
+              </h3>
+              <p className="dust-analogue-desc">
+                In planetary meteorology, Earth's atmospheric aerosol transport observed on NASA Worldview serves as a key comparative analogue for understanding Mars' planet-encircling dust storms (PEDEs). While NASA Worldview monitors Earth satellite layers, NASA monitors Martian dust dynamics via MRO MARCI, Odyssey THEMIS, and rover REMS/MEDA sensors.
+              </p>
+            </div>
+          </div>
+
+          <div className="dust-comparison-grid">
+            <div className="dust-col">
+              <h4 className="dust-col-title" style={{ color: '#f59e0b' }}>
+                <Wind size={13} /> Martian Global Dust Storms (PEDEs)
+              </h4>
+              <p className="dust-col-body">
+                During perihelion (southern summer), intense solar heating triggers local dust devils that can merge into planet-encircling events. In 2018, a global storm reached atmospheric optical depth &tau; &gt; 8.0, blocking &gt;99% of sunlight and concluding the solar-powered Opportunity rover mission after 15 years on Sol 5111.
+              </p>
+              <div className="dust-stat-row mono">
+                <div className="dust-stat-item">
+                  <span className="dust-stat-lbl">CLEAR SKY OPTICAL DEPTH (&tau;):</span>
+                  <span className="dust-stat-val">0.5 – 0.9 (REMS/MEDA)</span>
+                </div>
+                <div className="dust-stat-item">
+                  <span className="dust-stat-lbl">GLOBAL STORM OPTICAL DEPTH (&tau;):</span>
+                  <span className="dust-stat-val">&gt; 8.0 (2018 Global Event)</span>
+                </div>
+                <div className="dust-stat-item">
+                  <span className="dust-stat-lbl">ROVER POWER RESILIENCE:</span>
+                  <span className="dust-stat-val">RTG Nuclear (Curiosity, Perseverance)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="dust-col">
+              <h4 className="dust-col-title" style={{ color: '#38bdf8' }}>
+                <Globe2 size={13} /> Earth Aerosol Systems on NASA Worldview
+              </h4>
+              <p className="dust-col-body">
+                NASA Worldview interactively visualizes daily global satellite imagery (MODIS on Terra/Aqua and VIIRS on Suomi NPP/NOAA-20), tracking trans-Atlantic Saharan dust plumes and volcanic aerosol plumes. These Earth observations provide the mathematical hydrodynamic baseline for modeling Mars atmospheric suspension.
+              </p>
+              <div className="dust-stat-row mono">
+                <div className="dust-stat-item">
+                  <span className="dust-stat-lbl">SATELLITE SENSORS:</span>
+                  <span className="dust-stat-val">MODIS, VIIRS, AIRS</span>
+                </div>
+                <div className="dust-stat-item">
+                  <span className="dust-stat-lbl">CORE OBSERVABLE:</span>
+                  <span className="dust-stat-val">Aerosol Optical Depth (AOD 550nm)</span>
+                </div>
+                <div className="dust-stat-item">
+                  <span className="dust-stat-lbl">TEMPORAL REVISIT:</span>
+                  <span className="dust-stat-val">Daily Global Earth Coverage</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="dust-analogue-footer mono">
+            <span style={{ fontSize: '8.5px', color: '#8b949e' }}>
+              PROVENANCE: NASA JPL / MSSS MRO MARCI Weather Bulletins & NASA Earthdata GIBS
+            </span>
+            <div className="dust-analogue-links">
+              <a
+                href="https://worldview.earthdata.nasa.gov/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="dust-link"
+              >
+                Launch NASA Worldview <ExternalLink size={10} />
+              </a>
+              <a
+                href="https://www.msss.com/msss_images/latest_weather.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="dust-link"
+              >
+                MRO MARCI Weekly Mars Weather <ExternalLink size={10} />
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

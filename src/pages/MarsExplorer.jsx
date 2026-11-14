@@ -21,6 +21,7 @@ import {
   Activity,
   Rocket,
   Box,
+  Camera,
 } from 'lucide-react';
 import './MarsExplorer.css';
 
@@ -290,6 +291,25 @@ function MarsExplorer() {
                 >
                   {selectedLocation.source} <ExternalLink size={12} />
                 </a>
+
+                <a
+                  href={`https://trek.nasa.gov/mars/#v=0.1&x=${selectedLocation.lng.toFixed(4)}&y=${selectedLocation.lat.toFixed(4)}&z=7&p=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A104905`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mars-btn-secondary"
+                  title="Synchronize and open this landing site in NASA JPL Mars Trek"
+                >
+                  <Compass size={14} /> Open in NASA JPL Mars Trek <ExternalLink size={12} />
+                </a>
+
+                {selectedLocation.id === 'perseverance' && (
+                  <Link
+                    to="/raw-images"
+                    className="mars-btn-primary"
+                  >
+                    <Camera size={14} /> In-Situ Raw Images
+                  </Link>
+                )}
 
                 {selectedLocation.id === 'perseverance' && (
                   <button

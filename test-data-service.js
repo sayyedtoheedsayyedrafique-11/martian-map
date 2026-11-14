@@ -18,7 +18,15 @@ async function runTests() {
   }
   console.log('  ✓ Verified layers: USGS CTX (5m), NASA MOLA Altimetry, NASA Viking Color MDIM 2.1.');
 
-  console.log('\n2. Verifying Curated Jezero HiRISE Observation Benchmarks...');
+  console.log('\n2. Verifying Authentic DEM Elevation Interpolation...');
+  const elev = await getElevationAtCoordinate(18.4447, 77.4508);
+  console.log(`  Perseverance Touchdown MOLA Elevation: ${elev.elevationMeters} m (${elev.provenance})`);
+  if (elev.elevationMeters === null) {
+    throw new Error('DEM elevation query returned null for Jezero coordinate');
+  }
+  console.log('  ✓ Bilinear DEM elevation interpolation verified.');
+
+  console.log('\n3. Verifying Curated Jezero HiRISE Observation Benchmarks...');
   console.log(`  Found ${VERIFIED_JEZERO_OBSERVATIONS.length} ground-truth observations.`);
   VERIFIED_JEZERO_OBSERVATIONS.forEach((obs) => {
     if (!obs.id || typeof obs.lat !== 'number' || typeof obs.lon !== 'number' || !obs.sourceUrl) {

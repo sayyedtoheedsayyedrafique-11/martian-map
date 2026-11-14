@@ -23,6 +23,7 @@ function App() {
             <Route path="data" element={<Navigate to="/data-explorer" replace />} />
             <Route path="missions" element={<MissionIntelligencePage />} />
             <Route path="mission-intelligence" element={<Navigate to="/missions" replace />} />
+            <Route path="raw-images" element={<Navigate to="/missions?tab=raw-images" replace />} />
             <Route path="locations" element={<ScientificLocations />} />
             <Route path="terrain" element={<TerrainExplorer />} />
             <Route path="jezero" element={<Navigate to="/terrain?tab=jezero" replace />} />

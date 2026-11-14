@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import * as L_Module from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -8,7 +8,6 @@ import {
   VERIFIED_JEZERO_OBSERVATIONS,
   VERIFIED_MARS_TILE_LAYERS,
 } from '../services/marsDataService';
-import marsLocations from '../data/marsLocations';
 import { formatCoordinates } from '../utils/helpers';
 import {
   Database,
@@ -22,11 +21,8 @@ import {
   CheckCircle2,
   RefreshCw,
   Info,
-  Maximize2,
   Eye,
   FileText,
-  MapPin,
-  ArrowRight,
 } from 'lucide-react';
 import './MarsDataExplorer.css';
 
@@ -577,6 +573,19 @@ export default function MarsDataExplorer() {
               <span className="mde-coord-sub">
                 ({selectedTarget.lat.toFixed(5)}°N, {selectedTarget.lng.toFixed(5)}°E)
               </span>
+            </div>
+            <div style={{ marginTop: '8px' }}>
+              <a
+                href={`https://trek.nasa.gov/mars/#v=0.1&x=${selectedTarget.lng.toFixed(4)}&y=${selectedTarget.lat.toFixed(4)}&z=7&p=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A104905`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mde-trek-btn mono"
+                title="Synchronize and open this exact IAU areographic coordinate in NASA JPL Mars Trek"
+              >
+                <Compass size={12} />
+                <span>OPEN IN NASA JPL MARS TREK</span>
+                <ExternalLink size={10} />
+              </a>
             </div>
           </div>
 

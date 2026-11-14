@@ -5,7 +5,7 @@ import './MissionIntelligencePage.css';
 function MissionIntelligencePage() {
   const [searchParams] = useSearchParams();
   const initialMission = searchParams.get('mission') || 'perseverance';
-  const initialMode = searchParams.get('mode') || 'explorer';
+  const initialMode = searchParams.get('mode') || searchParams.get('tab') || 'explorer';
 
   return (
     <div className="mission-page fade-in">

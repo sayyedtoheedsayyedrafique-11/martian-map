@@ -2,7 +2,9 @@ import { useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import marsMissions from '../../data/marsMissions';
 import marsLocations, { locationTypes } from '../../data/marsLocations';
+import { MARS_RAW_IMAGES } from '../../data/marsRawImages';
 import MarsMap from '../MarsMap/MarsMap';
+import PerseveranceRawGallery from '../RawImages/PerseveranceRawGallery';
 import { formatCoordinates } from '../../utils/helpers';
 import {
   Rocket,
@@ -22,6 +24,7 @@ import {
   Activity,
   Cpu,
   ShieldCheck,
+  Camera,
 } from 'lucide-react';
 import './MarsMissionIntelligence.css';
 
@@ -102,6 +105,13 @@ function MarsMissionIntelligence({ defaultMissionId = 'perseverance', initialMod
             onClick={() => setActiveTab('explorer')}
           >
             <Rocket size={14} /> Mission Explorer & Details
+          </button>
+          <button
+            type="button"
+            className={`mmi-tab-btn ${activeTab === 'raw-images' ? 'mmi-tab-btn--active' : ''}`}
+            onClick={() => setActiveTab('raw-images')}
+          >
+            <Camera size={14} /> Perseverance Raw Images ({MARS_RAW_IMAGES.length})
           </button>
           <button
             type="button"
@@ -209,6 +219,15 @@ function MarsMissionIntelligence({ defaultMissionId = 'perseverance', initialMod
                 >
                   <GitCompare size={14} /> Compare Mission
                 </button>
+                {selectedMission.id === 'perseverance' && (
+                  <button
+                    type="button"
+                    className="mmi-btn-primary"
+                    onClick={() => setActiveTab('raw-images')}
+                  >
+                    <Camera size={14} /> View Raw Images ({MARS_RAW_IMAGES.length})
+                  </button>
+                )}
               </div>
             </div>
 
@@ -988,6 +1007,15 @@ function MarsMissionIntelligence({ defaultMissionId = 'perseverance', initialMod
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          TAB 5: NASA PERSEVERANCE RAW IMAGES GALLERY
+          ========================================================================= */}
+      {activeTab === 'raw-images' && (
+        <div style={{ marginTop: '16px' }}>
+          <PerseveranceRawGallery />
         </div>
       )}
 

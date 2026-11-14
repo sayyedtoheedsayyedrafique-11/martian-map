@@ -158,6 +158,21 @@ function DataSourcesPage() {
                   </div>
                 )}
 
+                {source.officialLayers && (
+                  <div className="source-card__layers mono" style={{ background: '#08090c', padding: '8px 10px', border: '1px solid #21262d', marginTop: '8px' }}>
+                    <span style={{ fontSize: '7.5px', color: 'var(--accent-yellow)', display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>
+                      VERIFIED JPL MARS TREK PRODUCT LAYERS:
+                    </span>
+                    <ul style={{ margin: 0, paddingLeft: '14px', fontSize: '8px', color: '#94a3b8' }}>
+                      {source.officialLayers.map((l) => (
+                        <li key={l.id} style={{ marginBottom: '2px' }}>
+                          <strong style={{ color: '#e2e8f0' }}>{l.name}:</strong> <code style={{ color: '#38bdf8' }}>{l.id}</code>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 <div className="source-card__footer">
                   <span className="source-card__id mono">
                     ID: {source.identifier}
