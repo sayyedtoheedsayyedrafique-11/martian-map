@@ -1,3 +1,4 @@
+import Button from './Button';
 import './EmptyState.css';
 
 function EmptyState({ icon: Icon, title, message, action }) {
@@ -7,9 +8,11 @@ function EmptyState({ icon: Icon, title, message, action }) {
       <h3 className="empty-state__title">{title}</h3>
       <p className="empty-state__message">{message}</p>
       {action && (
-        <button className="empty-state__action" onClick={action.onClick}>
-          {action.label}
-        </button>
+        <div className="empty-state__action-wrap">
+          <Button variant="primary" size="sm" onClick={action.onClick}>
+            {action.label}
+          </Button>
+        </div>
       )}
     </div>
   );

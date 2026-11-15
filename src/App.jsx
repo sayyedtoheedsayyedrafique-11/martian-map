@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
+import LandingPage from './pages/LandingPage';
 import MarsExplorer from './pages/MarsExplorer';
 import MarsDataExplorer from './pages/MarsDataExplorer';
 import ScientificLocations from './pages/ScientificLocations';
@@ -18,7 +19,11 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
-            <Route index element={<MarsExplorer />} />
+            <Route index element={<LandingPage />} />
+            <Route path="explore" element={<MarsExplorer />} />
+            <Route path="explorer" element={<Navigate to="/explore" replace />} />
+            <Route path="map" element={<Navigate to="/explore" replace />} />
+            <Route path="surface-explorer" element={<Navigate to="/explore" replace />} />
             <Route path="data-explorer" element={<MarsDataExplorer />} />
             <Route path="data" element={<Navigate to="/data-explorer" replace />} />
             <Route path="missions" element={<MissionIntelligencePage />} />

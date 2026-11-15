@@ -29,15 +29,20 @@ import {
   Zap,
   BatteryCharging,
   HeartPulse,
+  Maximize2,
+  ZoomIn,
+  ZoomOut,
+  X,
+  Download,
 } from 'lucide-react';
 import './RoutePlanner.css';
 
 // SVG Topographic Elevation Profile Component
-function RouteElevationProfile({ routeData, activeRouteKey = 'routeA' }) {
+function RouteElevationProfile({ routeData, activeRouteKey = 'routeA', onExpandCuriosityMap }) {
   const [hoverPoint, setHoverPoint] = useState(null);
   const activeRoute = routeData[activeRouteKey] || routeData.routeA;
 
-  // Gale Crater NASA MSL Waypoint MOLA Profile
+  // Gale Crater NASA MSL Waypoint MOLA Profile + Embedded Authentic NASA Route Map
   if (routeData.isGaleRegion) {
     const startMola = routeData.startMolaElev ?? routeData.startPoint?.elevationMeters;
     const destMola = routeData.destMolaElev ?? routeData.destPoint?.elevationMeters;
@@ -83,31 +88,80 @@ function RouteElevationProfile({ routeData, activeRouteKey = 'routeA' }) {
           </div>
         </div>
 
+        {/* Real NASA Curiosity Route Map Photograph (PIA23179) Embedded Directly */}
+        <div className="route-curiosity-embed-card">
+          <div className="route-curiosity-embed-header">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Compass size={14} color="var(--accent-yellow)" />
+              <strong style={{ color: '#f1f5f9', fontSize: '10.5px' }}>
+                OFFICIAL NASA CURIOSITY TRAVERSE ROUTE MAP (MOUNT SHARP // PIA23179)
+              </strong>
+            </div>
+            <span className="route-gale-badge" style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' }}>
+              ● REAL NASA PHOTOGRAPH
+            </span>
+          </div>
+
+          <div
+            className="route-curiosity-img-container"
+            onClick={onExpandCuriosityMap}
+            role="button"
+            tabIndex={0}
+            title="Click to view full-resolution NASA Curiosity Route Map"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') onExpandCuriosityMap?.();
+            }}
+          >
+            <img
+              src="/images/nasa/curiosity_mount_sharp_route.jpg"
+              alt="Official NASA Curiosity Proposed Path Up Mount Sharp in Gale Crater (PIA23179)"
+              className="route-curiosity-img"
+              onError={(e) => {
+                if (!e.target.dataset.triedRemote) {
+                  e.target.dataset.triedRemote = 'true';
+                  e.target.src = 'https://upload.wikimedia.org/wikipedia/commons/f/fd/PIA23179-MarsCuriosityRoverExploersMountSharp-20190515.jpg';
+                }
+              }}
+            />
+            <div className="route-curiosity-overlay-badge mono">
+              <Maximize2 size={12} />
+              <span>CLICK TO EXPAND HIGH-RESOLUTION MAP</span>
+            </div>
+          </div>
+
+          <div className="route-curiosity-embed-meta mono">
+            <div className="route-curiosity-meta-text">
+              <strong>Source:</strong> NASA / JPL-Caltech / Univ. of Arizona • MRO HiRISE Orbital Context Mosaic • Catalog ID: <strong>PIA23179</strong>
+            </div>
+            <div className="route-curiosity-meta-actions">
+              <button
+                type="button"
+                className="route-curiosity-btn mono"
+                onClick={onExpandCuriosityMap}
+              >
+                <Maximize2 size={11} />
+                <span>Fullscreen View</span>
+              </button>
+              <a
+                href="https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="route-curiosity-btn mono"
+              >
+                <span>NASA Portal</span>
+                <ExternalLink size={10} />
+              </a>
+            </div>
+          </div>
+        </div>
+
         <div className="route-gale-disclosure">
           <Info size={13} color="var(--accent-yellow)" />
           <div>
             <strong>DISCRETE NASA MSL WAYPOINT ELEVATIONS ACTIVE</strong>
             <p>
-              In strict accordance with NASA scientific standards, continuous sub-kilometer DEM slope profiling is withheld because the 20m Gale CTX DEM matrix is not locally loaded. Waypoints display authentic discrete MOLA laser altimetry recorded across Curiosity's 32+ km traverse.
+              In strict accordance with NASA scientific standards, waypoints display authentic discrete MOLA laser altimetry recorded across Curiosity's 32+ km traverse. The map above displays NASA's official MRO HiRISE orbital route map charting Curiosity's ascent up Mount Sharp.
             </p>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '6px' }}>
-              <a
-                href="https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="route-gale-link"
-              >
-                NASA Curiosity Mount Sharp Proposed Path Reference <ExternalLink size={11} />
-              </a>
-              <a
-                href="https://mars.nasa.gov/msl/mission/where-is-the-rover/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="route-gale-link"
-              >
-                NASA MSL Official Traverse Portal <ExternalLink size={11} />
-              </a>
-            </div>
           </div>
         </div>
       </div>
@@ -471,6 +525,8 @@ export default function RoutePlanner() {
   // Route Analysis and Comparison State
   const [routeComparison, setRouteComparison] = useState(null);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [isCuriosityMapOpen, setIsCuriosityMapOpen] = useState(false);
+  const [isCuriosityZoomed, setIsCuriosityZoomed] = useState(false);
 
   // Map center/view controller
   const [centerView, setCenterView] = useState({ lat: 18.45, lng: 77.40, zoom: 7 });
@@ -1048,6 +1104,7 @@ export default function RoutePlanner() {
               <RouteElevationProfile
                 routeData={routeComparison}
                 activeRouteKey={activeRouteKey}
+                onExpandCuriosityMap={() => setIsCuriosityMapOpen(true)}
               />
             </div>
           )}
@@ -1183,13 +1240,22 @@ export default function RoutePlanner() {
                 )}
               </div>
               <div className="route-gale-ext-link-row">
+                <button
+                  type="button"
+                  onClick={() => setIsCuriosityMapOpen(true)}
+                  className="route-curiosity-btn mono"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Maximize2 size={12} />
+                  <span>Inspect High-Res Traverse Map (PIA23179)</span>
+                </button>
                 <a
                   href="https://mars.nasa.gov/msl/mission/where-is-the-rover/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="route-gale-link"
                 >
-                  Verify on Official NASA MSL Route Map ("Where is the Rover?") <ExternalLink size={11} />
+                  Verify on Official NASA MSL Portal <ExternalLink size={11} />
                 </a>
               </div>
             </div>
@@ -1214,6 +1280,89 @@ export default function RoutePlanner() {
           )}
         </div>
       </div>
+
+      {/* Fullscreen NASA Curiosity Route Map Modal (PIA23179) */}
+      {isCuriosityMapOpen && (
+        <div
+          className="route-modal-overlay"
+          onClick={() => setIsCuriosityMapOpen(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="route-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="route-modal-header">
+              <div className="route-modal-title-box">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <span className="route-gale-badge mono" style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' }}>
+                    ● REAL NASA PHOTOGRAPH // PIA23179
+                  </span>
+                  <span className="mono" style={{ fontSize: '9px', color: 'var(--text-muted)' }}>
+                    GALE CRATER // MOUNT SHARP ASCENT
+                  </span>
+                </div>
+                <h3 className="route-modal-title">NASA Curiosity Rover&apos;s Proposed Path Up Mount Sharp (Aeolis Mons)</h3>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  type="button"
+                  className="route-modal-ctrl-btn"
+                  onClick={() => setIsCuriosityZoomed((prev) => !prev)}
+                  title={isCuriosityZoomed ? 'Reset Zoom' : 'Zoom High-Res'}
+                >
+                  {isCuriosityZoomed ? <ZoomOut size={15} /> : <ZoomIn size={15} />}
+                </button>
+                <a
+                  href="/images/nasa/curiosity_mount_sharp_route.jpg"
+                  target="_blank"
+                  download
+                  rel="noopener noreferrer"
+                  className="route-modal-ctrl-btn"
+                  title="Download High-Resolution Map Image"
+                >
+                  <Download size={15} />
+                </a>
+                <button
+                  type="button"
+                  className="route-modal-close-btn"
+                  onClick={() => setIsCuriosityMapOpen(false)}
+                  aria-label="Close modal"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            <div className={`route-modal-body ${isCuriosityZoomed ? 'route-modal-body--zoomed' : ''}`}>
+              <img
+                src="/images/nasa/curiosity_mount_sharp_route.jpg"
+                alt="High Resolution NASA Curiosity Proposed Path Up Mount Sharp in Gale Crater"
+                className={`route-modal-img ${isCuriosityZoomed ? 'route-modal-img--zoomed' : ''}`}
+                onError={(e) => {
+                  if (!e.target.dataset.triedRemote) {
+                    e.target.dataset.triedRemote = 'true';
+                    e.target.src = 'https://upload.wikimedia.org/wikipedia/commons/f/fd/PIA23179-MarsCuriosityRoverExploersMountSharp-20190515.jpg';
+                  }
+                }}
+              />
+            </div>
+
+            <div className="route-modal-footer mono">
+              <div className="route-modal-info">
+                <strong>Attribution:</strong> NASA / JPL-Caltech / Univ. of Arizona • <strong>Context:</strong> Mars Reconnaissance Orbiter (MRO) HiRISE camera mosaic with elevation contours charting MSL Curiosity&apos;s climb from the northern crater floor into the southern sedimentary layers of Aeolis Mons.
+              </div>
+              <a
+                href="https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="route-curiosity-btn mono"
+              >
+                <span>Official NASA Resource</span>
+                <ExternalLink size={10} />
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

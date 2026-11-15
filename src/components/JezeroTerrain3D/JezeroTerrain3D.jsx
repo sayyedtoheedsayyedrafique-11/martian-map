@@ -28,6 +28,7 @@ import {
   TrendingUp,
   CheckCircle2,
 } from 'lucide-react';
+import { createMissionControlMarkerSvg, computeLabelPlacements } from '../../utils/markerCollision';
 import './JezeroTerrain3D.css';
 
 // Base spatial dimensions of the terrain mesh in Three.js units (preserving 4456 x 5067 aspect ratio)
@@ -295,6 +296,17 @@ function JezeroTerrain3D({
   const [loadingStep, setLoadingStep] = useState('Fetching USGS CTX Stereo DEM dataset...');
   const [metadata, setMetadata] = useState(null);
   const [selectedFeature, setSelectedFeature] = useState(null);
+  const [hoveredFeature, setHoveredFeature] = useState(null);
+
+  const selectedFeatureRef = useRef(null);
+  useEffect(() => {
+    selectedFeatureRef.current = selectedFeature;
+  }, [selectedFeature]);
+
+  const hoveredFeatureRef = useRef(null);
+  useEffect(() => {
+    hoveredFeatureRef.current = hoveredFeature;
+  }, [hoveredFeature]);
 
   // Surface Shading: 'realistic' | 'scientific' | 'slope' | 'wireframe'
   const [activeLayer, setActiveLayer] = useState('realistic');
@@ -692,7 +704,8 @@ function JezeroTerrain3D({
       if (markersGroupRef.current && container && (currentTime - lastBadgeTimeRef.current >= 45)) {
         lastBadgeTimeRef.current = currentTime;
         const rect = container.getBoundingClientRect();
-        const positions = {};
+        const projectedList = [];
+
         markersGroupRef.current.children.forEach((marker) => {
           const feat = marker.userData.feature;
           const worldPos = marker.userData.worldPos.clone();
@@ -704,11 +717,51 @@ function JezeroTerrain3D({
           const x = (worldPos.x * 0.5 + 0.5) * rect.width;
           const y = (-(worldPos.y * 0.5) + 0.5) * rect.height;
 
-          positions[feat.id] = {
-            x,
-            y,
-            visible: isVisible,
-            feature: feat,
+          if (isVisible && x >= -60 && x <= rect.width + 60 && y >= -60 && y <= rect.height + 60) {
+            const isPerseverance = feat.id === 'perseverance-landing' || feat.id.includes('perseverance');
+            const type = isPerseverance ? 'rover' : (feat.type?.toLowerCase().includes('crater') || (feat.diameterKm && feat.diameterKm > 1) ? 'landmark' : 'lander');
+            const isSel = selectedFeatureRef.current?.id === feat.id;
+            const isHov = hoveredFeatureRef.current?.id === feat.id;
+
+            projectedList.push({
+              id: feat.id,
+              name: feat.name,
+              type,
+              x,
+              y,
+              lat: feat.lat,
+              lng: feat.lon || feat.lng,
+              isSelected: isSel,
+              isHovered: isHov,
+              coordsText: `${Math.abs(feat.lat).toFixed(3)}°N, ${Math.abs(feat.lon || feat.lng).toFixed(3)}°E · ${Math.round(feat.elevationMeters)}m`,
+              feature: feat,
+            });
+          }
+        });
+
+        // LOD level based on camera distance to controls target
+        const camDist = controls ? camera.position.distanceTo(controls.target) : 80;
+        let zoomLevel = 5;
+        if (camDist > 140) zoomLevel = 3;
+        else if (camDist > 85) zoomLevel = 4;
+        else zoomLevel = 6;
+
+        const placements = computeLabelPlacements(projectedList, {
+          zoomLevel,
+          bounds: { width: rect.width, height: rect.height },
+        });
+
+        const positions = {};
+        projectedList.forEach((p) => {
+          positions[p.id] = {
+            x: p.x,
+            y: p.y,
+            visible: true,
+            type: p.type,
+            isSelected: p.isSelected,
+            isHovered: p.isHovered,
+            feature: p.feature,
+            placement: placements.get(p.id) || { showLabel: false, labelSide: 'right' },
           };
         });
         setScreenPositions(positions);
@@ -717,20 +770,22 @@ function JezeroTerrain3D({
 
     animate(performance.now());
 
-    // Resize Handler
-    const handleResize = () => {
-      if (!container || !renderer || !camera) return;
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    };
-
-    window.addEventListener('resize', handleResize);
+    // Responsive Resize Observer
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width: w, height: h } = entry.contentRect;
+        if (w > 0 && h > 0 && camera && renderer) {
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+          renderer.setSize(w, h, false);
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        }
+      }
+    });
+    resizeObserver.observe(container);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
       if (animFrameIdRef.current) {
         cancelAnimationFrame(animFrameIdRef.current);
       }
@@ -884,6 +939,7 @@ function JezeroTerrain3D({
 
   const handlePointerLeave = () => {
     setHoveredElevation(null);
+    setHoveredFeature(null);
   };
 
   // Click on 3D mesh for Click-to-Measure Tool
@@ -1269,35 +1325,82 @@ function JezeroTerrain3D({
       });
     }
 
-    // Draw Feature Pins & Labels
+    // Draw Feature Pins & Labels (Mission Control system: 8px tactical dot, subtle pulse on select, dark mono label)
     allFeatures.forEach((feat) => {
       const fx = mapX + feat.u * mapW;
       const fy = mapY + feat.v * mapH;
       const isSelected = selectedFeature?.id === feat.id;
-      const isLanding = feat.id === 'perseverance-landing';
+      const isHovered = hoveredFeature?.id === feat.id;
+      const isMajor = feat.id === 'perseverance-landing' || feat.id.includes('perseverance') || (feat.diameterKm && feat.diameterKm > 2);
+      const isPerseverance = feat.id === 'perseverance-landing' || feat.id.includes('perseverance');
+      const shapeType = isPerseverance ? 'circle' : (feat.type?.toLowerCase().includes('crater') || (feat.diameterKm && feat.diameterKm > 1) ? 'diamond' : 'triangle');
 
-      ctx.beginPath();
-      ctx.arc(fx, fy, isSelected ? 8 : 5, 0, Math.PI * 2);
-      ctx.fillStyle = isLanding ? '#38bdf8' : isSelected ? '#f5c542' : 'rgba(245, 197, 66, 0.85)';
-      ctx.fill();
-      ctx.strokeStyle = '#080909';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      const fillColor = isSelected ? '#f59e0b' : isHovered ? '#ffffff' : '#9aa1ab';
+      const strokeColor = '#0a0b0d';
+      const r = isHovered ? 5 : isSelected ? 4.5 : 4;
 
-      if (isSelected || isLanding) {
+      // 16px pulse ring for selected marker
+      if (isSelected) {
         ctx.beginPath();
-        ctx.arc(fx, fy, 11, 0, Math.PI * 2);
-        ctx.strokeStyle = isLanding ? '#38bdf8' : '#f5c542';
-        ctx.lineWidth = 1.5;
+        ctx.arc(fx, fy, 8, 0, Math.PI * 2);
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 1;
         ctx.stroke();
       }
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = isSelected ? 'bold 11px monospace' : '10px monospace';
-      ctx.fillText(feat.name, fx + 10, fy - 6);
-      ctx.fillStyle = isLanding ? '#38bdf8' : '#f5c542';
-      ctx.font = '9px monospace';
-      ctx.fillText(`${feat.elevationMeters.toLocaleString()} m`, fx + 10, fy + 7);
+      // Draw 8px tactical marker shape
+      ctx.beginPath();
+      if (shapeType === 'triangle') {
+        ctx.moveTo(fx, fy - r);
+        ctx.lineTo(fx + r, fy + r);
+        ctx.lineTo(fx - r, fy + r);
+        ctx.closePath();
+      } else if (shapeType === 'diamond') {
+        ctx.moveTo(fx, fy - r);
+        ctx.lineTo(fx + r, fy);
+        ctx.lineTo(fx, fy + r);
+        ctx.lineTo(fx - r, fy);
+        ctx.closePath();
+      } else {
+        ctx.arc(fx, fy, r, 0, Math.PI * 2);
+      }
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Show label if selected, hovered, or major site
+      const showLabel = isSelected || isHovered || isMajor;
+      if (showLabel) {
+        const title = feat.name.split('(')[0].trim();
+        const coords = `${feat.elevationMeters.toLocaleString()}m · ${feat.lat.toFixed(2)}°N`;
+        ctx.font = '10px "IBM Plex Mono", monospace';
+        const titleWidth = ctx.measureText(title).width;
+        const boxWidth = Math.max(titleWidth + 14, 60);
+        const boxHeight = isSelected ? 32 : 18;
+        const lx = fx + 10;
+        const ly = fy - boxHeight / 2;
+
+        // Label box background & border
+        ctx.fillStyle = 'rgba(16, 18, 22, 0.88)';
+        ctx.fillRect(lx, ly, boxWidth, boxHeight);
+        ctx.strokeStyle = isSelected ? '#f59e0b' : '#262a32';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(lx, ly, boxWidth, boxHeight);
+
+        // Title
+        ctx.fillStyle = isSelected ? '#f59e0b' : '#e6e8eb';
+        ctx.font = '10px "IBM Plex Mono", monospace';
+        ctx.fillText(title, lx + 6, ly + 13);
+
+        // Subtitle (Selected coordinates & elevation)
+        if (isSelected) {
+          ctx.fillStyle = '#9aa1ab';
+          ctx.font = '9px "IBM Plex Mono", monospace';
+          ctx.fillText(coords, lx + 6, ly + 26);
+        }
+      }
     });
 
     // 20 km Scale Bar
@@ -1348,7 +1451,7 @@ function JezeroTerrain3D({
     ctx.fillText('N', nX - 3.5, nY + 16);
 
     ctx.restore();
-  }, [viewMode, map2dZoom, map2dPan, show2dGraticule, layer2d, allFeatures, selectedFeature, metadata]);
+  }, [viewMode, map2dZoom, map2dPan, show2dGraticule, layer2d, allFeatures, selectedFeature, hoveredFeature, metadata]);
 
   // 2D Mouse Handlers
   const handle2dMouseDown = (e) => {
@@ -1380,6 +1483,19 @@ function JezeroTerrain3D({
 
     const transX = (clientX - (w / 2 + map2dPan.x)) / map2dZoom + w / 2;
     const transY = (clientY - (h / 2 + map2dPan.y)) / map2dZoom + h / 2;
+
+    // Check hover near feature markers
+    let hoveredFeat = null;
+    for (const feat of allFeatures) {
+      const fx = mapX + feat.u * mapW;
+      const fy = mapY + feat.v * mapH;
+      const dist = Math.hypot(transX - fx, transY - fy);
+      if (dist < 14) {
+        hoveredFeat = feat;
+        break;
+      }
+    }
+    setHoveredFeature(hoveredFeat);
 
     if (transX >= mapX && transX <= mapX + mapW && transY >= mapY && transY <= mapY + mapH) {
       const u = (transX - mapX) / mapW;
@@ -1447,6 +1563,9 @@ function JezeroTerrain3D({
         return;
       }
     }
+
+    // Clicked empty map: deselect
+    setSelectedFeature(null);
   };
 
   // Dynamic elevation cursor position for the color legend (0% to 100%)
@@ -1460,27 +1579,20 @@ function JezeroTerrain3D({
 
   return (
     <div className={`jezero-3d-wrapper ${className}`}>
-      {/* Top Mission Workstation HUD Bar */}
-      <div className="jezero-top-bar">
-        <div className="jezero-top-bar__left">
-          <div className="jezero-brand-chip mono">
-            <span className="jezero-pulse-dot" />
-            NASA MARS 2020 // JEZERO CRATER 3D WORKSTATION
-          </div>
-          <div className="jezero-datum-chip mono">
-            USGS CTX DEM // 20m/px // DATUM: MOLA 610.5 Pa
-          </div>
-
-          {/* Prominent Vertical Scale Indicator Badge (Requirement 2 & 3) */}
-          <div className="jezero-scale-indicator-badge mono">
-            <span className="jezero-scale-tag">VERTICAL SCALE:</span>
-            <strong className={`jezero-scale-val ${verticalScale === 1.0 ? 'jezero-scale-val--true' : ''}`}>
-              {verticalScale.toFixed(1)}x {verticalScale === 1.0 ? '[1:1 TRUE TOPOGRAPHY — UNEXAGGERATED]' : `[${verticalScale.toFixed(1)}:1 EXAGGERATION]`}
-            </strong>
-          </div>
+      {/* Slim Non-Intrusive Header Strip (Max ~28px tall) */}
+      <div className="jezero-slim-header">
+        <div className="jezero-slim-header__left mono">
+          <span className="jezero-pulse-dot" />
+          <span className="jezero-brand-text">NASA MARS 2020 // JEZERO 3D</span>
+          <span className="jezero-sep">•</span>
+          <span className="jezero-datum-text">USGS CTX DEM (20m/px)</span>
+          <span className="jezero-sep">•</span>
+          <span className="jezero-scale-text">
+            VERT: <strong>{verticalScale.toFixed(1)}x</strong> {verticalScale === 1.0 ? '[1:1 TRUE]' : '[EXAGG]'}
+          </span>
         </div>
 
-        {/* View Mode Switcher: 3D Surface vs 2D Cartographic Map */}
+        {/* View Mode Switcher: 3D Surface vs 2D Field Map */}
         <div className="jezero-view-mode-switch">
           <button
             type="button"
@@ -1488,7 +1600,7 @@ function JezeroTerrain3D({
             onClick={() => setViewMode('3d')}
             title="Interactive 3D Topographic Surface Mesh"
           >
-            <Mountain size={13} />
+            <Mountain size={11} />
             <span>3D Surface</span>
           </button>
           <button
@@ -1497,161 +1609,13 @@ function JezeroTerrain3D({
             onClick={() => setViewMode('2d')}
             title="Orthographic 2D Cartographic Map with Scale & Graticule"
           >
-            <MapIcon size={13} />
-            <span>2D Field Map</span>
+            <MapIcon size={11} />
+            <span>2D Map</span>
           </button>
         </div>
-
-        {/* 3D Topographic Camera Presets */}
-        {viewMode === '3d' && (
-          <div className="jezero-top-bar__actions">
-            <button
-              type="button"
-              className={`jezero-hud-btn ${viewPreset === 'truescale' ? 'jezero-hud-btn--active' : ''}`}
-              onClick={handleTrueScalePerspective}
-              title="1:1 True Natural Scale Perspective (Zero Exaggeration)"
-            >
-              <CheckCircle2 size={13} />
-              <span>1:1 True Scale</span>
-            </button>
-            <button
-              type="button"
-              className={`jezero-hud-btn ${viewPreset === 'angled' ? 'jezero-hud-btn--active' : ''}`}
-              onClick={handleAngledView}
-              title="Angled 3D Isometric View"
-            >
-              <Mountain size={13} />
-              <span>Angled</span>
-            </button>
-            <button
-              type="button"
-              className={`jezero-hud-btn ${viewPreset === 'topdown' ? 'jezero-hud-btn--active' : ''}`}
-              onClick={handleTopDownView}
-              title="Orthographic Top-Down View"
-            >
-              <Compass size={13} />
-              <span>Top-Down</span>
-            </button>
-            <button
-              type="button"
-              className={`jezero-hud-btn ${viewPreset === 'delta' ? 'jezero-hud-btn--active' : ''}`}
-              onClick={handleDeltaPerspective}
-              title="Low Oblique View across Western Delta Inlet"
-            >
-              <Crosshair size={13} />
-              <span>Delta Fan</span>
-            </button>
-            <button
-              type="button"
-              className={`jezero-hud-btn ${isFlyoverActive ? 'jezero-hud-btn--accent' : ''}`}
-              onClick={handleToggleFlyover}
-              title="Smooth Cinematic Flyover of Jezero Crater & River Valleys"
-            >
-              {isFlyoverActive ? <Pause size={13} /> : <Play size={13} />}
-              <span>{isFlyoverActive ? 'Pause' : 'Flyover'}</span>
-            </button>
-            <button
-              type="button"
-              className={`jezero-hud-btn ${showTransectModal ? 'jezero-hud-btn--active' : ''}`}
-              onClick={() => setShowTransectModal(!showTransectModal)}
-              title="Open Topographic Elevation Profile Transect Tool"
-            >
-              <TrendingUp size={13} />
-              <span>Transect Profile</span>
-            </button>
-            <button
-              type="button"
-              className={`jezero-hud-btn ${measureMode ? 'jezero-hud-btn--active' : ''}`}
-              onClick={() => {
-                setMeasureMode(!measureMode);
-                setMeasurePoints([]);
-                setMeasurementResult(null);
-              }}
-              title="Click-to-Measure Tool (Distance, Elevation Delta & Slope)"
-            >
-              <Ruler size={13} />
-              <span>{measureMode ? 'Measuring...' : 'Measure'}</span>
-            </button>
-            <button
-              type="button"
-              className="jezero-hud-btn"
-              onClick={handleResetCamera}
-              title="Reset 3D Camera View"
-            >
-              <RotateCcw size={13} />
-              <span>Reset</span>
-            </button>
-            <button
-              type="button"
-              className="jezero-hud-btn"
-              onClick={() => setShowMetaModal(true)}
-              title="View Authentic Dataset Citation & Details"
-            >
-              <Info size={13} />
-              <span>Dataset Info</span>
-            </button>
-          </div>
-        )}
-
-        {/* 2D Map Controls */}
-        {viewMode === '2d' && (
-          <div className="jezero-top-bar__actions">
-            <div className="jezero-btn-segmented">
-              <button
-                type="button"
-                className={`jezero-seg-btn ${layer2d === 'scientific' ? 'jezero-seg-btn--active' : ''}`}
-                onClick={() => setLayer2d('scientific')}
-              >
-                MOLA Hypsometric
-              </button>
-              <button
-                type="button"
-                className={`jezero-seg-btn ${layer2d === 'realistic' ? 'jezero-seg-btn--active' : ''}`}
-                onClick={() => setLayer2d('realistic')}
-              >
-                CTX Surface
-              </button>
-              <button
-                type="button"
-                className={`jezero-seg-btn ${layer2d === 'slope' ? 'jezero-seg-btn--active' : ''}`}
-                onClick={() => setLayer2d('slope')}
-              >
-                Slope Analysis
-              </button>
-              <button
-                type="button"
-                className={`jezero-seg-btn ${layer2d === 'contour' ? 'jezero-seg-btn--active' : ''}`}
-                onClick={() => setLayer2d('contour')}
-              >
-                200m Contours
-              </button>
-            </div>
-            <button
-              type="button"
-              className={`jezero-hud-btn ${show2dGraticule ? 'jezero-hud-btn--active' : ''}`}
-              onClick={() => setShow2dGraticule(!show2dGraticule)}
-              title="Toggle Lat/Lon Graticule Lines"
-            >
-              <Grid size={13} />
-              <span>Graticule</span>
-            </button>
-            <button
-              type="button"
-              className="jezero-hud-btn"
-              onClick={() => {
-                setMap2dZoom(1);
-                setMap2dPan({ x: 0, y: 0 });
-              }}
-              title="Reset 2D Map Extent"
-            >
-              <RotateCcw size={13} />
-              <span>Reset Extent</span>
-            </button>
-          </div>
-        )}
       </div>
 
-      {/* Main Viewport Container */}
+      {/* Main Viewport Container (Fills 100% of remaining space) */}
       <div
         className="jezero-viewport-container"
         style={{ height }}
@@ -1659,9 +1623,196 @@ function JezeroTerrain3D({
         onPointerLeave={viewMode === '3d' ? handlePointerLeave : undefined}
         onClick={viewMode === '3d' && measureMode ? handleMeshClick : undefined}
       >
+        {/* Floating Compact Toolbar & Regional Sites Overlays ON TOP of Map */}
+        <div className="jezero-floating-toolbar">
+          {viewMode === '3d' && (
+            <div className="jezero-compact-tools-strip">
+              <button
+                type="button"
+                className={`jezero-hud-btn ${viewPreset === 'truescale' ? 'jezero-hud-btn--active' : ''}`}
+                onClick={handleTrueScalePerspective}
+                title="1:1 True Natural Scale Perspective (Zero Exaggeration)"
+              >
+                <CheckCircle2 size={12} />
+                <span className="jezero-btn-text">1:1 True</span>
+              </button>
+              <button
+                type="button"
+                className={`jezero-hud-btn ${viewPreset === 'angled' ? 'jezero-hud-btn--active' : ''}`}
+                onClick={handleAngledView}
+                title="Angled 3D Isometric View"
+              >
+                <Mountain size={12} />
+                <span className="jezero-btn-text">Angled</span>
+              </button>
+              <button
+                type="button"
+                className={`jezero-hud-btn ${viewPreset === 'topdown' ? 'jezero-hud-btn--active' : ''}`}
+                onClick={handleTopDownView}
+                title="Orthographic Top-Down View"
+              >
+                <Compass size={12} />
+                <span className="jezero-btn-text">Top-Down</span>
+              </button>
+              <button
+                type="button"
+                className={`jezero-hud-btn ${viewPreset === 'delta' ? 'jezero-hud-btn--active' : ''}`}
+                onClick={handleDeltaPerspective}
+                title="Low Oblique View across Western Delta Inlet"
+              >
+                <Crosshair size={12} />
+                <span className="jezero-btn-text">Delta</span>
+              </button>
+              <button
+                type="button"
+                className={`jezero-hud-btn ${isFlyoverActive ? 'jezero-hud-btn--accent' : ''}`}
+                onClick={handleToggleFlyover}
+                title="Smooth Cinematic Flyover"
+              >
+                {isFlyoverActive ? <Pause size={12} /> : <Play size={12} />}
+                <span className="jezero-btn-text">{isFlyoverActive ? 'Pause' : 'Flyover'}</span>
+              </button>
+              <button
+                type="button"
+                className={`jezero-hud-btn ${showTransectModal ? 'jezero-hud-btn--active' : ''}`}
+                onClick={() => setShowTransectModal(!showTransectModal)}
+                title="Open Topographic Elevation Profile Transect Tool"
+              >
+                <TrendingUp size={12} />
+                <span className="jezero-btn-text">Transect</span>
+              </button>
+              <button
+                type="button"
+                className={`jezero-hud-btn ${measureMode ? 'jezero-hud-btn--active' : ''}`}
+                onClick={() => {
+                  setMeasureMode(!measureMode);
+                  setMeasurePoints([]);
+                  setMeasurementResult(null);
+                }}
+                title="Click-to-Measure Tool"
+              >
+                <Ruler size={12} />
+                <span className="jezero-btn-text">{measureMode ? 'Measuring' : 'Measure'}</span>
+              </button>
+              <button
+                type="button"
+                className="jezero-hud-btn"
+                onClick={handleResetCamera}
+                title="Reset 3D Camera View"
+              >
+                <RotateCcw size={12} />
+                <span className="jezero-btn-text">Reset</span>
+              </button>
+              <button
+                type="button"
+                className="jezero-hud-btn"
+                onClick={() => setShowMetaModal(true)}
+                title="Dataset Citation & Details"
+              >
+                <Info size={12} />
+                <span className="jezero-btn-text">Info</span>
+              </button>
+            </div>
+          )}
+
+          {viewMode === '2d' && (
+            <div className="jezero-compact-tools-strip">
+              <div className="jezero-btn-segmented">
+                <button
+                  type="button"
+                  className={`jezero-seg-btn ${layer2d === 'scientific' ? 'jezero-seg-btn--active' : ''}`}
+                  onClick={() => setLayer2d('scientific')}
+                >
+                  MOLA
+                </button>
+                <button
+                  type="button"
+                  className={`jezero-seg-btn ${layer2d === 'realistic' ? 'jezero-seg-btn--active' : ''}`}
+                  onClick={() => setLayer2d('realistic')}
+                >
+                  CTX
+                </button>
+                <button
+                  type="button"
+                  className={`jezero-seg-btn ${layer2d === 'slope' ? 'jezero-seg-btn--active' : ''}`}
+                  onClick={() => setLayer2d('slope')}
+                >
+                  Slope
+                </button>
+                <button
+                  type="button"
+                  className={`jezero-seg-btn ${layer2d === 'contour' ? 'jezero-seg-btn--active' : ''}`}
+                  onClick={() => setLayer2d('contour')}
+                >
+                  Contours
+                </button>
+              </div>
+              <button
+                type="button"
+                className={`jezero-hud-btn ${show2dGraticule ? 'jezero-hud-btn--active' : ''}`}
+                onClick={() => setShow2dGraticule(!show2dGraticule)}
+                title="Toggle Lat/Lon Graticule Lines"
+              >
+                <Grid size={12} />
+                <span className="jezero-btn-text">Grid</span>
+              </button>
+              <button
+                type="button"
+                className="jezero-hud-btn"
+                onClick={() => {
+                  setMap2dZoom(1);
+                  setMap2dPan({ x: 0, y: 0 });
+                }}
+                title="Reset 2D Map Extent"
+              >
+                <RotateCcw size={12} />
+                <span className="jezero-btn-text">Reset</span>
+              </button>
+            </div>
+          )}
+
+          {/* Floating Regional Sites Quick-Jump Strip Overlay */}
+          <div className="jezero-feature-pills-bar">
+            <span className="jezero-pills-label mono">
+              <MapPin size={10} color="var(--accent-yellow)" /> SITES:
+            </span>
+            <div className="jezero-pills-scroll">
+              {allFeatures.map((feat) => {
+                const isSelected = selectedFeature?.id === feat.id;
+                const isHovered = hoveredFeature?.id === feat.id;
+                const isLanding = feat.id === 'perseverance-landing';
+                return (
+                  <button
+                    key={feat.id}
+                    type="button"
+                    className={`jezero-pill-btn ${isSelected ? 'jezero-pill-btn--active' : ''} ${isHovered ? 'jezero-pill-btn--hovered' : ''} ${isLanding ? 'jezero-pill-btn--landing' : ''}`}
+                    onClick={() => handleFocusFeature(feat)}
+                    onMouseEnter={() => setHoveredFeature(feat)}
+                    onMouseLeave={() => setHoveredFeature(null)}
+                  >
+                    <span>{feat.name}</span>
+                    <span className="jezero-pill-elev mono">
+                      {feat.elevationMeters.toLocaleString()}m
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
         {/* 3D WebGL Canvas */}
         {viewMode === '3d' && (
-          <div ref={mountRef} className="jezero-three-canvas" />
+          <div
+            ref={mountRef}
+            className="jezero-three-canvas"
+            onClick={(e) => {
+              if (measureMode) {
+                handleMeshClick(e);
+              } else {
+                setSelectedFeature(null);
+              }
+            }}
+          />
         )}
 
         {/* 2D Cartographic Map Canvas */}
@@ -1710,23 +1861,59 @@ function JezeroTerrain3D({
             {Object.entries(screenPositions).map(([id, pos]) => {
               if (!pos.visible) return null;
               const isSelected = selectedFeature?.id === id;
-              const isLanding = id === 'perseverance-landing';
+              const isHovered = hoveredFeature?.id === id;
+              const placement = pos.placement || { showLabel: false, labelSide: 'right' };
+              const showLabel = isSelected || isHovered || placement.showLabel;
+
               return (
                 <div
                   key={id}
-                  className={`jezero-screen-marker ${isSelected ? 'jezero-screen-marker--selected' : ''} ${isLanding ? 'jezero-screen-marker--landing' : ''}`}
+                  className="jezero-screen-marker-node"
                   style={{
-                    transform: `translate(${pos.x}px, ${pos.y}px)`,
+                    position: 'absolute',
+                    left: `${pos.x}px`,
+                    top: `${pos.y}px`,
+                    pointerEvents: 'auto',
+                    zIndex: isSelected ? 30 : isHovered ? 25 : 12,
                   }}
-                  onClick={() => handleFocusFeature(pos.feature)}
                 >
-                  <div className="jezero-marker-pill">
-                    <span className="jezero-marker-dot" />
-                    <span className="jezero-marker-name">{pos.feature.name}</span>
-                    <span className="jezero-marker-elev mono">
-                      {pos.feature.elevationMeters.toLocaleString()} m
-                    </span>
-                  </div>
+                  <button
+                    type="button"
+                    className={`mc-marker-container ${isSelected ? 'mc-marker-container--selected' : ''}`}
+                    aria-label={`Select ${pos.feature.name}`}
+                    tabIndex={0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFocusFeature(pos.feature);
+                    }}
+                    onMouseEnter={() => setHoveredFeature(pos.feature)}
+                    onMouseLeave={() => setHoveredFeature(null)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleFocusFeature(pos.feature);
+                      }
+                    }}
+                  >
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: createMissionControlMarkerSvg(pos.type, isSelected, isHovered),
+                      }}
+                    />
+                    <div
+                      className={`mc-marker-label mc-label--${placement.labelSide} ${
+                        showLabel ? 'mc-marker-label--visible' : ''
+                      } ${isSelected ? 'mc-marker-label--selected' : ''}`}
+                    >
+                      <span className="mc-label-name">{pos.feature.name}</span>
+                      {isSelected && (
+                        <span className="mc-label-coords">
+                          {Math.abs(pos.feature.lat).toFixed(3)}°N, {Math.abs(pos.feature.lon || pos.feature.lng).toFixed(3)}°E · {Math.round(pos.feature.elevationMeters)}m
+                        </span>
+                      )}
+                    </div>
+                  </button>
                 </div>
               );
             })}
@@ -1973,32 +2160,6 @@ function JezeroTerrain3D({
             </div>
           </div>
         )}
-
-        {/* Quick Regional Feature Selector Strip */}
-        <div className="jezero-feature-pills-bar">
-          <span className="jezero-pills-label mono">
-            <MapPin size={11} color="var(--accent-yellow)" /> REGIONAL SITES:
-          </span>
-          <div className="jezero-pills-scroll">
-            {allFeatures.map((feat) => {
-              const isSelected = selectedFeature?.id === feat.id;
-              const isLanding = feat.id === 'perseverance-landing';
-              return (
-                <button
-                  key={feat.id}
-                  type="button"
-                  className={`jezero-pill-btn ${isSelected ? 'jezero-pill-btn--active' : ''} ${isLanding ? 'jezero-pill-btn--landing' : ''}`}
-                  onClick={() => handleFocusFeature(feat)}
-                >
-                  <span>{feat.name}</span>
-                  <span className="jezero-pill-elev mono">
-                    {feat.elevationMeters.toLocaleString()} m
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
         {/* Selected Feature Dossier Card */}
         {selectedFeature && (

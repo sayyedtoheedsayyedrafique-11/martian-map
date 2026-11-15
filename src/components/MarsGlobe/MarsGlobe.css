@@ -3,10 +3,14 @@
 .mars-globe-container {
   position: relative;
   width: 100%;
-  background: var(--bg-space);
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  background: radial-gradient(circle at 50% 50%, #0d1117 0%, #05070a 100%);
   overflow: hidden;
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-sm);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.25), 0 8px 32px rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
   user-select: none;
 }
 
@@ -118,65 +122,92 @@
 
 .mars-fallback-btn {
   margin-top: 6px;
-  background: var(--accent-amber);
-  color: #0f1115;
-  border: none;
+  background: var(--btn-accent, #d99b26);
+  color: var(--btn-accent-text, #0f1115);
+  border: 1px solid var(--btn-accent-border, #c2851a);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   padding: 8px 16px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--btn-radius-sm, 4px);
   cursor: pointer;
-  letter-spacing: 0.04em;
-  transition: background var(--transition-fast);
+  letter-spacing: 0.02em;
+  box-shadow: var(--btn-shadow-primary);
+  transition: var(--btn-transition);
 }
 
 .mars-fallback-btn:hover {
-  background: var(--accent-amber-hover);
+  background: var(--btn-accent-hover, #e5a93c);
+  border-color: var(--btn-accent-hover, #e5a93c);
 }
 
-/* Top Telemetry HUD */
-.mars-globe-top-hud {
+.mars-fallback-btn:active {
+  transform: translateY(1px);
+  box-shadow: var(--btn-shadow-active);
+}
+
+/* Unified Top Overlays Stack (Organized Flex Layout, Non-overlapping) */
+.mars-globe-header-overlay {
   position: absolute;
-  top: 12px;
-  left: 14px;
-  right: 14px;
+  top: 10px;
+  left: 12px;
+  right: 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.mars-globe-top-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  pointer-events: none;
-  z-index: 10;
-  gap: 10px;
+  gap: 12px;
+  flex-wrap: nowrap;
+  max-height: 28px;
+  width: 100%;
 }
 
 .mars-hud-telemetry {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.mars-hud-telemetry::-webkit-scrollbar {
+  display: none;
 }
 
 .mars-hud-chip {
   pointer-events: auto;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 8px;
-  background: var(--bg-panel);
+  gap: 5px;
+  padding: 2px 7px;
+  background: rgba(18, 22, 28, 0.9);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  font-size: 10.5px;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 10px;
   color: var(--text-secondary);
+  white-space: nowrap;
+  height: 24px;
+  box-sizing: border-box;
 }
 
 .mars-hud-chip--active {
   border-color: var(--accent-amber);
   color: var(--accent-amber);
-  background: var(--accent-amber-subtle);
+  background: rgba(217, 155, 38, 0.12);
 }
 
 .mars-status-dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   background: var(--status-nominal);
   border-radius: 50%;
   display: inline-block;
@@ -185,38 +216,43 @@
 .mars-hud-label {
   font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
+  font-size: 9.5px;
+}
+
+.mars-globe-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  pointer-events: auto;
 }
 
 .mars-hud-meta {
-  pointer-events: auto;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 10px;
+  gap: 6px;
+  font-size: 9.5px;
   color: var(--text-muted);
-  background: var(--bg-panel);
+  background: rgba(18, 22, 28, 0.9);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 3px 8px;
-}
-
-.mars-meta-engine-tag {
-  color: var(--accent-amber);
-  font-weight: 700;
-  font-size: 9px;
-  border-left: 1px solid var(--border-subtle);
-  padding-left: 8px;
+  border-radius: var(--radius-sm, 4px);
+  padding: 2px 7px;
+  height: 24px;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 
 /* Basemap Layer Toggle */
 .mars-globe-layer-toggle {
-  pointer-events: auto;
   display: inline-flex;
-  background: var(--bg-panel);
+  background: rgba(18, 22, 28, 0.9);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-sm, 4px);
   overflow: hidden;
+  height: 24px;
 }
 
 .mars-globe-toggle-btn {
@@ -224,11 +260,12 @@
   border: none;
   border-right: 1px solid var(--border-subtle);
   color: var(--text-secondary);
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 8px;
+  font-size: 9.5px;
+  font-weight: 500;
+  padding: 2px 8px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: var(--btn-transition);
+  white-space: nowrap;
 }
 
 .mars-globe-toggle-btn:last-child {
@@ -237,82 +274,107 @@
 
 .mars-globe-toggle-btn:hover {
   color: var(--text-primary);
-  background: var(--bg-panel-elevated);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mars-globe-toggle-btn:active {
+  transform: translateY(1px);
 }
 
 .mars-globe-toggle-btn--active {
-  background: var(--accent-amber);
-  color: #0f1115;
-  font-weight: 700;
+  background: var(--btn-accent, #d99b26) !important;
+  color: var(--btn-accent-text, #0f1115) !important;
+  font-weight: 600;
 }
 
-/* Controls Toolbar */
+/* Controls Toolbar (Docked Right, Compact 32px Vertical Strip) */
 .mars-globe-controls {
   position: absolute;
-  top: 52px;
-  right: 14px;
+  top: 10px;
+  right: 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  z-index: 15;
+  gap: 3px;
+  padding: 3px;
+  background: rgba(14, 18, 24, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(48, 54, 61, 0.7);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  z-index: 25;
 }
 
 .mars-ctrl-btn {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  background: var(--btn-neutral-bg, #181c23);
+  border: 1px solid var(--btn-neutral-border, #2e3543);
+  border-radius: var(--btn-radius-sm, 4px);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  box-shadow: var(--btn-shadow);
+  transition: var(--btn-transition);
 }
 
 .mars-ctrl-btn:hover {
-  background: var(--bg-panel-elevated);
+  background: var(--btn-neutral-bg-hover, #222732);
   color: var(--text-primary);
-  border-color: var(--border-medium);
+  border-color: var(--btn-neutral-border-hover, #3d4657);
+}
+
+.mars-ctrl-btn:active {
+  transform: translateY(1px);
+  box-shadow: var(--btn-shadow-active);
 }
 
 .mars-ctrl-btn--active {
-  color: #0f1115;
-  background: var(--accent-amber);
-  border-color: var(--accent-amber);
+  color: var(--btn-accent-text, #0f1115);
+  background: var(--btn-accent, #d99b26) !important;
+  border-color: var(--btn-accent-border, #c2851a) !important;
+  font-weight: 600;
+  box-shadow: var(--btn-shadow-primary) !important;
 }
 
 .mars-ctrl-btn--active:hover {
-  background: var(--accent-amber-hover);
+  background: var(--btn-accent-hover, #e5a93c) !important;
 }
 
-/* Featured Sites Strip */
+/* Featured Sites Strip (Horizontally Scrollable, Non-overlapping) */
 .mars-globe-quick-strip {
-  position: absolute;
-  top: 50px;
-  left: 14px;
   display: flex;
   align-items: center;
   gap: 5px;
-  z-index: 15;
-  flex-wrap: wrap;
-  max-width: calc(100% - 65px);
+  max-width: 100%;
+  pointer-events: auto;
+  overflow: hidden;
 }
 
 .mars-strip-label {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 9.5px;
+  gap: 3px;
+  font-size: 9px;
   color: var(--text-dim);
   letter-spacing: 0.04em;
+  flex-shrink: 0;
 }
 
 .mars-strip-chips {
   display: flex;
+  align-items: center;
   gap: 4px;
-  flex-wrap: wrap;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 1px 0;
+}
+
+.mars-strip-chips::-webkit-scrollbar {
+  display: none;
 }
 
 .mars-strip-chip {
@@ -320,26 +382,28 @@
   align-items: center;
   gap: 4px;
   padding: 2px 7px;
-  background: var(--bg-panel);
+  background: rgba(18, 22, 28, 0.9);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-sm, 4px);
   color: var(--text-secondary);
-  font-size: 10px;
-  font-family: var(--font-mono);
+  font-size: 9.5px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all var(--btn-transition);
 }
 
 .mars-strip-chip:hover {
-  background: var(--bg-panel-elevated);
+  border-color: var(--accent-amber);
   color: var(--text-primary);
-  border-color: var(--border-medium);
+  background: rgba(28, 33, 42, 0.95);
 }
 
 .mars-strip-chip--selected {
-  background: var(--bg-panel-active);
-  color: var(--accent-amber);
-  border-color: var(--accent-amber);
+  background: rgba(217, 155, 38, 0.16) !important;
+  border-color: var(--accent-amber) !important;
+  color: var(--accent-amber) !important;
   font-weight: 600;
 }
 
@@ -350,43 +414,71 @@
   background: var(--accent-amber);
 }
 
-/* Floating Selected Site Dossier */
+/* Floating Selected Site Dossier (Compact & Dismissible, Never covers center) */
 .mars-globe-selected-dossier {
   position: absolute;
-  bottom: 40px;
-  left: 14px;
-  width: min(92%, 350px);
-  background: var(--bg-panel);
-  border: 1px solid var(--border-medium);
-  border-left: 3px solid var(--accent-amber);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  z-index: 15;
-  box-shadow: none;
+  bottom: 12px;
+  left: 12px;
+  width: 280px;
+  max-width: 280px;
+  background: rgba(14, 18, 24, 0.94);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-left: 3px solid var(--accent-amber, #d99b26);
+  border-radius: 6px;
+  padding: 8px 10px;
+  z-index: 20;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+  box-sizing: border-box;
 }
 
 .mars-dossier-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
+}
+
+.mars-dossier-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mars-dossier-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #8c93a0);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  transition: color var(--btn-transition);
+}
+
+.mars-dossier-close-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .mars-dossier-tag {
-  font-size: 8.5px;
-  letter-spacing: 0.06em;
+  font-size: 8px;
+  letter-spacing: 0.05em;
   color: var(--accent-amber);
   font-weight: 700;
 }
 
 .mars-dossier-status {
-  font-size: 9.5px;
+  font-size: 8.5px;
   color: var(--status-nominal);
   font-weight: 600;
 }
 
 .mars-dossier-name {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--text-primary);
   font-weight: 600;
   margin: 0 0 2px 0;
@@ -394,19 +486,19 @@
 }
 
 .mars-dossier-mission {
-  font-size: 10.5px;
+  font-size: 9.5px;
   color: var(--text-muted);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .mars-dossier-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  padding: 6px 0;
+  gap: 6px;
+  padding: 4px 0;
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .mars-dossier-stat {
@@ -416,103 +508,72 @@
 }
 
 .mars-stat-label {
-  font-size: 8.5px;
+  font-size: 8px;
   color: var(--text-dim);
   letter-spacing: 0.04em;
 }
 
 .mars-stat-val {
-  font-size: 10.5px;
-  color: var(--text-primary);
+  font-size: 9.5px;
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
 .mars-dossier-desc {
-  font-size: 10.5px;
+  font-size: 9px;
   color: var(--text-secondary);
-  line-height: 1.4;
-  margin-bottom: 10px;
+  margin: 0 0 6px 0;
+  line-height: 1.35;
 }
 
 .mars-dossier-action-btn {
   width: 100%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: var(--accent-amber);
-  color: #0f1115;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  gap: 5px;
+  padding: 4px 8px;
+  min-height: 28px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm, 4px);
+  color: var(--text-primary);
+  font-size: 9.5px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: all var(--btn-transition);
 }
 
 .mars-dossier-action-btn:hover {
-  background: var(--accent-amber-hover);
+  background: var(--bg-panel-elevated);
+  border-color: var(--accent-amber);
 }
 
-/* Floating Marker Labels */
-.mars-globe-marker-labels {
+.mars-dossier-action-btn--terrain {
+  background: var(--btn-accent, #d99b26) !important;
+  color: #080909 !important;
+  border-color: var(--btn-accent, #d99b26) !important;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.mars-dossier-action-btn--terrain:hover {
+  background: var(--btn-accent-hover, #e5a93c) !important;
+}
+
+/* Floating Mission Control Tactical Markers Overlay */
+.mars-globe-markers-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
-  z-index: 12;
+  z-index: 25;
 }
 
-.mars-screen-tag {
+.mc-globe-marker-node {
   position: absolute;
-  top: 0;
-  left: 0;
   pointer-events: auto;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transform-origin: bottom center;
-}
-
-.mars-screen-tag__stem {
-  width: 1px;
-  height: 14px;
-  background: var(--border-medium);
-}
-
-.mars-screen-tag__pill {
-  transform: translateY(-100%);
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 2px 6px;
-  box-shadow: none;
-  white-space: nowrap;
-}
-
-.mars-screen-tag--selected .mars-screen-tag__pill {
-  border-color: var(--accent-amber);
-  background: var(--bg-panel-elevated);
-}
-
-.mars-screen-tag--selected .mars-screen-tag__stem {
-  background: var(--accent-amber);
-  height: 18px;
-}
-
-.mars-tag-name {
-  font-size: 9.5px;
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.mars-screen-tag--selected .mars-tag-name {
-  color: var(--accent-amber);
+  transition: opacity 120ms ease-out;
 }
 
 .mars-tag-coords {
@@ -561,27 +622,38 @@
 }
 
 @media (max-width: 768px) {
-  .mars-globe-top-hud {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+  .mars-globe-header-overlay {
+    top: 8px;
+    left: 8px;
+    right: 48px;
+    gap: 4px;
   }
 
-  .mars-globe-quick-strip {
-    top: 78px;
-    max-width: calc(100% - 50px);
+  .mars-globe-top-row {
+    flex-wrap: wrap;
+    max-height: none;
+    gap: 4px;
+  }
+
+  .mars-hud-telemetry {
+    max-width: 100%;
+  }
+
+  .mars-globe-header-right {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .mars-globe-selected-dossier {
-    left: 10px;
-    right: 10px;
+    left: 8px;
+    right: 8px;
     width: auto;
-    bottom: 38px;
+    max-width: none;
+    bottom: 30px;
   }
 
   .mars-globe-bottom-hint {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+    font-size: 7.5px;
+    bottom: 4px;
   }
 }

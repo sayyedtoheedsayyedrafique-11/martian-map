@@ -8,7 +8,20 @@
      - Structural Hairlines:      #242933, #2d3442, #3d4657 (1px solid)
    ========================================================================== */
 
+@import './components/ui/Button.css';
+@import './components/ui/MissionControlMarker.css';
+
 :root {
+  /* Mission Control Design System Tokens */
+  --bg-0: #0a0b0d;
+  --bg-1: #101216;
+  --bg-2: #171a20;
+  --line: #262a32;
+  --line-strong: #3a404b;
+  --text: #e6e8eb;
+  --text-dim: #9aa1ab;
+  --text-faint: #636a75;
+
   /* Anodized-Metal Aerospace Mission Control Palette (Zero AI Slop) */
   --bg-space: #0b0d10;
   --bg-primary: #0b0d10;      /* Base canvas */
@@ -102,12 +115,58 @@
   --font-main: -apple-system, BlinkMacSystemFont, 'Inter', 'Space Grotesk', 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Roboto Mono', 'Consolas', monospace;
 
-  /* Strict 2px technical corners */
-  --radius-sm: 2px;
-  --radius-md: 2px;
-  --radius-lg: 2px;
+  /* Strict technical corners for cards & containers */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
 
-  /* Flat Matte Surfaces: ZERO box-shadows, ZERO glowing borders */
+  /* ==========================================================================
+     TACTILE PHYSICAL BUTTON DESIGN TOKENS
+     Authentic Precision Hardware Aesthetic: 1px border, subtle physical depth,
+     tactile pressed active state, unified 6px border-radius, calm transitions.
+     ========================================================================== */
+  --btn-font: var(--font-main);
+  --btn-font-mono: var(--font-mono);
+
+  /* ONE Restrained Accent: Tactile Instrument Amber */
+  --btn-accent: #d99b26;
+  --btn-accent-hover: #e5a93c;
+  --btn-accent-active: #c2851a;
+  --btn-accent-text: #0b0d10;
+  --btn-accent-border: #d99b26;
+  --btn-accent-border-hover: #e5a93c;
+
+  /* Derived Neutrals for Secondary / Outlined Surfaces */
+  --btn-neutral-bg: #181c23;
+  --btn-neutral-bg-hover: #222732;
+  --btn-neutral-bg-active: #13161c;
+  --btn-neutral-border: #2e3543;
+  --btn-neutral-border-hover: #3d4657;
+  --btn-neutral-text: #f2f0e6;
+  --btn-neutral-text-muted: #8c93a0;
+
+  /* Restrained Martian Rust for Danger / Abort */
+  --btn-danger-bg: #b04a33;
+  --btn-danger-hover: #c4543b;
+  --btn-danger-active: #8a3724;
+  --btn-danger-border: #8a3724;
+  --btn-danger-text: #ffffff;
+
+  /* Consistent 4–8px radius (strict 6px for buttons, 4px for compact controls) */
+  --btn-radius: 6px;
+  --btn-radius-sm: 4px;
+  --btn-radius-lg: 8px;
+
+  /* Subtle Tactile Physical Depth (Realistic 1px bevel + soft shadow, NOT neon glow) */
+  --btn-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --btn-shadow-primary: 0 1px 3px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  --btn-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --btn-shadow-active: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+
+  /* Fast, Calm Transitions: 120-140ms ease-out (Only color, border, shadow, translateY) */
+  --btn-transition: background-color 140ms ease-out, border-color 140ms ease-out, color 140ms ease-out, box-shadow 140ms ease-out, transform 100ms ease-out;
+
+  /* Flat Matte Surfaces for panels */
   --shadow-sm: none;
   --shadow-md: none;
   --shadow-lg: none;
@@ -116,12 +175,11 @@
   --transition-normal: 140ms ease;
 }
 
-/* Global Reset: Force box-shadow: none !important and backdrop-filter: none !important across cards, panels, and sidebars */
-*, *::before, *::after,
-.card, .panel, .sidebar, .header, .modal, [class*="card"], [class*="panel"], [class*="drawer"], [class*="hud"], [class*="overlay"], [class*="badge"] {
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+/* Global Reset: Prevent AI neon glow & arbitrary blur while preserving intentional tactile physical depth on buttons */
+.card, .panel, .sidebar, .header, [class*="card"]:not([class*="btn"]):not(button), [class*="panel"]:not([class*="btn"]):not(button), [class*="drawer"]:not([class*="btn"]):not(button) {
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 /* Authentic Scientific Tables (Clean row dividers, compact padding, scannable tabular alignment) */

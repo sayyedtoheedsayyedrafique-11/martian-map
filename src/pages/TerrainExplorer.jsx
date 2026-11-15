@@ -21,8 +21,43 @@ import {
   MapPin,
   Box,
   Activity,
+  Maximize2,
+  ZoomIn,
+  ZoomOut,
+  Download,
+  X,
+  BookOpen,
 } from 'lucide-react';
 import './TerrainExplorer.css';
+
+const USGS_GEOLOGIC_MAPS = {
+  sim3292: {
+    id: 'sim3292',
+    title: 'USGS SIM 3292: Global Geologic Map of Mars',
+    shortTitle: 'Global Geologic Map (SIM 3292)',
+    authors: 'Tanaka, K.L., Skinner, J.A., Jr., Dohm, J.M., Irwin, R.P., III, et al. (2014)',
+    scale: '1:20,000,000',
+    publication: 'U.S. Geological Survey Scientific Investigations Map 3292, pamphlet 43 p.',
+    imageSrc: '/images/nasa/usgs_mars_geologic_map_sim3292.png',
+    fallbackSrc: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/USGS-MarsMap-sim3292-20140714-full.png',
+    description: 'The definitive USGS global geologic map of Mars synthesizes post-Viking spacecraft observations (MGS, Odyssey, Mars Express, and MRO). Displays 44 geologic units grouped across Noachian, Hesperian, and Amazonian systems, along with structural features, channel axes, and caldera rims.',
+    coverage: 'Global (-90° to +90° Latitude, 0° to 360° Longitude)',
+    citationUrl: 'https://pubs.usgs.gov/sim/3292/',
+  },
+  sim3464: {
+    id: 'sim3464',
+    title: 'USGS SIM 3464: Geologic Map of Jezero Crater & Nili Planum',
+    shortTitle: 'Jezero Landing Site Map (SIM 3464)',
+    authors: 'Sun, V.Z., and Stack, K.M. (2020)',
+    scale: '1:75,000',
+    publication: 'U.S. Geological Survey Scientific Investigations Map 3464, pamphlet 14 p.',
+    imageSrc: '/images/nasa/usgs_jezero_geologic_map_sim3464.png',
+    fallbackSrc: 'https://upload.wikimedia.org/wikipedia/commons/3/37/Sim3464_USGS_Jezero_Perseverance_exploration_ellipse.png',
+    description: 'Official USGS 1:75,000-scale landing site map for NASA Mars 2020 Perseverance. Delineates the Jezero delta units, crater floor volcanic/olivine-rich lithologies, and the ~7.7 x 6.6 km landing ellipse.',
+    coverage: 'Jezero Crater Basin (18.1°N–18.7°N, 77.2°E–77.7°E)',
+    citationUrl: 'https://pubs.usgs.gov/sim/3464/',
+  },
+};
 
 function TerrainExplorer() {
   const [searchParams] = useSearchParams();
@@ -37,6 +72,9 @@ function TerrainExplorer() {
   const [selectedFeature, setSelectedFeature] = useState(MARS_TERRAIN_FEATURES[0]);
   const [selectedHazard, setSelectedHazard] = useState(MARS_SURFACE_HAZARDS[0]);
   const [filterType, setFilterType] = useState('all');
+  const [selectedGeologicMap, setSelectedGeologicMap] = useState('sim3292'); // 'sim3292' | 'sim3464'
+  const [isGeologicModalOpen, setIsGeologicModalOpen] = useState(false);
+  const [isGeologicZoomed, setIsGeologicZoomed] = useState(false);
 
   const filteredFeatures = useMemo(() => {
     if (filterType === 'all') return MARS_TERRAIN_FEATURES;
@@ -446,6 +484,146 @@ function TerrainExplorer() {
             </div>
           </div>
 
+          {/* Official USGS–NASA Geologic Map Interactive Viewer */}
+          <div className="terrain-geologic-viewer-card">
+            <div className="terrain-geologic-viewer-header">
+              <div className="terrain-geologic-title-group">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Layers size={16} color="var(--accent-yellow)" />
+                  <h3 className="terrain-geologic-title mono">
+                    OFFICIAL USGS–NASA MARS GEOLOGICAL MAPS
+                  </h3>
+                </div>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <span className="terrain-sys-tag mono" style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)', padding: '1px 6px', fontSize: '8px' }}>
+                    ● REAL USGS–NASA CARTOGRAPHY
+                  </span>
+                  <span className="terrain-sys-tag mono" style={{ padding: '1px 6px', fontSize: '8px' }}>
+                    ORIGINAL SCIENTIFIC LABELS INTACT
+                  </span>
+                </div>
+              </div>
+
+              {/* Map Switcher Tabs */}
+              <div className="terrain-geologic-map-tabs mono">
+                {Object.values(USGS_GEOLOGIC_MAPS).map((mapObj) => (
+                  <button
+                    key={mapObj.id}
+                    type="button"
+                    className={`terrain-geologic-tab-btn ${selectedGeologicMap === mapObj.id ? 'terrain-geologic-tab-btn--active' : ''}`}
+                    onClick={() => setSelectedGeologicMap(mapObj.id)}
+                  >
+                    <span>{mapObj.shortTitle}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Map Display & Interactive Inspection Box */}
+            {(() => {
+              const activeMap = USGS_GEOLOGIC_MAPS[selectedGeologicMap] || USGS_GEOLOGIC_MAPS.sim3292;
+              return (
+                <div className="terrain-geologic-view-body">
+                  <div
+                    className="terrain-geologic-img-wrap"
+                    onClick={() => setIsGeologicModalOpen(true)}
+                    role="button"
+                    tabIndex={0}
+                    title="Click to expand high-resolution USGS geological map and inspect units"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') setIsGeologicModalOpen(true);
+                    }}
+                  >
+                    <img
+                      src={activeMap.imageSrc}
+                      alt={activeMap.title}
+                      className="terrain-geologic-img"
+                      onError={(e) => {
+                        if (!e.target.dataset.triedRemote && activeMap.fallbackSrc) {
+                          e.target.dataset.triedRemote = 'true';
+                          e.target.src = activeMap.fallbackSrc;
+                        }
+                      }}
+                    />
+                    <div className="terrain-geologic-overlay mono">
+                      <Maximize2 size={13} />
+                      <span>CLICK TO INSPECT FULL RESOLUTION & SCIENTIFIC LABELS</span>
+                    </div>
+                  </div>
+
+                  {/* Map Information & Legend Summary */}
+                  <div className="terrain-geologic-meta-panel mono">
+                    <div className="terrain-geologic-meta-top">
+                      <div className="terrain-geologic-map-name">
+                        <strong>{activeMap.title}</strong>
+                        <span className="terrain-geologic-scale">Scale: {activeMap.scale}</span>
+                      </div>
+                      <span className="terrain-geologic-coverage">{activeMap.coverage}</span>
+                    </div>
+
+                    <p className="terrain-geologic-desc">{activeMap.description}</p>
+
+                    <div className="terrain-geologic-authors">
+                      <strong>AUTHORS & CITATION:</strong> {activeMap.authors}. {activeMap.publication}
+                    </div>
+
+                    {/* Scientific Map Legend Bar */}
+                    <div className="terrain-geologic-legend-box">
+                      <span className="terrain-geologic-legend-label">
+                        SYSTEM CHRONOSTRATIGRAPHY & GEOLOGIC MAP UNITS:
+                      </span>
+                      <div className="terrain-geologic-legend-grid">
+                        <div className="terrain-geologic-legend-item">
+                          <span className="terrain-legend-dot" style={{ background: '#f59e0b' }} />
+                          <span><strong>Amazonian (A):</strong> Youngest volcanic shields, polar caps, windblown mantles</span>
+                        </div>
+                        <div className="terrain-geologic-legend-item">
+                          <span className="terrain-legend-dot" style={{ background: '#10b981' }} />
+                          <span><strong>Hesperian (H):</strong> Extensive ridged basaltic plains, catastrophic outflow floods</span>
+                        </div>
+                        <div className="terrain-geologic-legend-item">
+                          <span className="terrain-legend-dot" style={{ background: '#a855f7' }} />
+                          <span><strong>Noachian (N):</strong> Ancient cratered highlands, phyllosilicate clays, valley networks</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="terrain-geologic-actions">
+                      <button
+                        type="button"
+                        className="terrain-geologic-btn terrain-geologic-btn--primary"
+                        onClick={() => setIsGeologicModalOpen(true)}
+                      >
+                        <Maximize2 size={12} />
+                        <span>Open High-Resolution Map Lightbox</span>
+                      </button>
+                      <a
+                        href={activeMap.imageSrc}
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="terrain-geologic-btn terrain-geologic-btn--secondary"
+                      >
+                        <Download size={12} />
+                        <span>Download Full Map Image</span>
+                      </a>
+                      <a
+                        href={activeMap.citationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="terrain-geologic-btn terrain-geologic-btn--secondary"
+                      >
+                        <BookOpen size={12} />
+                        <span>Official USGS Publication</span>
+                        <ExternalLink size={10} />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
           {/* Chronostratigraphic Eras Grid */}
           <h3 className="terrain-chrono-sec-title mono" style={{ fontSize: '11px', color: '#f0f6fc', marginBottom: '8px' }}>
             MARTIAN CHRONOSTRATIGRAPHIC TIME SCALE (USGS ASTRONOMICAL DATUM)
@@ -657,6 +835,93 @@ function TerrainExplorer() {
           </div>
         </div>
       )}
+
+      {/* Fullscreen USGS Geological Map Lightbox Modal */}
+      {isGeologicModalOpen && (() => {
+        const activeModalMap = USGS_GEOLOGIC_MAPS[selectedGeologicMap] || USGS_GEOLOGIC_MAPS.sim3292;
+        return (
+          <div
+            className="terrain-modal-overlay"
+            onClick={() => setIsGeologicModalOpen(false)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="terrain-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="terrain-modal-header">
+                <div className="terrain-modal-title-box">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <span className="terrain-sys-tag mono" style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)', padding: '1px 6px', fontSize: '8px' }}>
+                      ● REAL USGS–NASA CARTOGRAPHY
+                    </span>
+                    <span className="mono" style={{ fontSize: '9px', color: 'var(--text-muted)' }}>
+                      SCALE: {activeModalMap.scale} • {activeModalMap.coverage}
+                    </span>
+                  </div>
+                  <h3 className="terrain-modal-title">{activeModalMap.title}</h3>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    type="button"
+                    className="terrain-modal-ctrl-btn"
+                    onClick={() => setIsGeologicZoomed((prev) => !prev)}
+                    title={isGeologicZoomed ? 'Reset Zoom' : 'Zoom High-Res'}
+                  >
+                    {isGeologicZoomed ? <ZoomOut size={15} /> : <ZoomIn size={15} />}
+                  </button>
+                  <a
+                    href={activeModalMap.imageSrc}
+                    target="_blank"
+                    download
+                    rel="noopener noreferrer"
+                    className="terrain-modal-ctrl-btn"
+                    title="Download Full Map Image"
+                  >
+                    <Download size={15} />
+                  </a>
+                  <button
+                    type="button"
+                    className="terrain-modal-close-btn"
+                    onClick={() => setIsGeologicModalOpen(false)}
+                    aria-label="Close modal"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+
+              <div className={`terrain-modal-body ${isGeologicZoomed ? 'terrain-modal-body--zoomed' : ''}`}>
+                <img
+                  src={activeModalMap.imageSrc}
+                  alt={activeModalMap.title}
+                  className={`terrain-modal-img ${isGeologicZoomed ? 'terrain-modal-img--zoomed' : ''}`}
+                  onError={(e) => {
+                    if (!e.target.dataset.triedRemote && activeModalMap.fallbackSrc) {
+                      e.target.dataset.triedRemote = 'true';
+                      e.target.src = activeModalMap.fallbackSrc;
+                    }
+                  }}
+                />
+              </div>
+
+              <div className="terrain-modal-footer mono">
+                <div className="terrain-modal-info">
+                  <strong>Citation:</strong> {activeModalMap.authors}. {activeModalMap.publication} • Preserves full official USGS stratigraphic legends, unit contacts, impact structures, and coordinate grids.
+                </div>
+                <a
+                  href={activeModalMap.citationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="terrain-geologic-btn terrain-geologic-btn--secondary"
+                  style={{ fontSize: '9px', padding: '5px 10px' }}
+                >
+                  <span>USGS Map Server</span>
+                  <ExternalLink size={10} />
+                </a>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

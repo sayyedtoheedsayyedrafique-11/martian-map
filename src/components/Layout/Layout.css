@@ -30,6 +30,20 @@
   display: none;
 }
 
+/* Full-bleed landing page overrides */
+.layout--landing .layout__main {
+  margin-left: 0;
+}
+
+.layout--landing .sidebar:not(.sidebar--open) {
+  display: none;
+}
+
+.layout__content--landing {
+  padding: 0 !important;
+  max-width: 100%;
+}
+
 @media (max-width: 768px) {
   .layout__main {
     margin-left: 0;

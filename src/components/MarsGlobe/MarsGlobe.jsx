@@ -18,7 +18,9 @@ import {
   Radio,
   Layers,
   ArrowDownCircle,
+  X,
 } from 'lucide-react';
+import { createMissionControlMarkerSvg, computeLabelPlacements } from '../../utils/markerCollision';
 import './MarsGlobe.css';
 
 const GLOBE_RADIUS = 5;
@@ -164,7 +166,7 @@ function MarsGlobe({
     sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(42, width / heightPx, 0.1, 1000);
-    camera.position.set(0, 2.2, 12.8);
+    camera.position.set(0, 1.8, 11.2);
     cameraRef.current = camera;
 
     // 2. WebGL Renderer
@@ -433,7 +435,13 @@ function MarsGlobe({
           const loc = hit.object.userData.location;
           onLocationSelect(loc);
           navigateToLocation(loc);
+          return;
         }
+      }
+
+      // Clicking empty space or globe surface deselects
+      if (onLocationSelect) {
+        onLocationSelect(null);
       }
     };
 
@@ -448,7 +456,8 @@ function MarsGlobe({
         if (w > 0 && h > 0) {
           camera.aspect = w / h;
           camera.updateProjectionMatrix();
-          renderer.setSize(w, h);
+          renderer.setSize(w, h, false);
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
         }
       }
     });
@@ -508,7 +517,7 @@ function MarsGlobe({
         }
       });
 
-      if (showLabels && renderer && camera && globeGroupRef.current) {
+      if (renderer && camera && globeGroupRef.current) {
         const projected = [];
         const camPos = camera.position;
         const rect = renderer.domElement.getBoundingClientRect();
@@ -517,9 +526,14 @@ function MarsGlobe({
           const localVec = latLngToVector3(loc.lat, loc.lng, GLOBE_RADIUS * 1.004);
           const worldPos = localVec.clone().applyMatrix4(globeGroupRef.current.matrixWorld);
 
-          const isFacing = worldPos.dot(camPos) > 1.2;
+          const worldNorm = worldPos.clone().normalize();
+          const camNorm = camPos.clone().normalize();
+          const facingDot = worldNorm.dot(camNorm);
 
-          if (isFacing) {
+          // Far-side fade out based on camera-facing angle:
+          // Smooth fade between facingDot 0.05 and 0.25, fully visible above 0.25
+          if (facingDot > 0.05) {
+            const opacity = Math.min(Math.max((facingDot - 0.05) / 0.2, 0), 1);
             const screenVec = worldPos.clone().project(camera);
             const x = ((screenVec.x + 1) * rect.width) / 2;
             const y = ((-screenVec.y + 1) * rect.height) / 2;
@@ -533,13 +547,32 @@ function MarsGlobe({
               lng: loc.lng,
               x,
               y,
+              opacity,
               isSelected: selectedLocation?.id === loc.id,
               isHovered: hoveredLocationRef.current?.id === loc.id,
+              coordsText: `${Math.abs(loc.lat).toFixed(2)}°${loc.lat >= 0 ? 'N' : 'S'}, ${Math.abs(loc.lng).toFixed(2)}°${loc.lng >= 0 ? 'E' : 'W'}`,
             });
           }
         });
 
-        setScreenMarkers(projected);
+        // LOD level based on camera distance (zoomed out: > 14, mid: 9.5-14, zoomed in: < 9.5)
+        const camDist = camPos.length();
+        let zoomLevel = 3;
+        if (camDist > 14) zoomLevel = 2;
+        else if (camDist < 9.5) zoomLevel = 6;
+        else zoomLevel = 4;
+
+        const placements = computeLabelPlacements(projected, {
+          zoomLevel,
+          bounds: { width: rect.width, height: rect.height },
+        });
+
+        const withPlacements = projected.map((p) => ({
+          ...p,
+          labelPlacement: placements.get(p.id) || { showLabel: false, labelSide: 'right' },
+        }));
+
+        setScreenMarkers(withPlacements);
       } else {
         setScreenMarkers([]);
       }
@@ -627,7 +660,7 @@ function MarsGlobe({
 
   const handleResetView = () => {
     if (cameraRef.current && globeGroupRef.current) {
-      cameraRef.current.position.set(0, 2.2, 12.8);
+      cameraRef.current.position.set(0, 1.8, 11.2);
       globeGroupRef.current.rotation.set(0, 0, -MARS_AXIAL_TILT);
       controlsRef.current?.target.set(0, 0, 0);
       controlsRef.current?.update();
@@ -683,134 +716,187 @@ function MarsGlobe({
         </div>
       )}
 
-      {/* Floating Mission Control HUD (Top Bar) */}
-      <div className="mars-globe-top-hud">
-        <div className="mars-hud-telemetry">
-          <div className="mars-hud-chip">
-            <span className="mars-status-dot" />
-            <span className="mars-hud-label mono">ORBITAL 3D GIS</span>
-          </div>
-
-          <div className="mars-hud-chip mono">
-            <Compass size={12} color="#F5C542" />
-            <span>TILT: {MARS_PHYSICAL_CONSTANTS.axialTiltDeg}°</span>
-          </div>
-
-          <div className="mars-hud-chip mono">
-            <span>Ls: 64° [N. SPRING]</span>
-          </div>
-
-          <div className="mars-hud-chip mono">
-            <span>DATUM: MOLA 610.5 Pa</span>
-          </div>
-
-          {pointerCoords && (
-            <div className="mars-hud-chip mars-hud-chip--active mono">
-              <Crosshair size={12} color="#F5C542" />
-              <span>
-                {Math.abs(pointerCoords.lat).toFixed(2)}°{pointerCoords.lat >= 0 ? 'N' : 'S'},{' '}
-                {Math.abs(pointerCoords.lng).toFixed(2)}°{pointerCoords.lng >= 0 ? 'E' : 'W'}
-              </span>
+      {/* Unified Top Overlays Stack (Non-overlapping, organized flex column) */}
+      <div className="mars-globe-header-overlay">
+        {/* Top Row: Left Telemetry & Right Basemap Toggle */}
+        <div className="mars-globe-top-row">
+          <div className="mars-hud-telemetry">
+            <div className="mars-hud-chip mars-hud-chip--badge">
+              <span className="mars-status-dot" />
+              <span className="mars-hud-label mono">ORBITAL 3D GIS</span>
             </div>
-          )}
+
+            <div className="mars-hud-chip mono">
+              <Compass size={11} color="var(--accent-amber, #d99b26)" />
+              <span>TILT: {MARS_PHYSICAL_CONSTANTS.axialTiltDeg}°</span>
+            </div>
+
+            <div className="mars-hud-chip mono">
+              <span>Ls: 64° [N. SPRING]</span>
+            </div>
+
+            {pointerCoords && (
+              <div className="mars-hud-chip mars-hud-chip--active mono">
+                <Crosshair size={11} color="var(--accent-amber, #d99b26)" />
+                <span>
+                  {Math.abs(pointerCoords.lat).toFixed(1)}°{pointerCoords.lat >= 0 ? 'N' : 'S'},{' '}
+                  {Math.abs(pointerCoords.lng).toFixed(1)}°{pointerCoords.lng >= 0 ? 'E' : 'W'}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Right Header: Viking / MOLA Toggle + Shortened Citation */}
+          <div className="mars-globe-header-right">
+            <div className="mars-globe-layer-toggle mono">
+              <button
+                type="button"
+                className={`mars-globe-toggle-btn ${globeLayer === 'viking' ? 'mars-globe-toggle-btn--active' : ''}`}
+                onClick={() => setGlobeLayer('viking')}
+                title="NASA Viking MDIM 2.1 Global Controlled Color Mosaic"
+              >
+                Viking Color
+              </button>
+              <button
+                type="button"
+                className={`mars-globe-toggle-btn ${globeLayer === 'mola' ? 'mars-globe-toggle-btn--active' : ''}`}
+                onClick={() => setGlobeLayer('mola')}
+                title="NASA MOLA Laser Altimetry Topographic Map"
+              >
+                MOLA Topo
+              </button>
+            </div>
+
+            <div className="mars-hud-meta mono" title={textureSourceNote}>
+              <span className="mars-meta-cit">{globeLayer === 'mola' ? 'NASA MOLA (~463m/px)' : 'Viking MDIM 2.1 (2K)'}</span>
+            </div>
+          </div>
         </div>
 
-        {/* Globe Basemap Toggle (Viking vs MOLA Topography) */}
-        <div className="mars-globe-layer-toggle mono">
-          <button
-            type="button"
-            className={`mars-globe-toggle-btn ${globeLayer === 'viking' ? 'mars-globe-toggle-btn--active' : ''}`}
-            onClick={() => setGlobeLayer('viking')}
-            title="NASA Viking MDIM 2.1 Global Controlled Color Mosaic"
-          >
-            Viking Color
-          </button>
-          <button
-            type="button"
-            className={`mars-globe-toggle-btn ${globeLayer === 'mola' ? 'mars-globe-toggle-btn--active' : ''}`}
-            onClick={() => setGlobeLayer('mola')}
-            title="NASA MOLA Laser Altimetry Topographic Map"
-          >
-            MOLA Topography
-          </button>
-        </div>
-
-        <div className="mars-hud-meta mono">
-          <span className="mars-meta-cit">{textureSourceNote}</span>
-          <span className="mars-meta-engine-tag">[THREE.JS WEBGL]</span>
+        {/* SITES bar: single row, horizontally scrollable, placed directly below top row */}
+        <div className="mars-globe-quick-strip">
+          <span className="mars-strip-label mono">
+            <MapPin size={11} color="var(--accent-amber, #d99b26)" /> SITES:
+          </span>
+          <div className="mars-strip-chips">
+            {featuredSites.map((site) => {
+              const isSelected = selectedLocation?.id === site.id;
+              const isHovered = hoveredLocation?.id === site.id;
+              return (
+                <button
+                  key={site.id}
+                  type="button"
+                  className={`mars-strip-chip ${isSelected ? 'mars-strip-chip--selected' : ''} ${
+                    isHovered ? 'mars-strip-chip--hovered' : ''
+                  }`}
+                  onMouseEnter={() => setHoveredLocation(site)}
+                  onMouseLeave={() => setHoveredLocation(null)}
+                  onClick={() => {
+                    onLocationSelect(site);
+                    navigateToLocation(site);
+                  }}
+                >
+                  {isSelected && <span className="mars-strip-chip-dot" />}
+                  {site.name.split('(')[0].trim()}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Floating 2D Marker Screen Labels */}
-      {showLabels && (
-        <div className="mars-globe-marker-labels" aria-hidden="true">
-          {screenMarkers.map((m) => {
-            const isImportant = m.isSelected || m.isHovered || ['perseverance', 'curiosity', 'olympus-mons'].includes(m.id);
-            if (!isImportant && screenMarkers.length > 8) return null;
+      {/* Floating Mission Control Tactical Markers & Collision-Resolved Labels */}
+      <div className="mars-globe-markers-overlay" aria-label="Mars Surface Markers">
+        {screenMarkers.map((m) => {
+          const placement = m.labelPlacement || { showLabel: false, labelSide: 'right' };
+          // Marker labels are hidden by default; show ONLY on hover or select
+          const showLabel = (m.isHovered || m.isSelected) && m.opacity > 0.35;
+          const isInteractive = m.opacity > 0.25;
 
-            return (
-              <div
-                key={m.id}
-                className={`mars-screen-tag ${m.isSelected ? 'mars-screen-tag--selected' : ''} ${
-                  m.isHovered ? 'mars-screen-tag--hovered' : ''
-                }`}
-                style={{
-                  transform: `translate3d(${m.x}px, ${m.y}px, 0)`,
-                }}
-                onClick={() => {
+          return (
+            <div
+              key={m.id}
+              className={`mc-globe-marker-node ${m.isSelected ? 'mc-globe-marker-node--selected' : ''}`}
+              style={{
+                position: 'absolute',
+                left: `${m.x}px`,
+                top: `${m.y}px`,
+                transform: 'translate(-50%, -50%)',
+                opacity: m.opacity,
+                pointerEvents: isInteractive ? 'auto' : 'none',
+                zIndex: m.isSelected ? 50 : m.isHovered ? 40 : 20,
+              }}
+            >
+              <button
+                type="button"
+                className="mc-marker-container"
+                tabIndex={isInteractive ? 0 : -1}
+                aria-label={m.name}
+                onClick={(e) => {
+                  e.stopPropagation();
                   const target = locations.find((l) => l.id === m.id);
                   if (target) {
                     onLocationSelect(target);
                     navigateToLocation(target);
                   }
                 }}
-              >
-                <div className="mars-screen-tag__stem" />
-                <div className="mars-screen-tag__pill">
-                  <span className="mars-tag-name">{m.name.split('(')[0].trim()}</span>
-                  <span className="mars-tag-coords mono">
-                    {Math.abs(m.lat).toFixed(1)}°{m.lat >= 0 ? 'N' : 'S'}{' '}
-                    {Math.abs(m.lng).toFixed(1)}°{m.lng >= 0 ? 'E' : 'W'}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Floating Featured Sites Quick-Jump Strip */}
-      <div className="mars-globe-quick-strip">
-        <span className="mars-strip-label mono">
-          <MapPin size={11} color="#F5C542" /> SITES:
-        </span>
-        <div className="mars-strip-chips">
-          {featuredSites.map((site) => {
-            const isSelected = selectedLocation?.id === site.id;
-            return (
-              <button
-                key={site.id}
-                type="button"
-                className={`mars-strip-chip ${isSelected ? 'mars-strip-chip--selected' : ''}`}
-                onClick={() => {
-                  onLocationSelect(site);
-                  navigateToLocation(site);
+                onMouseEnter={() => {
+                  const target = locations.find((l) => l.id === m.id);
+                  if (target) setHoveredLocation(target);
+                }}
+                onMouseLeave={() => setHoveredLocation(null)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const target = locations.find((l) => l.id === m.id);
+                    if (target) {
+                      onLocationSelect(target);
+                      navigateToLocation(target);
+                    }
+                  }
                 }}
               >
-                {isSelected && <span className="mars-strip-chip-dot" />}
-                {site.name.split('(')[0].trim()}
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: createMissionControlMarkerSvg(m.type, m.isSelected, m.isHovered),
+                  }}
+                />
+                <div
+                  className={`mc-marker-label mc-label--${placement.labelSide} ${
+                    showLabel ? 'mc-marker-label--visible' : ''
+                  } ${m.isSelected ? 'mc-marker-label--selected' : ''}`}
+                >
+                  <span className="mc-label-name">{m.name.split('(')[0].trim()}</span>
+                  {m.isSelected && (
+                    <span className="mc-label-coords">
+                      {Math.abs(m.lat).toFixed(2)}°{m.lat >= 0 ? 'N' : 'S'}, {Math.abs(m.lng).toFixed(2)}°{m.lng >= 0 ? 'E' : 'W'}
+                    </span>
+                  )}
+                </div>
               </button>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Floating Selected Site Summary Dossier Overlay */}
+      {/* Floating Selected Site Summary Dossier Overlay (Compact & dismissible) */}
       {selectedLocation && (
         <div className="mars-globe-selected-dossier">
           <div className="mars-dossier-header">
-            <span className="mars-dossier-tag mono">VERIFIED SITE</span>
-            <span className="mars-dossier-status mono">{selectedLocation.status}</span>
+            <div className="mars-dossier-header-badges">
+              <span className="mars-dossier-tag mono">VERIFIED SITE</span>
+              <span className="mars-dossier-status mono">{selectedLocation.status}</span>
+            </div>
+            <button
+              type="button"
+              className="mars-dossier-close-btn"
+              onClick={() => onLocationSelect(null)}
+              aria-label="Close Site Details"
+              title="Close Site Details"
+            >
+              <X size={12} />
+            </button>
           </div>
           <h3 className="mars-dossier-name">{selectedLocation.name}</h3>
           <p className="mars-dossier-mission mono">
@@ -819,21 +905,21 @@ function MarsGlobe({
 
           <div className="mars-dossier-stats mono">
             <div className="mars-dossier-stat">
-              <span className="mars-stat-label">COORDINATES</span>
+              <span className="mars-stat-label">COORDS</span>
               <span className="mars-stat-val">
-                {Math.abs(selectedLocation.lat).toFixed(4)}°{selectedLocation.lat >= 0 ? 'N' : 'S'},{' '}
-                {Math.abs(selectedLocation.lng).toFixed(4)}°{selectedLocation.lng >= 0 ? 'E' : 'W'}
+                {Math.abs(selectedLocation.lat).toFixed(2)}°{selectedLocation.lat >= 0 ? 'N' : 'S'},{' '}
+                {Math.abs(selectedLocation.lng).toFixed(2)}°{selectedLocation.lng >= 0 ? 'E' : 'W'}
               </span>
             </div>
             <div className="mars-dossier-stat">
-              <span className="mars-stat-label">ELEVATION</span>
-              <span className="mars-stat-val">{selectedLocation.elevation || 'MOLA Datum'}</span>
+              <span className="mars-stat-label">ELEV</span>
+              <span className="mars-stat-val">{selectedLocation.elevation || 'MOLA'}</span>
             </div>
           </div>
 
           {selectedLocation.notableDiscovery && (
             <p className="mars-dossier-desc">
-              <strong>Finding:</strong> {selectedLocation.notableDiscovery}
+              <strong>Finding:</strong> {selectedLocation.notableDiscovery.length > 95 ? `${selectedLocation.notableDiscovery.slice(0, 90)}…` : selectedLocation.notableDiscovery}
             </p>
           )}
 
@@ -842,10 +928,9 @@ function MarsGlobe({
               type="button"
               className="mars-dossier-action-btn mars-dossier-action-btn--terrain"
               onClick={() => onExploreTerrain(selectedLocation)}
-              style={{ marginBottom: '8px', background: 'var(--accent-yellow)', color: '#080909', fontWeight: 700 }}
             >
-              <Compass size={14} color="#080909" />
-              <span>Explore 3D Jezero Crater DEM</span>
+              <Compass size={12} color="#080909" />
+              <span>Explore 3D Jezero DEM</span>
             </button>
           )}
 
@@ -855,7 +940,7 @@ function MarsGlobe({
               className="mars-dossier-action-btn"
               onClick={() => onScrollToMap(selectedLocation)}
             >
-              <ArrowDownCircle size={14} color="#080909" />
+              <ArrowDownCircle size={12} color="#080909" />
               <span>Inspect on 2D GIS Map</span>
             </button>
           )}
@@ -926,8 +1011,8 @@ function MarsGlobe({
       </div>
 
       {/* Bottom Hint Banner */}
-      <div className="mars-globe-bottom-hint">
-        <span className="mono">DRAG TO ORBIT • SCROLL TO ZOOM • CLICK LANDING MARKERS TO TARGET</span>
+      <div className="mars-globe-bottom-hint mono">
+        <span>DRAG TO ORBIT • SCROLL TO ZOOM</span>
         {onScrollToMap && (
           <button type="button" className="mars-scroll-prompt-btn" onClick={onScrollToMap}>
             <span>CONTINUE TO 2D GIS MAP</span>

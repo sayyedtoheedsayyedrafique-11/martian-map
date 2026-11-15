@@ -1,14 +1,14 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, useMapEvents, Polygon } from 'react-leaflet';
-import { useNavigate } from 'react-router-dom';
 import * as L_Module from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import marsLocations, { locationTypes } from '../../data/marsLocations';
+import marsLocations from '../../data/marsLocations';
 import HIRISE_FOOTPRINTS from '../../data/hiriseFootprints';
 import { formatCoordinates } from '../../utils/helpers';
 import { getElevationAtCoordinate } from '../../services/marsDataService';
 import ClassificationBadge from '../ui/ClassificationBadge';
-import { RotateCcw, ExternalLink, Route, Compass, MapPin, Eye, ChevronDown } from 'lucide-react';
+import { RotateCcw, ExternalLink, Eye, ChevronDown } from 'lucide-react';
+import { createMissionControlMarkerSvg, computeLabelPlacements } from '../../utils/markerCollision';
 import './MarsMap.css';
 
 // Resilient Leaflet namespace resolution
@@ -24,51 +24,170 @@ try {
 }
 
 /**
- * Clean SVG pin icon with distinctive geometry
- * When selected, highlighted in Warm Yellow (#F5C542)
+ * Mission Control Map Marker Leaflet DivIcon Generator
+ * 8px SVG dot with 24px hit area, 16px pulse ring, and collision-resolved label
  */
-function createMarkerIcon(type = 'rover', color = '#D4D4D8', isSelected = false) {
+function createMissionControlLeafletIcon(loc, isSelected = false, isHovered = false, showLabel = false, labelSide = 'right') {
   try {
-    const pinColor = isSelected ? '#d97706' : '#D4D4D8';
-    const glyphFill = '#080909';
-    let glyph = '';
-    if (type === 'helicopter') {
-      glyph = `<line x1="7" y1="12" x2="19" y2="12" stroke="${glyphFill}" stroke-width="2" stroke-linecap="round"/>
-               <line x1="13" y1="9" x2="13" y2="15" stroke="${glyphFill}" stroke-width="1.5"/>`;
-    } else if (type === 'landmark') {
-      glyph = `<polygon points="13,7 7,16 19,16" fill="${glyphFill}"/>`;
-    } else if (type === 'lander') {
-      glyph = `<circle cx="13" cy="11" r="3" fill="${glyphFill}"/>
-               <line x1="8" y1="16" x2="18" y2="16" stroke="${glyphFill}" stroke-width="1.8"/>`;
-    } else {
-      // Rover
-      glyph = `<circle cx="13" cy="12" r="3.5" fill="${glyphFill}"/>`;
-    }
+    const svg = createMissionControlMarkerSvg(loc.type, isSelected, isHovered);
+    const coordsHtml = isSelected
+      ? `<span class="mc-label-coords">${formatCoordinates(loc.lat, loc.lng)}</span>`
+      : '';
 
-    const strokeColor = '#080909';
-    const strokeWidth = isSelected ? '2' : '1.2';
-    const scale = isSelected ? 'scale(1.2) translate(-2, -2.5)' : '';
-
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 36" width="24" height="34">
-      <g transform="${scale}">
-        <path d="M13 1C7 1 2 6 2 12c0 8 11 22 11 22s11-14 11-22c0-6-5-11-11-11z" fill="${pinColor}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
-        ${glyph}
-      </g>
-    </svg>`;
+    const html = `
+      <div class="mc-marker-container ${isSelected ? 'mc-marker-container--selected' : ''}" role="button" tabindex="0" aria-label="${loc.name}" data-loc-id="${loc.id}">
+        ${svg}
+        <div class="mc-marker-label mc-label--${labelSide} ${showLabel ? 'mc-marker-label--visible' : ''} ${isSelected ? 'mc-marker-label--selected' : ''}">
+          <span class="mc-label-name">${loc.name.split('(')[0].trim()}</span>
+          ${coordsHtml}
+        </div>
+      </div>
+    `;
 
     if (L?.divIcon) {
       return L.divIcon({
-        html: svg,
-        className: 'mars-map-pin',
-        iconSize: [24, 34],
-        iconAnchor: [12, 34],
-        popupAnchor: [0, -34],
+        html,
+        className: 'mc-leaflet-div-icon',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, -14],
       });
     }
   } catch (err) {
-    console.error('Marker icon creation fallback:', err);
+    console.error('Mission Control marker icon fallback:', err);
   }
   return undefined;
+}
+
+/**
+ * Dedicated Leaflet Markers Component with dynamic LOD and collision detection
+ */
+function MissionControlLeafletMarkers({
+  locations,
+  selectedLocation,
+  hoveredLocationId,
+  setHoveredLocationId,
+  onLocationSelect,
+  setCursorCoords,
+}) {
+  const map = useMap();
+  const [labelPlacements, setLabelPlacements] = useState(new Map());
+
+  const updatePlacements = useCallback(() => {
+    if (!map) return;
+    const size = map.getSize();
+    const zoomLevel = map.getZoom();
+
+    const screenMarkers = locations.map((loc) => {
+      const pt = map.latLngToContainerPoint([loc.lat, loc.lng]);
+      const isSelected = selectedLocation?.id === loc.id;
+      const isHovered = hoveredLocationId === loc.id;
+      return {
+        id: loc.id,
+        name: loc.name,
+        type: loc.type,
+        lat: loc.lat,
+        lng: loc.lng,
+        x: pt.x,
+        y: pt.y,
+        isSelected,
+        isHovered,
+        coordsText: formatCoordinates(loc.lat, loc.lng),
+      };
+    });
+
+    const placements = computeLabelPlacements(screenMarkers, {
+      zoomLevel,
+      bounds: { width: size.x, height: size.y },
+    });
+    setLabelPlacements(placements);
+  }, [map, locations, selectedLocation, hoveredLocationId]);
+
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      updatePlacements();
+    });
+    return () => cancelAnimationFrame(handle);
+  }, [updatePlacements]);
+
+  useEffect(() => {
+    if (!map) return;
+    let timer = null;
+    const handleMove = () => {
+      if (timer) return;
+      timer = setTimeout(() => {
+        timer = null;
+        updatePlacements();
+      }, 80);
+    };
+
+    map.on('move', handleMove);
+    map.on('zoomend', updatePlacements);
+
+    return () => {
+      map.off('move', handleMove);
+      map.off('zoomend', updatePlacements);
+      if (timer) clearTimeout(timer);
+    };
+  }, [map, updatePlacements]);
+
+  // Keyboard accessibility: Enter or Space on focused marker selects it
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const target = e.target?.closest ? e.target.closest('.mc-marker-container') : null;
+        if (target && target.dataset && target.dataset.locId) {
+          const loc = locations.find((l) => l.id === target.dataset.locId);
+          if (loc && onLocationSelect) {
+            e.preventDefault();
+            onLocationSelect(loc);
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [locations, onLocationSelect]);
+
+  return (
+    <>
+      {locations.map((loc) => {
+        const isSelected = selectedLocation?.id === loc.id;
+        const isHovered = hoveredLocationId === loc.id;
+        const placement = labelPlacements.get(loc.id) || { showLabel: false, labelSide: 'right' };
+        const showLabel = placement.showLabel || isHovered || isSelected;
+
+        const icon = createMissionControlLeafletIcon(
+          loc,
+          isSelected,
+          isHovered,
+          showLabel,
+          placement.labelSide
+        );
+
+        return (
+          <Marker
+            key={loc.id}
+            position={[loc.lat, loc.lng]}
+            icon={icon}
+            eventHandlers={{
+              click: (e) => {
+                if (e?.originalEvent) {
+                  e.originalEvent.stopPropagation();
+                }
+                setCursorCoords({ lat: loc.lat, lng: loc.lng });
+                if (onLocationSelect) onLocationSelect(loc);
+              },
+              mouseover: () => setHoveredLocationId(loc.id),
+              mouseout: () => {
+                if (hoveredLocationId === loc.id) setHoveredLocationId(null);
+              },
+            }}
+          />
+        );
+      })}
+    </>
+  );
 }
 
 /**
@@ -339,7 +458,6 @@ function MarsMap({
   onLayerChange = null,
   hideToolbar = false,
 }) {
-  const navigate = useNavigate();
   const [cursorCoords, setCursorCoords] = useState(() => {
     if (selectedLocation && typeof selectedLocation.lat === 'number' && typeof selectedLocation.lng === 'number') {
       return { lat: selectedLocation.lat, lng: selectedLocation.lng };
@@ -407,6 +525,7 @@ function MarsMap({
     }
   }, [cursorCoords, cursorElev, onCursorCoordsChange]);
 
+  const [hoveredLocationId, setHoveredLocationId] = useState(null);
   const locations = useMemo(() => {
     return filteredLocations || marsLocations;
   }, [filteredLocations]);
@@ -584,118 +703,28 @@ function MarsMap({
           />
 
           <MapCenterController centerView={centerView} />
-          <CoordinateTracker onMove={setCursorCoords} onClick={onMapClick} />
+          <CoordinateTracker
+            onMove={setCursorCoords}
+            onClick={(latlng) => {
+              if (onMapClick) onMapClick(latlng);
+              else if (onLocationSelect) onLocationSelect(null);
+            }}
+          />
           <MapScaleTracker onScaleUpdate={handleScaleUpdate} />
 
           {selectedLocation && <FlyToLocation location={selectedLocation} />}
 
-          {/* Render Verified Locations */}
-          {showMarkers &&
-            locations.map((loc) => {
-              const typeInfo = locationTypes[loc.type] || { color: '#94A3B8', label: loc.type };
-              const isSelected = selectedLocation?.id === loc.id;
-              const icon = createMarkerIcon(loc.type, typeInfo.color, isSelected);
-              return (
-                <Marker
-                  key={loc.id}
-                  position={[loc.lat, loc.lng]}
-                  icon={icon}
-                  eventHandlers={{
-                    click: () => {
-                      setCursorCoords({ lat: loc.lat, lng: loc.lng });
-                      if (onLocationSelect) onLocationSelect(loc);
-                    },
-                  }}
-                >
-                  <Popup>
-                    <div className="mars-popup-box">
-                      <div className="mars-popup-header">
-                        <ClassificationBadge type="actual" size="sm" />
-                        <span className="mars-popup-status">{loc.status}</span>
-                      </div>
-
-                      <h4 className="mars-popup-name">{loc.name}</h4>
-
-                      {loc.catalogId && (
-                        <div className="mars-popup-catalog mono">
-                          {loc.catalogId}
-                        </div>
-                      )}
-
-                      <p className="mars-popup-text">{loc.description}</p>
-
-                      <div className="mars-popup-details">
-                        <div className="mars-popup-row">
-                          <span>Areographic:</span>
-                          <strong className="mono">{formatCoordinates(loc.lat, loc.lng)}</strong>
-                        </div>
-                        {loc.elevation && (
-                          <div className="mars-popup-row">
-                            <span>MOLA Datum:</span>
-                            <strong>{loc.elevation}</strong>
-                          </div>
-                        )}
-                        {loc.terrainLabel && (
-                          <div className="mars-popup-row">
-                            <span>Terrain:</span>
-                            <span>{loc.terrainLabel}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Interactive Route & Dossier Actions inside Popup */}
-                      <div className="mars-popup-actions">
-                        <button
-                          type="button"
-                          className="mars-popup-btn mars-popup-btn--primary"
-                          onClick={() => {
-                            if (onLocationSelect) onLocationSelect(loc);
-                          }}
-                        >
-                          <MapPin size={11} /> Inspect Dossier
-                        </button>
-
-                        <button
-                          type="button"
-                          className="mars-popup-btn"
-                          onClick={() => navigate(`/route-planner?start=${loc.id}`)}
-                          title="Set as Route Origin (Point A)"
-                        >
-                          <Route size={11} /> Route from Here
-                        </button>
-
-                        <button
-                          type="button"
-                          className="mars-popup-btn"
-                          onClick={() => navigate(`/route-planner?dest=${loc.id}`)}
-                          title="Set as Route Destination (Point B)"
-                        >
-                          <Compass size={11} /> Route to Here
-                        </button>
-                      </div>
-
-                      <div className="mars-popup-footer">
-                        <span>Source: </span>
-                        <a href={loc.sourceUrl} target="_blank" rel="noopener noreferrer">
-                          {loc.source} <ExternalLink size={11} style={{ verticalAlign: 'middle' }} />
-                        </a>
-                        <span style={{ margin: '0 4px', color: 'var(--text-muted)' }}>•</span>
-                        <a
-                          href={`https://trek.nasa.gov/mars/#v=0.1&x=${loc.lng.toFixed(4)}&y=${loc.lat.toFixed(4)}&z=6&p=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A104905`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mono"
-                          title="View coordinates in official NASA JPL Mars Trek GIS portal"
-                          style={{ color: 'var(--accent-yellow)' }}
-                        >
-                          NASA Mars Trek <ExternalLink size={10} style={{ verticalAlign: 'middle' }} />
-                        </a>
-                      </div>
-                    </div>
-                  </Popup>
-                </Marker>
-              );
-            })}
+          {/* Render Mission Control Tactical Markers with Dynamic Collision Handling */}
+          {showMarkers && (
+            <MissionControlLeafletMarkers
+              locations={locations}
+              selectedLocation={selectedLocation}
+              hoveredLocationId={hoveredLocationId}
+              setHoveredLocationId={setHoveredLocationId}
+              onLocationSelect={onLocationSelect}
+              setCursorCoords={setCursorCoords}
+            />
+          )}
 
           {/* Waypoint Pins for Route (Point A in Stark White, Point B in Warm Yellow) */}
           {routeStartLoc && (

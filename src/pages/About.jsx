@@ -1,5 +1,6 @@
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
+import MarsLogo from '../components/ui/MarsLogo';
 import {
   Rocket,
   Target,
@@ -14,6 +15,9 @@ function About() {
   return (
     <div className="about-page fade-in">
       <div className="about-page__header">
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
+          <MarsLogo size={56} className="about-page__logo" />
+        </div>
         <div className="about-page__badge">
           <Rocket size={14} /> NASA Space Apps Challenge 2026
         </div>

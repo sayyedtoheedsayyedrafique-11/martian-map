@@ -332,6 +332,7 @@ export const CAMERA_SEARCH_CODES = {
  * 
  * Has open CORS (Access-Control-Allow-Origin: *) and returns verified real telemetry frames.
  * Uses official search parameter (e.g. search=MCZ_LEFT|MCZ_RIGHT) for camera filtering.
+ * Automatically tries direct NASA API first, with fallback to local dev proxy (/api/nasa-raw/...).
  */
 export async function fetchLivePerseveranceRawImages({ sol, camera, page = 0, num = 24 } = {}) {
   const cacheKey = `${sol ?? 'all'}_${camera ?? 'all'}_${page}_${num}`;
@@ -339,82 +340,106 @@ export async function fetchLivePerseveranceRawImages({ sol, camera, page = 0, nu
     return liveImageCache.get(cacheKey);
   }
 
-  let url = `https://mars.nasa.gov/rss/api/?feed=raw_images&category=mars2020&feedtype=json&ver=1.2&num=${num}&page=${page}`;
-  if (sol !== undefined && sol !== null && sol !== '') {
-    url += `&sol=${sol}`;
+  const queryParams = new URLSearchParams({
+    feed: 'raw_images',
+    category: 'mars2020',
+    feedtype: 'json',
+    ver: '1.2',
+    num: String(num),
+    page: String(page),
+  });
+
+  if (sol !== undefined && sol !== null && sol !== '' && sol !== 'all') {
+    queryParams.set('sol', String(sol));
   }
   if (camera && camera !== 'all') {
     const searchCode = CAMERA_SEARCH_CODES[camera] || camera;
-    url += `&search=${encodeURIComponent(searchCode)}`;
+    queryParams.set('search', searchCode);
   }
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 7000);
+  const endpoints = [
+    `https://mars.nasa.gov/rss/api/?${queryParams.toString()}`,
+    `/api/nasa-raw/rss/api/?${queryParams.toString()}`,
+  ];
 
-  try {
-    const res = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeoutId);
-    if (!res.ok) throw new Error(`NASA Raw Images API returned HTTP ${res.status}`);
-    const data = await res.json();
-    const rawList = Array.isArray(data.images) ? data.images : [];
+  let lastError = null;
 
-    const mapped = rawList.map((item) => {
-      const inst = item.camera?.instrument || '';
-      let mappedCam = 'OTHER';
-      if (inst.startsWith('MCZ') || inst.includes('MAST')) mappedCam = 'MASTCAM_Z';
-      else if (inst.includes('SCAM') || inst.includes('SUPERCAM')) mappedCam = 'SUPERCAM_RMI';
-      else if (inst.includes('NAV')) mappedCam = 'NAVCAM';
-      else if (inst.includes('HAZ')) mappedCam = 'HAZCAM';
-      else if (inst.includes('WATSON') || inst.includes('SHERLOC')) mappedCam = 'WATSON';
-      else if (inst.includes('HELI') || inst.includes('INGENUITY')) mappedCam = 'INGENUITY';
+  for (const url of endpoints) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-      const utcDate = item.date_taken_utc || null;
-      let earthFormatted = 'not provided';
-      if (utcDate) {
-        try {
-          earthFormatted = new Date(utcDate).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          });
-        } catch {
-          earthFormatted = utcDate;
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (!res.ok) throw new Error(`NASA Raw Images API returned HTTP ${res.status}`);
+      const data = await res.json();
+      const rawList = Array.isArray(data.images) ? data.images : [];
+
+      const mapped = rawList.map((item) => {
+        const inst = item.camera?.instrument || '';
+        let mappedCam = 'OTHER';
+        if (inst.startsWith('MCZ') || inst.includes('MAST')) mappedCam = 'MASTCAM_Z';
+        else if (inst.includes('SCAM') || inst.includes('SUPERCAM')) mappedCam = 'SUPERCAM_RMI';
+        else if (inst.includes('NAV')) mappedCam = 'NAVCAM';
+        else if (inst.includes('HAZ')) mappedCam = 'HAZCAM';
+        else if (inst.includes('WATSON') || inst.includes('SHERLOC')) mappedCam = 'WATSON';
+        else if (inst.includes('HELI') || inst.includes('INGENUITY')) mappedCam = 'INGENUITY';
+
+        const utcDate = item.date_taken_utc || null;
+        let earthFormatted = 'not provided';
+        if (utcDate) {
+          try {
+            earthFormatted = new Date(utcDate).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            });
+          } catch {
+            earthFormatted = utcDate;
+          }
         }
-      }
 
-      return {
-        id: item.imageid,
-        title: item.title || `Mars Perseverance Sol ${item.sol}: ${inst}`,
-        sol: Number(item.sol) || 0,
-        camera: mappedCam,
-        cameraFullName: item.camera?.camera_model_type ? `${inst} (${item.camera.camera_model_type})` : (inst || 'Perseverance Camera'),
-        dateUtc: item.date_taken_utc || 'not provided',
-        dateEarthFormatted: earthFormatted,
-        ltst: item.date_taken_mars ? `${item.date_taken_mars.replace('Sol-', 'Sol ').replace('M', ' ')} LTST` : 'not provided',
-        target: 'Jezero Crater Exploration Path',
-        imageUrl: item.image_files?.large || item.image_files?.medium || item.image_files?.full_res,
-        thumbnailUrl: item.image_files?.small || item.image_files?.medium,
-        sourceUrl: item.link || 'https://mars.nasa.gov/mars2020/multimedia/raw-images/',
-        officialArchiveUrl: item.link || 'https://mars.nasa.gov/mars2020/multimedia/raw-images/',
-        credit: item.credit || 'NASA/JPL-Caltech',
-        verified: true,
+        const highResUrl = item.image_files?.large || item.image_files?.full_res || item.image_files?.medium;
+        const thumbUrl = item.image_files?.medium || item.image_files?.small || highResUrl;
+
+        return {
+          id: item.imageid,
+          title: item.title || `Mars Perseverance Sol ${item.sol}: ${inst}`,
+          sol: Number(item.sol) || 0,
+          camera: mappedCam,
+          cameraFullName: item.camera?.camera_model_type ? `${inst} (${item.camera.camera_model_type})` : (inst || 'Perseverance Camera'),
+          filterName: item.camera?.filter_name && item.camera.filter_name !== 'UNK' ? item.camera.filter_name : null,
+          dateUtc: item.date_taken_utc || 'not provided',
+          dateEarthFormatted: earthFormatted,
+          ltst: item.date_taken_mars ? `${item.date_taken_mars.replace('Sol-', 'Sol ').replace('M', ' ')} LTST` : 'not provided',
+          target: 'Jezero Crater Exploration Path',
+          imageUrl: highResUrl,
+          thumbnailUrl: thumbUrl,
+          sourceUrl: item.link || `https://mars.nasa.gov/mars2020/multimedia/raw-images/${item.imageid}`,
+          officialArchiveUrl: item.link || `https://mars.nasa.gov/mars2020/multimedia/raw-images/${item.imageid}`,
+          credit: item.credit || 'NASA/JPL-Caltech',
+          verified: true,
+          isLive: true,
+          hasCornerBadge: true,
+          caption: item.caption || `Raw operational telemetry frame acquired by Perseverance on Sol ${item.sol}.`,
+          scientificSignificance: 'Real-time telemetry and tactical reconnaissance photograph downlinked from Perseverance rover.'
+        };
+      });
+
+      const result = {
+        images: mapped,
+        total: data.total_results || mapped.length,
+        page,
         isLive: true,
-        hasCornerBadge: true,
-        caption: item.caption || `Raw operational frame downlinked on Sol ${item.sol}.`,
-        scientificSignificance: 'Real-time telemetry and tactical reconnaissance frame downlinked from Perseverance rover.'
       };
-    });
-
-    const result = {
-      images: mapped,
-      total: data.total_results || mapped.length,
-      page,
-      isLive: true,
-    };
-    liveImageCache.set(cacheKey, result);
-    return result;
-  } catch (err) {
-    clearTimeout(timeoutId);
-    throw err;
+      liveImageCache.set(cacheKey, result);
+      return result;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      lastError = err;
+      // Try next endpoint (e.g. proxy)
+    }
   }
+
+  throw lastError || new Error('Failed to connect to NASA Mars Raw Images API');
 }

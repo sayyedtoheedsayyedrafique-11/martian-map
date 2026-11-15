@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import {
+  Compass,
   Globe,
   Route,
   Database,
@@ -8,18 +9,24 @@ import {
   X,
   Thermometer,
   Layers,
-  Compass,
   Camera,
 } from 'lucide-react';
+import MarsLogo from '../ui/MarsLogo';
 import './Sidebar.css';
 
 const primaryNav = [
   {
     to: '/',
+    icon: Compass,
+    label: 'Overview & Guide',
+    subtitle: 'Mission Landing Page',
+    end: true,
+  },
+  {
+    to: '/explore',
     icon: Globe,
     label: 'Explore Map',
-    subtitle: '2D Map & 3D Terrain',
-    end: true,
+    subtitle: '2D Map & 3D Globe',
   },
   {
     to: '/route-planner',
@@ -53,8 +60,8 @@ function Sidebar({ isOpen, onClose }) {
     <aside className={`sidebar ${isOpen ? 'sidebar--open' : ''}`}>
       <div className="sidebar__header">
         <div className="sidebar__brand">
-          <div className="sidebar__brand-mark">
-            <Compass size={14} />
+          <div className="sidebar__brand-mark" title="Mars Pathfinder - Mars & Moon Insignia">
+            <MarsLogo size={20} className="sidebar__logo-icon" />
           </div>
           <div className="sidebar__brand-text">
             <span className="sidebar__title">Mars Pathfinder</span>

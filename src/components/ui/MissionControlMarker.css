@@ -1,0 +1,148 @@
+/* ==========================================================================
+   MISSION CONTROL MAP MARKER & LABEL STYLESHEET
+   Unified tactical GIS symbology for 2D Map, 3D Globe, and 3D Jezero DEM.
+   ========================================================================== */
+
+/* Marker Root Container */
+.mc-marker-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  outline: none;
+  user-select: none;
+}
+
+@media (pointer: coarse) {
+  .mc-marker-container {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.mc-marker-container:focus-visible {
+  outline: 2px solid var(--accent-amber, #f59e0b);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Marker SVG Graphics */
+.mc-marker-svg {
+  display: block;
+  overflow: visible;
+  transition: transform 140ms ease-out;
+  pointer-events: none;
+}
+
+.mc-marker-container:hover .mc-marker-svg,
+.mc-marker-svg--hovered {
+  transform: scale(1.2);
+}
+
+/* Selected 16px Ring with Calm 2s Opacity Pulse (Zero Bounce) */
+.mc-marker-ring-pulse {
+  transform-origin: center;
+  animation: mc-ring-opacity-pulse 2s ease-in-out infinite;
+}
+
+@keyframes mc-ring-opacity-pulse {
+  0%, 100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+/* Floating Mission Control Label */
+.mc-marker-label {
+  position: absolute;
+  pointer-events: none;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  background: rgba(16, 18, 22, 0.88);
+  backdrop-filter: blur(6px);
+  border: 1px solid #262a32;
+  border-radius: 4px;
+  padding: 4px 8px;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 140ms ease-out, visibility 140ms ease-out;
+}
+
+.mc-marker-label--visible,
+.mc-marker-container:hover .mc-marker-label,
+.mc-marker-container:focus-visible .mc-marker-label {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Offsets: 10px from dot, never covering the dot */
+.mc-label--right {
+  left: calc(100% - 2px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.mc-label--left {
+  right: calc(100% - 2px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.mc-label--top {
+  bottom: calc(100% - 2px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.mc-label--bottom {
+  top: calc(100% - 2px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Label Internal Typography */
+.mc-label-name {
+  display: block;
+  font-weight: 500;
+  color: #e6e8eb;
+  white-space: nowrap;
+}
+
+.mc-label-coords {
+  display: block;
+  font-size: 9px;
+  color: #9aa1ab;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Selected Label Accents */
+.mc-marker-label--selected {
+  border-color: rgba(245, 158, 11, 0.55);
+  background: rgba(23, 26, 32, 0.94);
+}
+
+.mc-marker-label--selected .mc-label-name {
+  color: var(--accent-amber, #f59e0b);
+  font-weight: 600;
+}
+
+/* 2D Leaflet Pin Override */
+.leaflet-marker-icon.mc-leaflet-div-icon {
+  background: transparent !important;
+  border: none !important;
+  overflow: visible !important;
+}

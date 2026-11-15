@@ -1,0 +1,21 @@
+/* MarsLogo.css — Mission Control Mars & Moon Insignia */
+
+.mars-logo {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  transition: transform 180ms ease-out;
+}
+
+.mars-logo:hover {
+  transform: scale(1.05);
+}
+
+.mars-logo-moon {
+  transform-origin: 25.5px 11.2px;
+  transition: transform 300ms ease;
+}
+
+.mars-logo:hover .mars-logo-moon {
+  transform: scale(1.1);
+}

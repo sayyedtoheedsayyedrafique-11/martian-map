@@ -78,7 +78,7 @@
 .mars-button-group {
   display: inline-flex;
   border: 1px solid var(--border-subtle, #242933);
-  border-radius: var(--radius-sm, 2px);
+  border-radius: var(--btn-radius-sm, 4px);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -98,17 +98,17 @@
   color: var(--text-primary, #f2f0e6);
   font-size: 0.68rem;
   font-weight: 500;
-  padding: 3px 22px 3px 8px;
-  border-radius: var(--radius-sm, 2px);
+  padding: 4px 22px 4px 8px;
+  border-radius: var(--btn-radius-sm, 4px);
   cursor: pointer;
   outline: none;
   font-family: var(--font-mono, monospace);
-  transition: border-color var(--transition-fast, 80ms ease);
+  transition: border-color var(--btn-transition);
 }
 
 .mars-control-select:hover,
 .mars-control-select:focus {
-  border-color: var(--accent-amber, #d99b26);
+  border-color: var(--btn-accent, #d99b26);
 }
 
 .mars-control-select option {
@@ -127,15 +127,15 @@
 
 /* Physical Avionics Switch: Crisp borders, subtle hover, no bouncy animation */
 .mars-control-btn {
-  background: var(--bg-panel, #181b20);
+  background: var(--btn-neutral-bg, #181c20);
   border: none;
   border-right: 1px solid var(--border-subtle, #232832);
   color: var(--text-muted, #8c93a0);
-  font-size: 0.66rem;
+  font-size: 0.68rem;
   font-weight: 500;
-  padding: 3px 7px;
+  padding: 5px 9px;
   cursor: pointer;
-  transition: all var(--transition-fast, 80ms ease);
+  transition: var(--btn-transition);
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -148,44 +148,48 @@
 }
 
 .mars-control-btn:hover {
-  background: var(--bg-panel-elevated, #1e2229);
+  background: var(--btn-neutral-bg-hover, #222732);
   color: var(--text-primary, #f2f0e6);
+}
+
+.mars-control-btn:active {
+  transform: translateY(1px);
 }
 
 /* Active State: Amber highlight, dark well fill */
 .mars-control-btn--active {
-  background: var(--bg-panel-active, #242a34);
-  color: var(--accent-amber, #d99b26);
-  font-weight: 700;
-  border-bottom: 2px solid var(--accent-amber, #d99b26);
-}
-
-.mars-control-btn--active:hover {
-  background: var(--bg-panel-active, #242a34);
-  color: var(--accent-amber, #d99b26);
+  background: var(--btn-accent, #d99b26) !important;
+  color: var(--btn-accent-text, #0b0d10) !important;
+  font-weight: 600;
 }
 
 .mars-reset-btn {
-  background: var(--bg-panel, #181b20);
-  border: 1px solid var(--border-subtle, #232832);
-  border-radius: var(--radius-sm, 2px);
-  padding: 2px 7px;
+  background: var(--btn-neutral-bg, #181c23);
+  border: 1px solid var(--btn-neutral-border, #2e3543);
+  border-radius: var(--btn-radius-sm, 4px);
+  padding: 4px 10px;
   color: var(--text-muted, #8c93a0);
-  font-size: 0.64rem;
+  font-size: 0.68rem;
   font-family: var(--font-mono, monospace);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   margin-left: auto;
   flex-shrink: 0;
-  transition: all var(--transition-fast, 80ms ease);
+  box-shadow: var(--btn-shadow);
+  transition: var(--btn-transition);
 }
 
 .mars-reset-btn:hover {
-  background: var(--bg-panel-elevated, #1e2229);
-  border-color: var(--accent-amber, #d99b26);
+  background: var(--btn-neutral-bg-hover, #222732);
+  border-color: var(--btn-accent, #d99b26);
   color: var(--text-primary, #f2f0e6);
+}
+
+.mars-reset-btn:active {
+  transform: translateY(1px);
+  box-shadow: var(--btn-shadow-active);
 }
 
 /* Map Canvas */
@@ -343,36 +347,43 @@
 }
 
 .mars-popup-btn {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
+  background: var(--btn-neutral-bg, #181c23);
+  border: 1px solid var(--btn-neutral-border, #2e3543);
   color: var(--text-primary);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  border-radius: var(--btn-radius-sm, 4px);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  transition: all var(--transition-fast);
+  gap: 5px;
+  box-shadow: var(--btn-shadow);
+  transition: var(--btn-transition);
   font-family: var(--font-mono);
 }
 
 .mars-popup-btn:hover {
-  background: var(--bg-panel-elevated);
-  border-color: var(--border-medium);
+  background: var(--btn-neutral-bg-hover, #222732);
+  border-color: var(--btn-neutral-border-hover, #3d4657);
+}
+
+.mars-popup-btn:active {
+  transform: translateY(1px);
+  box-shadow: var(--btn-shadow-active);
 }
 
 .mars-popup-btn--primary {
-  background: var(--accent-amber);
-  color: #0c0c0c;
-  border-color: var(--accent-amber);
-  font-weight: 700;
+  background: var(--btn-accent, #d99b26);
+  color: var(--btn-accent-text, #0c0c0c);
+  border-color: var(--btn-accent-border, #c2851a);
+  font-weight: 600;
+  box-shadow: var(--btn-shadow-primary);
 }
 
 .mars-popup-btn--primary:hover {
-  background: var(--accent-amber-hover);
-  color: #0c0c0c;
+  background: var(--btn-accent-hover, #e5a93c);
+  border-color: var(--btn-accent-hover, #e5a93c);
 }
 
 .mars-popup-footer {

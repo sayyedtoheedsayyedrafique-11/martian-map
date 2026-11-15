@@ -2,7 +2,24 @@ import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import SearchBar from '../components/ui/SearchBar';
 import dataSources, { sourceCategories } from '../data/dataSources';
-import { ExternalLink, CheckCircle2, Radio, HardDrive, Archive, Filter, Compass, Layers, Route, Wind, Camera } from 'lucide-react';
+import {
+  ExternalLink,
+  CheckCircle2,
+  Radio,
+  HardDrive,
+  Archive,
+  Filter,
+  Compass,
+  Layers,
+  Route,
+  Wind,
+  Camera,
+  Maximize2,
+  ZoomIn,
+  ZoomOut,
+  Download,
+  X,
+} from 'lucide-react';
 import './DataSourcesPage.css';
 
 const CORE_CHALLENGE_RESOURCES = [
@@ -17,6 +34,10 @@ const CORE_CHALLENGE_RESOURCES = [
     inAppRoute: '/?view=map',
     inAppLabel: 'Open in 2D Map',
     externalUrl: 'https://trek.nasa.gov/mars/',
+    previewImage: 'https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/0/0/0.jpg',
+    previewAlt: 'NASA JPL Mars Trek Viking Color MDIM 2.1 WMTS Tile',
+    previewCaption: 'Actual accessible OGC WMTS Viking MDIM 2.1 true-color planetary mosaic tile streamed directly from NASA Trek.',
+    previewCredit: 'NASA JPL / Caltech / USGS Astrogeology',
     icon: Layers,
   },
   {
@@ -30,6 +51,11 @@ const CORE_CHALLENGE_RESOURCES = [
     inAppRoute: '/terrain',
     inAppLabel: 'Inspect Geologic Units',
     externalUrl: 'https://pubs.usgs.gov/sim/3292/',
+    previewImage: '/images/nasa/usgs_mars_geologic_map_sim3292.png',
+    previewFallback: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/USGS-MarsMap-sim3292-20140714-full.png',
+    previewAlt: 'USGS SIM 3292 Geologic Map of Mars',
+    previewCaption: 'Actual official USGS Scientific Investigations Map 3292 map sheet with full legends and chronostratigraphic unit contacts.',
+    previewCredit: 'USGS Astrogeology / NASA (Tanaka et al., 2014)',
     icon: Compass,
   },
   {
@@ -43,6 +69,11 @@ const CORE_CHALLENGE_RESOURCES = [
     inAppRoute: '/route-planner?start=bradbury-landing&dest=gediz-vallis',
     inAppLabel: 'Curiosity Route Planner',
     externalUrl: 'https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/',
+    previewImage: '/images/nasa/curiosity_mount_sharp_route.jpg',
+    previewFallback: 'https://upload.wikimedia.org/wikipedia/commons/f/fd/PIA23179-MarsCuriosityRoverExploersMountSharp-20190515.jpg',
+    previewAlt: 'NASA Curiosity Traverse Route Map Up Mount Sharp',
+    previewCaption: 'Actual NASA MRO HiRISE orbital route map photograph charting Curiosity climbing Mount Sharp (PIA23179).',
+    previewCredit: 'NASA / JPL-Caltech / Univ. of Arizona',
     icon: Route,
   },
   {
@@ -69,6 +100,10 @@ const CORE_CHALLENGE_RESOURCES = [
     inAppRoute: '/missions?tab=raw-images',
     inAppLabel: 'Perseverance Gallery',
     externalUrl: 'https://mars.nasa.gov/mars2020/multimedia/raw-images/',
+    previewImage: '/images/nasa/perseverance_raw_mosaic.jpg',
+    previewAlt: 'Perseverance Raw Acquisition Grid',
+    previewCaption: 'Actual SuperCam RMI telescopic frames and Mastcam-Z stereo rock exposures downlinked inside Jezero Crater.',
+    previewCredit: 'NASA/JPL-Caltech/LANL/CNES/ASU/MSSS',
     icon: Camera,
   },
 ];
@@ -84,6 +119,8 @@ function DataSourcesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedMode, setSelectedMode] = useState('all');
+  const [challengeModalResource, setChallengeModalResource] = useState(null);
+  const [isChallengeZoomed, setIsChallengeZoomed] = useState(false);
 
   const filteredSources = useMemo(() => {
     return dataSources.filter((source) => {
@@ -166,6 +203,36 @@ function DataSourcesPage() {
                 </div>
                 <h3 className="sources-challenge-card__name">{res.name}</h3>
                 <p className="sources-challenge-card__desc">{res.desc}</p>
+
+                {res.previewImage && (
+                  <div
+                    className="sources-challenge-img-container"
+                    onClick={() => setChallengeModalResource(res)}
+                    role="button"
+                    tabIndex={0}
+                    title={`Click to inspect authentic ${res.name} Mars imagery`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') setChallengeModalResource(res);
+                    }}
+                  >
+                    <img
+                      src={res.previewImage}
+                      alt={res.previewAlt || res.name}
+                      className="sources-challenge-img"
+                      onError={(e) => {
+                        if (!e.target.dataset.triedFallback && res.previewFallback) {
+                          e.target.dataset.triedFallback = 'true';
+                          e.target.src = res.previewFallback;
+                        }
+                      }}
+                    />
+                    <div className="sources-challenge-img-overlay mono">
+                      <Maximize2 size={10} />
+                      <span>REAL NASA / USGS IMAGERY</span>
+                    </div>
+                  </div>
+                )}
+
                 <div className="sources-challenge-card__usage mono">
                   <strong className="sources-challenge-usage-lbl">INTEGRATED IN PATHFINDER:</strong>
                   <span>{res.realDataUsage}</span>
@@ -312,6 +379,105 @@ function DataSourcesPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Challenge Resource High-Res Lightbox Modal */}
+      {challengeModalResource && (
+        <div
+          className="sources-modal-overlay"
+          onClick={() => {
+            setChallengeModalResource(null);
+            setIsChallengeZoomed(false);
+          }}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="sources-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="sources-modal-header">
+              <div className="sources-modal-title-box">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <span className="sources-challenge-pill mono sources-challenge-pill--actual">
+                    {challengeModalResource.badge}
+                  </span>
+                  <span className="mono" style={{ fontSize: '9px', color: 'var(--text-muted)' }}>
+                    {challengeModalResource.agency}
+                  </span>
+                </div>
+                <h3 className="sources-modal-title">{challengeModalResource.name}</h3>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  type="button"
+                  className="sources-modal-ctrl-btn"
+                  onClick={() => setIsChallengeZoomed((prev) => !prev)}
+                  title={isChallengeZoomed ? 'Reset Zoom' : 'Zoom High-Res'}
+                >
+                  {isChallengeZoomed ? <ZoomOut size={15} /> : <ZoomIn size={15} />}
+                </button>
+                <a
+                  href={challengeModalResource.previewImage}
+                  target="_blank"
+                  download
+                  rel="noopener noreferrer"
+                  className="sources-modal-ctrl-btn"
+                  title="Download Image"
+                >
+                  <Download size={15} />
+                </a>
+                <button
+                  type="button"
+                  className="sources-modal-close-btn"
+                  onClick={() => {
+                    setChallengeModalResource(null);
+                    setIsChallengeZoomed(false);
+                  }}
+                  aria-label="Close modal"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            <div className={`sources-modal-body ${isChallengeZoomed ? 'sources-modal-body--zoomed' : ''}`}>
+              <img
+                src={challengeModalResource.previewImage}
+                alt={challengeModalResource.previewAlt || challengeModalResource.name}
+                className={`sources-modal-img ${isChallengeZoomed ? 'sources-modal-img--zoomed' : ''}`}
+                onError={(e) => {
+                  if (!e.target.dataset.triedFallback && challengeModalResource.previewFallback) {
+                    e.target.dataset.triedFallback = 'true';
+                    e.target.src = challengeModalResource.previewFallback;
+                  }
+                }}
+              />
+            </div>
+
+            <div className="sources-modal-footer mono">
+              <div className="sources-modal-info">
+                <strong>Description:</strong> {challengeModalResource.previewCaption} • <strong>Attribution:</strong> {challengeModalResource.previewCredit || challengeModalResource.agency}
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <Link
+                  to={challengeModalResource.inAppRoute}
+                  className="sources-challenge-btn sources-challenge-btn--app mono"
+                  onClick={() => setChallengeModalResource(null)}
+                >
+                  {challengeModalResource.inAppLabel} ↗
+                </Link>
+                <a
+                  href={challengeModalResource.externalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="sources-challenge-btn sources-challenge-btn--ext mono"
+                >
+                  <span>Official Portal</span>
+                  <ExternalLink size={10} />
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import MarsGlobe from '../components/MarsGlobe/MarsGlobe';
 import MarsMap from '../components/MarsMap/MarsMap';
-import JezeroTerrainViewer from '../components/Jezero3D/JezeroTerrainViewer';
+import JezeroTerrain3D from '../components/JezeroTerrain3D/JezeroTerrain3D';
 import SearchBar from '../components/ui/SearchBar';
 import ClassificationBadge from '../components/ui/ClassificationBadge';
 import MetadataInspector from '../components/ui/MetadataInspector';
@@ -39,14 +39,14 @@ function MarsExplorer() {
   // Default viewMode is 'map' — Map-Centric Primary Focus
   const [viewMode, setViewMode] = useState(() => (viewParam === 'globe' ? 'globe' : viewParam === 'terrain' ? 'terrain' : 'map'));
   const [terrainFeatureId, setTerrainFeatureId] = useState('jezero-crater');
-  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeBasemap, setActiveBasemap] = useState('viking');
 
   const [selectedLocation, setSelectedLocation] = useState(() => {
     if (siteParam) {
-      return marsLocations.find((l) => l.id === siteParam) || marsLocations[0];
+      return marsLocations.find((l) => l.id === siteParam) || null;
     }
-    return marsLocations.find((l) => l.id === 'perseverance') || marsLocations[0];
+    return null;
   });
   const [prevSiteParam, setPrevSiteParam] = useState(siteParam);
 
@@ -79,7 +79,7 @@ function MarsExplorer() {
 
   const handleSelectLocation = (loc) => {
     setSelectedLocation(loc);
-    setIsDrawerOpen(true);
+    setIsDrawerOpen(!!loc);
   };
 
   return (
@@ -144,6 +144,26 @@ function MarsExplorer() {
       {/* Main Expansive Viewport Workstation Canvas & Sliding Drawer Container */}
       <main className="mars-workstation-viewport" aria-label="Mars Surface Exploration Canvas">
         <div className="mars-workstation-canvas-container">
+          {/* Mission-Control Corner Brackets */}
+          <div className="mars-corner-bracket mars-corner-bracket--tl" aria-hidden="true" />
+          <div className="mars-corner-bracket mars-corner-bracket--tr" aria-hidden="true" />
+          <div className="mars-corner-bracket mars-corner-bracket--bl" aria-hidden="true" />
+          <div className="mars-corner-bracket mars-corner-bracket--br" aria-hidden="true" />
+
+          {/* Thin Reopen Handle (when drawer is collapsed) */}
+          {!isDrawerOpen && (
+            <button
+              type="button"
+              className="mars-drawer-reopen-tab"
+              onClick={() => setIsDrawerOpen(true)}
+              title="Expand Target Science Dossier (Site Info)"
+              aria-label="Expand Target Science Dossier"
+            >
+              <SlidersHorizontal size={13} />
+              <span className="mono">SITE INFO</span>
+            </button>
+          )}
+
           {/* Active Workstation View Mode */}
           {viewMode === 'map' && (
             <div className="mars-viewport-map-wrapper">
@@ -161,9 +181,6 @@ function MarsExplorer() {
 
           {viewMode === 'globe' && (
             <div className="mars-viewport-3d-wrapper">
-              <div className="mars-3d-hud-hint mono">
-                <span>ORBITAL VIEW // DRAG TO ROTATE • SCROLL TO ZOOM • CLICK TARGET TO INSPECT</span>
-              </div>
               <MarsGlobe
                 locations={filteredLocations}
                 selectedLocation={selectedLocation}
@@ -176,13 +193,10 @@ function MarsExplorer() {
 
           {viewMode === 'terrain' && (
             <div className="mars-viewport-3d-wrapper">
-              <div className="mars-3d-hud-hint mono">
-                <span>REGIONAL 3D CTX DEM (20M/PX) // DRAG TO ORBIT • RIGHT-DRAG TO PAN • SCROLL TO ZOOM</span>
-              </div>
-              <JezeroTerrainViewer
+              <JezeroTerrain3D
                 height="100%"
                 selectedFeatureId={terrainFeatureId}
-                onFeatureSelect={(f) => setTerrainFeatureId(f.id)}
+                onSelectFeature={(f) => setTerrainFeatureId(f?.id || f)}
               />
             </div>
           )}

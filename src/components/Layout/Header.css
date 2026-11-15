@@ -22,18 +22,45 @@
 
 .header__menu-btn {
   display: none;
-  background: transparent;
-  border: 1px solid var(--border-subtle, #242933);
+  background: var(--btn-neutral-bg, #181c23);
+  border: 1px solid var(--btn-neutral-border, #2e3543);
   color: var(--text-muted, #8c93a0);
   cursor: pointer;
-  padding: 3px 5px;
-  border-radius: var(--radius-sm, 2px);
-  transition: border-color var(--transition-fast), color var(--transition-fast);
+  padding: 6px 8px;
+  border-radius: var(--btn-radius-sm, 4px);
+  box-shadow: var(--btn-shadow);
+  transition: var(--btn-transition);
 }
 
 .header__menu-btn:hover {
-  border-color: var(--accent-amber, #d99b26);
+  background: var(--btn-neutral-bg-hover, #222732);
+  border-color: var(--btn-neutral-border-hover, #3d4657);
   color: var(--text-primary, #f2f0e6);
+}
+
+.header__menu-btn:active {
+  transform: translateY(1px);
+  box-shadow: var(--btn-shadow-active);
+}
+
+.header__menu-btn:focus-visible {
+  outline: 2px solid var(--btn-accent, #d99b26);
+  outline-offset: 2px;
+}
+
+.header__brand-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: var(--radius-sm, 4px);
+  transition: opacity 140ms ease-out;
+}
+
+.header__brand-link:hover {
+  opacity: 0.85;
 }
 
 .header__brand-group {
@@ -48,6 +75,12 @@
   color: var(--text-primary, #f2f0e6);
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  text-decoration: none;
+  transition: color 140ms ease-out;
+}
+
+.header__brand-tag:hover {
+  color: var(--accent-amber);
 }
 
 .header__divider {
@@ -125,6 +158,27 @@
   background: var(--bg-panel, #181c23);
   border-color: var(--accent-amber, #d99b26);
   color: var(--text-primary, #f2f0e6);
+}
+
+.header__cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--mars-rust, #b04a33);
+  color: #ffffff !important;
+  border: 1px solid #c4543b;
+  border-radius: var(--radius-sm, 3px);
+  padding: 2px 8px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: all var(--transition-fast, 80ms ease);
+}
+
+.header__cta-link:hover {
+  background: #c4543b;
+  box-shadow: 0 0 10px rgba(176, 74, 51, 0.4);
 }
 
 @media (max-width: 1024px) {
